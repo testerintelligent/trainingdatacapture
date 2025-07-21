@@ -1,0 +1,204 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 400vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #be0f98;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: rgb(121, 55, 104);
+}
+
+.App-link {
+  color: #6a777a;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: linear-gradient(135deg, #eaedf0 0%, #edc5d3 100%) !important;
+  font-family: 'Roboto', sans-serif;
+  display: flex;
+}
+
+#root {
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  position: relative;
+}
+
+.left-pane {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 200vh;
+  z-index: 10;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  width: 220px;
+  background: rgba(25, 118, 210, 0.9);
+  color: #703d61;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 1rem 1rem 0 1rem;
+  min-height: 50vh;
+  position: relative;
+}
+
+.left-pane::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -2.5px;
+  width: 2px;
+  height: 100%;
+  background: #ff69b4;
+  z-index: 2;
+}
+
+.left-pane .MuiButton-root {
+  align-self: flex-start;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.main-content {
+  margin-left: 10px;
+  width: calc(100% - 60px);
+  min-height: 100vh;
+  background-color: #f7fafc;
+  padding: 5px;
+  flex: 1;
+  padding: 1rem 55rem 1rem 1rem; /* Adjusted for wide content */
+  overflow-x: 200%; 
+  background: none;
+}
+
+.MuiTableContainer-root {
+  width: 80%;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.MuiTable-root {
+  table-layout: auto;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.MuiTableCell-head, .MuiTableCell-body {
+  word-break: break-word;
+  white-space: normal;
+  padding: 20px 16px;
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+.MuiTableRow-root {
+  height: 64px;
+}
+
+@media (max-width: 1200px) {
+  .main-content {
+    padding: 2rem 1rem;
+  }
+  .MuiTableCell-head, .MuiTableCell-body {
+    padding: 14px 8px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .main-content {
+    padding: 1rem 0.5rem;
+  }
+  .MuiTableCell-head, .MuiTableCell-body {
+    padding: 10px 4px;
+    font-size: 0.95rem;
+  }
+  .MuiTable-root {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 900x) {
+  .main-content {
+    padding: 0.5rem 0,2rem;
+  }
+  .MuiTableCell-head, .MuiTableCell-body {
+    padding: 8px 2px;
+    font-size: 0.9rem;
+  }
+  .MuiTable-root {
+    font-size: 0.9rem;
+  }
+  .MuiTableContainer-root {
+    min-width: 350px;
+  }
+}
+
+
+/* Material UI Overrides */
+.MuiIconButton-root {
+  border-radius: 8px !important;
+  padding: 12px !important;
+}
+
+.MuiTooltip-tooltip {
+  font-size: 0.875rem !important;
+  padding: 8px 12px !important;
+}
+
+/* Form and Table Styles */
+.form-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 2px;
+  margin-top: 2px;
+}
+
+.table-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 2px;
+  overflow: hidden;
+}
+
+/* Typography */
+.page-title {
+  color: #2d3748;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+.Typography--bold {
+  font-weight: bold !important;
+}
