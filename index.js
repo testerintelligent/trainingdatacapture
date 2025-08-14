@@ -66,7 +66,7 @@ const swaggerOptions = {
       description: 'API for managing employee training records',
     },
     servers: [
-      { url: 'http://localhost:' + (process.env.PORT || 5000) }
+      { url: 'http://10.192.190.130/:' + (process.env.PORT || 5000) }
     ],
   },
   apis: ['./index.js'], // Path to the API docs
