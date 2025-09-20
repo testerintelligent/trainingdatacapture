@@ -20,6 +20,7 @@ db.once('open', () => console.log('Connected to MongoDB'));
 
 // Employee Training Schema
 const trainingSchema = new mongoose.Schema({
+  empId: { type: String, required: true },
   employeeName: { type: String, required: true },
   course: { type: String, required: true },
   startDate: { type: Date, required: true },
@@ -81,6 +82,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *     Training:
  *       type: object
  *       required:
+ *         - empId
  *         - employeeName
  *         - course
  *         - startDate
@@ -90,6 +92,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *         - trainingType
  *         - projectName
  *       properties:
+ *         empId:
+ *           type: string
  *         employeeName:
  *           type: string
  *         course:

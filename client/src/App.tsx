@@ -12,6 +12,7 @@ import './responsive.css';
 
 interface Training {
   _id?: string;
+  empId: string;
   employeeName: string;
   course: string;
   startDate: string;
@@ -30,6 +31,7 @@ const projectNameOptions = (process.env.REACT_APP_PROJECT_NAMES || 'ABC, CDE, EF
 function App() {
   const [trainings, setTrainings] = useState<Training[]>([]);
   const [form, setForm] = useState<Training>({
+    empId: '',
     employeeName: '',
     course: '',
     startDate: new Date().toISOString().slice(0, 10),
@@ -44,6 +46,7 @@ function App() {
   const [showTable, setShowTable] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [filters, setFilters] = useState({
+    empId: '',
     employeeName: '',
     course: '',
     trainerName: '',
@@ -68,6 +71,7 @@ function App() {
       setEditId(training._id!);
     } else {
       setForm({
+        empId: '',
         employeeName: '',
         course: '',
         startDate: new Date().toISOString().slice(0, 10),
@@ -114,6 +118,7 @@ function App() {
 
   const filteredTrainings = trainings.filter((t) => {
     return (
+      (!filters.empId || t.empId.toLowerCase().includes(filters.empId.toLowerCase())) &&
       (!filters.employeeName || t.employeeName.toLowerCase().includes(filters.employeeName.toLowerCase())) &&
       (!filters.course || t.course.toLowerCase().includes(filters.course.toLowerCase())) &&
       (!filters.trainerName || t.trainerName.toLowerCase().includes(filters.trainerName.toLowerCase())) &&
@@ -205,6 +210,7 @@ function App() {
                   <TableHead>
                     <TableRow>
                       <TableCell sx={{ width: '12.52%', backgroundColor: '#006A71', color: '#fff', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Project Name</TableCell>
+                      <TableCell sx={{ width: '10%', backgroundColor: '#006A71', color: '#fff', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>EMP ID</TableCell>
                       <TableCell sx={{ width: '18.97%', backgroundColor: '#006A71', color: '#fff', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Employee Name</TableCell>
                       <TableCell sx={{ width: '18.97%', backgroundColor: '#006A71', color: '#fff', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Course</TableCell>
                       <TableCell sx={{ width: '18.97%', backgroundColor: '#006A71', color: '#fff', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Trainer Name</TableCell>
@@ -217,6 +223,7 @@ function App() {
                     </TableRow>
                     <TableRow>
                       <TableCell><TextField size="small" select variant="outlined" placeholder="Filter" value={filters.projectName} onChange={e => setFilters(f => ({ ...f, projectName: e.target.value }))} fullWidth><MenuItem value="">All</MenuItem>{projectNameOptions.map(option => (<MenuItem key={option} value={option}>{option}</MenuItem>))}</TextField></TableCell>
+                      <TableCell><TextField size="small" variant="outlined" placeholder="Filter" value={filters.empId} onChange={e => setFilters(f => ({ ...f, empId: e.target.value }))} fullWidth /></TableCell>
                       <TableCell><TextField size="small" variant="outlined" placeholder="Filter" value={filters.employeeName} onChange={e => setFilters(f => ({ ...f, employeeName: e.target.value }))} fullWidth /></TableCell>
                       <TableCell><TextField size="small" variant="outlined" placeholder="Filter" value={filters.course} onChange={e => setFilters(f => ({ ...f, course: e.target.value }))} fullWidth /></TableCell>
                       <TableCell><TextField size="small" variant="outlined" placeholder="Filter" value={filters.trainerName} onChange={e => setFilters(f => ({ ...f, trainerName: e.target.value }))} fullWidth /></TableCell>
@@ -232,6 +239,7 @@ function App() {
                     {filteredTrainings.map((t) => (
                       <TableRow key={t._id} sx={{ height: 24, '&:not(:last-child)': { borderBottom: '1px solid #e0e0e0' }, '& > *': { paddingTop: 0, paddingBottom: 0 }, backgroundColor: '#9ACBD0' }}>
                         <TableCell sx={{ width: '12.52%', padding: '0 8px' }}>{t.projectName}</TableCell>
+                        <TableCell sx={{ width: '10%', padding: '0 8px' }}>{t.empId}</TableCell>
                         <TableCell sx={{ width: '18.97%', padding: '0 8px' }}>{t.employeeName}</TableCell>
                         <TableCell sx={{ width: '18.97%', padding: '0 8px' }}>{t.course}</TableCell>
                         <TableCell sx={{ width: '18.97%', padding: '0 8px' }}>{t.trainerName}</TableCell>
@@ -261,6 +269,7 @@ function App() {
                   <MenuItem key={option} value={option}>{option}</MenuItem>
                 ))}
               </TextField>
+              <TextField label="EMP ID" name="empId" value={form.empId} onChange={handleChange} required sx={{ width: '100%' }} />
               <TextField label="Employee Name" name="employeeName" value={form.employeeName} onChange={handleChange} required sx={{ width: '100%' }} />
               <TextField label="Course" name="course" value={form.course} onChange={handleChange} required sx={{ width: '100%' }} />
               <TextField label="Trainer Name" name="trainerName" value={form.trainerName} onChange={handleChange} required sx={{ width: '100%' }} />
