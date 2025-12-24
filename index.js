@@ -67,12 +67,32 @@ const swaggerOptions = {
       description: 'API for managing employee training records',
     },
     servers: [
-      { url: 'http://10.192.190.130/:' + (process.env.PORT || 5000) }
+      { url: `http://localhost:${process.env.PORT || 5000}` },
+      { url: `http://10.192.190.130:${process.env.PORT || 5000}` }
     ],
+    tags: [
+      { name: 'Trainings', description: 'Operations related to employee training records' }
+    ]
   },
   apis: ['./index.js'], // Path to the API docs
 };
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
+
+// Ensure the projectName enum in the swagger spec reflects the runtime environment
+const projectNames = process.env.PROJECT_NAMES ? process.env.PROJECT_NAMES.split(',').map(s => s.trim()) : ['ABC', 'CDE', 'EFG', 'HIJ', 'KLM'];
+if (swaggerSpec) {
+  swaggerSpec.components = swaggerSpec.components || {};
+  swaggerSpec.components.schemas = swaggerSpec.components.schemas || {};
+  // If Training schema exists from JSDoc, update its projectName enum, otherwise create the property
+  if (swaggerSpec.components.schemas.Training && swaggerSpec.components.schemas.Training.properties && swaggerSpec.components.schemas.Training.properties.projectName) {
+    swaggerSpec.components.schemas.Training.properties.projectName.enum = projectNames;
+  } else {
+    swaggerSpec.components.schemas.Training = swaggerSpec.components.schemas.Training || { type: 'object', properties: {} };
+    swaggerSpec.components.schemas.Training.properties = swaggerSpec.components.schemas.Training.properties || {};
+    swaggerSpec.components.schemas.Training.properties.projectName = { type: 'string', enum: projectNames };
+  }
+}
+
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 /**

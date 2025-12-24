@@ -26,7 +26,7 @@ interface Training {
 
 const statusOptions = ['Completed', 'In Progress', 'Not Started'];
 const trainingTypeOptions = ['Udemy', 'Coursera', 'Classroom', 'Virtual'];
-const projectNameOptions = (process.env.REACT_APP_PROJECT_NAMES || 'ABC, CDE, EFG,HIJ,KLM').split(',');
+const projectNameOptions = (process.env.REACT_APP_PROJECT_NAMES || 'ABC,CDE,EFG,HIJ,KLM').split(',');
  
 function App() {
   const [trainings, setTrainings] = useState<Training[]>([]);
@@ -94,7 +94,11 @@ function App() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({
+      ...form,
+      [name]: name === 'projectName' ? value.trim() : value
+    });
   };
 
   const handleSubmit = async () => {
@@ -132,32 +136,17 @@ function App() {
   });
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      <div className="left-pane" style={{ 
-        backgroundColor: '#1a2233', 
-        width: '100px', 
-        display: 'flex', 
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: '10px 0'
-      }}>
+    <div className="app-flex-root">
+      <aside className="side-menu">
         <IconButton 
-          sx={{ 
-            color: '#fff',
-            mb: 3,
-            '&:hover': { backgroundColor: '#2d3748' }
-          }}
+          sx={{ color: '#fff', mb: 3 }}
         >
           <MenuIcon />
         </IconButton>
         <Tooltip title="Training Summary" placement="right">
           <IconButton 
             onClick={() => { setShowTable(true); setShowForm(false); }}
-            sx={{ 
-              color: showTable ? '#4299e1' : '#fff',
-              mb: 2,
-              '&:hover': { backgroundColor: '#2d3748' }
-            }}
+            sx={{ color: showTable ? '#4299e1' : '#fff', mb: 2 }}
           >
             <DashboardIcon />
           </IconButton>
@@ -165,48 +154,24 @@ function App() {
         <Tooltip title="Add Training" placement="right">
           <IconButton 
             onClick={() => { setShowForm(true); setShowTable(false); handleOpen(); }}
-            sx={{ 
-              color: showForm ? '#4299e1' : '#fff',
-              '&:hover': { backgroundColor: '#2d3748' }
-            }}
+            sx={{ color: showForm ? '#4299e1' : '#fff' }}
           >
             <AddCircleIcon />
           </IconButton>
         </Tooltip>
-      </div>
-      <div className="main-content" style={{ flex: 1, backgroundColor: '#f7fafc' }}>
-        <Container maxWidth="md" sx={{ mt: 6 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '200%', mb: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Typography 
-                variant="h3" 
-                gutterBottom 
-                className="Typography--bold" 
-                align="center"
-                sx={{ 
-                  background: 'linear-gradient(to right,rgb(161, 147, 147),rgb(114, 101, 101),rgb(163, 146, 146) 100%)', 
-                  borderRadius: 2, 
-                  px: 3, 
-                  py: 1, 
-                  width: 'fit-content', 
-                  boxShadow: 2,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  fontSize: { xs: '1.2rem', sm: '1.5rem', md: '2.2rem' }
-                }}
-              >
-                Employee Training Records
-              </Typography>
-              <Button variant="contained" color="success" onClick={() => exportToExcel(trainings)} sx={{ ml: 2, height: 'fit-content' }}>
-                Export to Excel
-              </Button>
-            </Box>
+      </aside>
+      <main className="main-content-flex">
+        <div className="page-header">Employee Training Records</div>
+        <Container maxWidth="md" sx={{ px: 0 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', mb: 2 }}>
+            <Button variant="contained" color="success" onClick={() => exportToExcel(trainings)} sx={{ ml: 2, height: 'fit-content' }}>
+              Export to Excel
+            </Button>
           </Box>
           {showTable && (
             <>
-              <TableContainer component={Paper} sx={{ width: '180%', minWidth: 1100, overflowX: 'auto' }}>
-                <Table sx={{ minWidth: 1170 }}>
+              <TableContainer component={Paper}>
+                <Table>
                   <TableHead>
                     <TableRow>
                       <TableCell sx={{ width: '12.52%', backgroundColor: '#006A71', color: '#fff', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Project Name</TableCell>
@@ -237,7 +202,7 @@ function App() {
                   </TableHead>
                   <TableBody>
                     {filteredTrainings.map((t) => (
-                      <TableRow key={t._id} sx={{ height: 24, '&:not(:last-child)': { borderBottom: '1px solid #e0e0e0' }, '& > *': { paddingTop: 0, paddingBottom: 0 }, backgroundColor: '#9ACBD0' }}>
+                      <TableRow key={t._id} sx={{ height: 44, '&:not(:last-child)': { borderBottom: '1px solid #e0e0e0' }, '& > *': { paddingTop: 0, paddingBottom: 0 }, backgroundColor: '#9ACBD0' }}>
                         <TableCell sx={{ width: '12.52%', padding: '0 8px' }}>{t.projectName}</TableCell>
                         <TableCell sx={{ width: '10%', padding: '0 8px' }}>{t.empId}</TableCell>
                         <TableCell sx={{ width: '18.97%', padding: '0 8px' }}>{t.employeeName}</TableCell>
@@ -262,7 +227,7 @@ function App() {
             </>
           )}
           {showForm && (
-            <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 4, background: 'linear-gradient(to right,rgb(221, 227, 236),rgb(190, 168, 240),rgb(241, 177, 209) 100%)', p: 3, borderRadius: 2, boxShadow: 2, width: '200%', minWidth: 350, alignSelf: 'center' }}>
+            <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 4, background: 'linear-gradient(to right,rgb(221, 227, 236),rgb(190, 168, 240),rgb(241, 177, 209) 100%)', p: 3, borderRadius: 2, boxShadow: 2, minWidth: 350, alignSelf: 'center' }}>
               <Typography variant="h6" gutterBottom>{editId ? 'Edit Training' : 'Add Training'}</Typography>
               <TextField select label="Project Name" name="projectName" value={form.projectName} onChange={handleChange} required sx={{ width: '100%' }}>
                 {projectNameOptions.map((option) => (
@@ -293,8 +258,8 @@ function App() {
             </Box>
           )}
         </Container>
-      </div>
-    </Box>
+      </main>
+    </div>
   );
 }
 
