@@ -2,6 +2,10 @@
 html, body, #root {
   height: 100%;
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 *, *:before, *:after {
@@ -124,13 +128,12 @@ body {
 }
 
 .main-content {
-  margin-left: 10px;
   width: calc(100% - 60px);
   min-height: 100vh;
   background-color: #f7fafc;
   padding: 1px;
   flex: 1;
-  padding: 10rem 5rem 10rem 10rem; /* Adjusted for wide content */
+  padding: 10rem 5rem 10rem 10rem; 
   overflow-x: 100%; 
   background: none;
 }
@@ -143,14 +146,14 @@ body {
 
 .main-content-flex {
   flex: 1 1 95%;
-  max-width: 25%;
+  max-width: none;
   min-width: 0;
   background: #f7fafc;
   padding: 0 0 1px 0;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  overflow-x: visible;
+  overflow-x: hidden;
   width: 100%;
   margin-top: var(--main-top-margin);
 }
@@ -168,7 +171,7 @@ body {
 .main-content-flex .MuiTableContainer-root {
   width: 100% !important;
   max-width: 100% !important;
-  overflow-x: visible !important;
+  /* overflow-x: visible !important; */
   margin: 0;
   padding: 0;
 }
@@ -187,11 +190,17 @@ body {
 }
 
 .MuiTableCell-head, .MuiTableCell-body {
-  word-break: break-word;
+  /* word-break: break-word;
   white-space: normal;
-  padding: 20px 16px;
+ 
   font-size: 1.1rem;
-  line-height: 1.7;
+  line-height: 1.7; */
+  /* text-overflow: ellipsis; */
+  padding: 20px 16px;
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .MuiTableRow-root {
@@ -221,7 +230,7 @@ body {
   }
 }
 
-@media (max-width: 900x) {
+@media (max-width: 900px) {
   .main-content {
     padding: 0.5rem 0,2rem;
   }
@@ -289,14 +298,14 @@ body {
 
 .main-content-flex {
   flex: 1 1 95%;
-  max-width: 35%;
+  max-width: none;
   min-width: 0;
   background: #f7fafc;
   padding: 0 0 1px 0;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  overflow-x: visible;
+  /* overflow-x: visible; */
   width: 100%;
   margin-top: var(--main-top-margin);
 }
@@ -304,7 +313,7 @@ body {
 .main-content-flex .MuiTableContainer-root {
   width: 100% !important;
   max-width: 100% !important;
-  overflow-x: visible !important;
+  /* overflow-x: visible !important; */
   margin: 0;
   padding: 0;
 }
