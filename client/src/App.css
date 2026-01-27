@@ -140,8 +140,8 @@ body {
 
 :root {
   --main-top-margin: -10vh;
-  --table-header-padding: 12px 12px;
-  --table-header-min-width: 60px;
+  --table-header-padding: 6px 6px;
+  --table-header-min-width: 30px;
 }
 
 .main-content-flex {
@@ -174,6 +174,7 @@ body {
   /* overflow-x: visible !important; */
   margin: 0;
   padding: 0;
+  
 }
 
 .main-content-flex .MuiTable-root {
@@ -186,7 +187,8 @@ body {
   padding: var(--table-header-padding) !important;
   min-width: var(--table-header-min-width);
   font-weight: bold;
-  font-size: 1rem;
+  /* font-size: 1rem; */
+  font-size: 0.7rem;
 }
 
 .MuiTableCell-head, .MuiTableCell-body {
@@ -196,11 +198,12 @@ body {
   font-size: 1.1rem;
   line-height: 1.7; */
   /* text-overflow: ellipsis; */
-  padding: 20px 16px;
+  padding: 10px 8px;
   max-width: 120px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 0.5rem !important;
 }
 
 .MuiTableRow-root {
@@ -212,8 +215,9 @@ body {
     padding: 2rem 1rem;
   }
   .MuiTableCell-head, .MuiTableCell-body {
-    padding: 14px 8px;
-    font-size: 1rem;
+    padding: 7px 4px;
+    /* font-size: 1rem; */
+    font-size: 0.7rem;
   }
 }
 
@@ -223,10 +227,12 @@ body {
   }
   .MuiTableCell-head, .MuiTableCell-body {
     padding: 10px 4px;
-    font-size: 0.95rem;
+    /* font-size: 0.95rem; */
+    font-size: 0.7rem;
   }
   .MuiTable-root {
-    font-size: 0.95rem;
+    /* font-size: 0.95rem; */
+    font-size: 0.7rem;
   }
 }
 
@@ -236,10 +242,12 @@ body {
   }
   .MuiTableCell-head, .MuiTableCell-body {
     padding: 8px 2px;
-    font-size: 0.9rem;
+    /* font-size: 0.9rem; */
+    font-size: 0.7rem;
   }
   .MuiTable-root {
-    font-size: 0.9rem;
+    /* font-size: 0.9rem; */
+    font-size: 0.7rem;
   }
   .MuiTableContainer-root {
     min-width: 3px;
@@ -328,7 +336,8 @@ body {
   padding: var(--table-header-padding) !important;
   min-width: var(--table-header-min-width);
   font-weight: bold;
-  font-size: 1rem;
+  /* font-size: 1rem; */
+  font-size: 0.7rem;
 }
 
 @media (max-width: 900px) {
@@ -393,7 +402,7 @@ body {
 }
 
 .glass-table tr:hover td {
-  background: rgba(255,255,255,0.42);
+  /* background: rgba(255,255,255,0.42); */
 }
 
 /* Accessibility: Keyboard focus */

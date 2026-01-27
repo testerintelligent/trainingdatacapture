@@ -63,6 +63,8 @@ function App() {
   const [editId, setEditId] = useState<string | null>(null);
   const [showTable, setShowTable] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [searchText, setSearchText] = useState("");
+
   const [filters, setFilters] = useState({
     empId: "",
     employeeName: "",
@@ -144,29 +146,43 @@ function App() {
     fetchTrainings();
   };
 
-  const filteredTrainings = trainings.filter((t) => {
+  const filteredRows = trainings.filter((row) => {
+    const search = searchText.toLowerCase();
+
     return (
-      (!filters.empId ||
-        t.empId.toLowerCase().includes(filters.empId.toLowerCase())) &&
-      (!filters.employeeName ||
-        t.employeeName
-          .toLowerCase()
-          .includes(filters.employeeName.toLowerCase())) &&
-      (!filters.course ||
-        t.course.toLowerCase().includes(filters.course.toLowerCase())) &&
-      (!filters.trainerName ||
-        t.trainerName
-          .toLowerCase()
-          .includes(filters.trainerName.toLowerCase())) &&
-      (!filters.trainingType || t.trainingType === filters.trainingType) &&
-      (!filters.startDate || t.startDate.slice(0, 10) === filters.startDate) &&
-      (!filters.endDate || t.endDate.slice(0, 10) === filters.endDate) &&
-      (!filters.status || t.status === filters.status) &&
-      (!filters.percentCompleted ||
-        String(t.percentCompleted ?? "").includes(filters.percentCompleted)) &&
-      (!filters.projectName || t.projectName === filters.projectName)
+      row.projectName?.toLowerCase().includes(search) ||
+      row.empId?.toLowerCase().includes(search) ||
+      row.employeeName?.toLowerCase().includes(search) ||
+      row.course?.toLowerCase().includes(search) ||
+      row.trainerName?.toLowerCase().includes(search) ||
+      row.trainingType?.toLowerCase().includes(search) ||
+      row.status?.toLowerCase().includes(search) ||
+      row.endDate?.includes(search)
     );
   });
+  // const filteredTrainings = trainings.filter((t) => {
+  //   return (
+  //     (!filters.empId ||
+  //       t.empId.toLowerCase().includes(filters.empId.toLowerCase())) &&
+  //     (!filters.employeeName ||
+  //       t.employeeName
+  //         .toLowerCase()
+  //         .includes(filters.employeeName.toLowerCase())) &&
+  //     (!filters.course ||
+  //       t.course.toLowerCase().includes(filters.course.toLowerCase())) &&
+  //     (!filters.trainerName ||
+  //       t.trainerName
+  //         .toLowerCase()
+  //         .includes(filters.trainerName.toLowerCase())) &&
+  //     (!filters.trainingType || t.trainingType === filters.trainingType) &&
+  //     (!filters.startDate || t.startDate.slice(0, 10) === filters.startDate) &&
+  //     (!filters.endDate || t.endDate.slice(0, 10) === filters.endDate) &&
+  //     (!filters.status || t.status === filters.status) &&
+  //     (!filters.percentCompleted ||
+  //       String(t.percentCompleted ?? "").includes(filters.percentCompleted)) &&
+  //     (!filters.projectName || t.projectName === filters.projectName)
+  //   );
+  // });
 
   return (
     <div className="app-flex-root">
@@ -180,7 +196,7 @@ function App() {
               setShowTable(true);
               setShowForm(false);
             }}
-            sx={{ color: showTable ? "#4299e1" : "#fff", mb: 2 }}
+            sx={{ color: showTable ? "#4299e1" : "#fff" }}
           >
             <DashboardIcon />
           </IconButton>
@@ -200,10 +216,10 @@ function App() {
       </aside>
       <main className="main-content-flex">
         <div className="page-header">Employee Training Records</div>
-        <Container maxWidth="md" sx={{ px: 0 }}>
+        <Container>
           {showTable && (
             <>
-              <Box
+              {/* <Box
                 sx={{
                   display: "flex",
                   alignItems: "center",
@@ -212,6 +228,14 @@ function App() {
                   mb: 2,
                 }}
               >
+                <TextField
+                  size="small"
+                  label="Search"
+                  placeholder="Search in table..."
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  fullWidth
+                />
                 <Button
                   variant="contained"
                   color="success"
@@ -220,12 +244,47 @@ function App() {
                 >
                   Export to Excel
                 </Button>
+              </Box> */}
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  width: "100%",
+                  mb: 2,
+                  gap: 2,
+                }}
+              >
+                <TextField
+                  size="small"
+                  label="Search"
+                  placeholder="Search in table..."
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  sx={{ width: 300 }} // control width instead of fullWidth
+                />
+
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => exportToExcel(trainings)}
+                >
+                  Export to Excel
+                </Button>
               </Box>
+
               <TableContainer
                 component={Paper}
-                sx={{ width: "100%", overflowX: "auto" }}
+                sx={{
+                  width: "100%",
+                  overflowX: "auto",
+                  height: "80%",
+                }}
               >
-                <Table sx={{ tableLayout: "fixed", width: "100%" }}>
+                <Table
+                  sx={{ tableLayout: "fixed", width: "100%" }}
+                  stickyHeader
+                >
                   <TableHead>
                     <TableRow>
                       <TableCell
@@ -359,7 +418,6 @@ function App() {
                         % Completed
                       </TableCell>
                       <TableCell
-                        align="right"
                         sx={{
                           width: "5.46%",
                           backgroundColor: "#006A71",
@@ -373,7 +431,7 @@ function App() {
                         Actions
                       </TableCell>
                     </TableRow>
-                    <TableRow>
+                    {/* <TableRow>
                       <TableCell>
                         <TextField
                           size="small"
@@ -547,10 +605,10 @@ function App() {
                         />
                       </TableCell>
                       <TableCell />
-                    </TableRow>
+                    </TableRow> */}
                   </TableHead>
                   <TableBody>
-                    {filteredTrainings.map((t) => (
+                    {filteredRows.map((t) => (
                       <TableRow
                         key={t._id}
                         sx={{
@@ -612,7 +670,7 @@ function App() {
                               flexDirection: "row",
                               justifyContent: "flex-end",
                               alignItems: "center",
-                              gap: 1,
+                              // gap: 0.5,
                             }}
                           >
                             <IconButton
@@ -623,15 +681,21 @@ function App() {
                                 handleOpen(t);
                               }}
                               size="small"
+                              sx={{
+                                padding: "2px !important", // reduce clickable area
+                              }}
                             >
-                              <EditIcon fontSize="small" />
+                              <EditIcon sx={{ fontSize: "14px" }} />
                             </IconButton>
                             <IconButton
                               aria-label="delete"
                               onClick={() => handleDelete(t._id!)}
                               size="small"
+                              sx={{
+                                padding: "2px !important", // reduce clickable area
+                              }}
                             >
-                              <DeleteIcon fontSize="small" />
+                              <DeleteIcon sx={{ fontSize: "14px" }} />
                             </IconButton>
                           </Box>
                         </TableCell>
@@ -649,14 +713,16 @@ function App() {
                 display: "flex",
                 flexDirection: "column",
                 gap: 2,
-                mt: 4,
+                // mt: 4,
                 background:
                   "linear-gradient(to right,rgb(221, 227, 236),rgb(190, 168, 240),rgb(241, 177, 209) 100%)",
-                p: 3,
+                p: 2,
                 borderRadius: 2,
                 boxShadow: 2,
                 minWidth: 350,
                 alignSelf: "center",
+                height: "90vh", // or fixed height like 500px
+                overflowY: "auto",
               }}
             >
               <Typography variant="h6" gutterBottom>
