@@ -206,7 +206,7 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 0.5rem !important;
+  font-size: 0.7rem !important;
 }
 
 .MuiTableRow-root {

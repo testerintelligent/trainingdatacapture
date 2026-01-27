@@ -222,11 +222,11 @@ function App() {
             px: "14px", // no side padding at any size
           }}
         >
-          <Box>
-            <Typography variant="h6">Employee Training Records</Typography>
-          </Box>
           {showTable && (
             <>
+              <Box>
+                <Typography variant="h6">Employee Training Records</Typography>
+              </Box>
               <Box
                 sx={{
                   display: "flex",
@@ -250,16 +250,12 @@ function App() {
               <TableContainer
                 component={Paper}
                 sx={{
-                  width: "100%",
-                  overflowX: "auto",
-                  height: "70%",
+                  maxHeight: 470, // set your desired height
+                  overflowY: "auto",
                   scrollbarWidth: "thin",
                 }}
               >
-                <Table
-                  sx={{ tableLayout: "fixed", width: "100%" }}
-                  stickyHeader
-                >
+                <Table stickyHeader>
                   <TableHead>
                     <TableRow>
                       <TableCell
@@ -271,6 +267,7 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
+                          fontSize: "16px !important", // increase as needed
                         }}
                       >
                         Project Name
@@ -284,6 +281,7 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
+                          fontSize: "16px !important",
                         }}
                       >
                         EMP ID
@@ -297,6 +295,7 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
+                          fontSize: "16px !important",
                         }}
                       >
                         Employee Name
@@ -310,6 +309,7 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
+                          fontSize: "16px !important",
                         }}
                       >
                         Course
@@ -323,6 +323,7 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
+                          fontSize: "16px !important",
                         }}
                       >
                         Trainer Name
@@ -336,6 +337,7 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
+                          fontSize: "16px !important",
                         }}
                       >
                         Training Type
@@ -349,6 +351,7 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
+                          fontSize: "16px !important",
                         }}
                       >
                         Start Date
@@ -362,6 +365,7 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
+                          fontSize: "16px !important",
                         }}
                       >
                         End Date
@@ -375,6 +379,7 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
+                          fontSize: "16px !important",
                         }}
                       >
                         Status
@@ -388,6 +393,7 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
+                          fontSize: "16px !important",
                         }}
                       >
                         % Completed
@@ -401,6 +407,7 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
+                          fontSize: "16px !important",
                         }}
                       >
                         Actions
@@ -753,14 +760,22 @@ function App() {
             </>
           )}
           {showForm && (
-            <Box sx={{ marginTop: "10px" }}>
+            <Box
+              sx={{
+                mt: 1,
+                mx: { xs: 1, sm: "15%" }, // small margin on mobile, 10% on desktop
+              }}
+            >
+              <Box>
+                <Typography variant="h6">Employee Training Records</Typography>
+              </Box>
               <Box
                 component="form"
                 sx={{
                   display: "flex",
                   flexDirection: "column",
                   gap: 2,
-                  // mt: 4,
+                  mt: 4,
                   background:
                     "linear-gradient(to right,rgb(221, 227, 236),rgb(190, 168, 240),rgb(241, 177, 209) 100%)",
                   p: 1,
@@ -768,17 +783,8 @@ function App() {
                   boxShadow: 2,
                   minWidth: 350,
                   alignSelf: "center",
-                  height: "85vh", // or fixed height like 500px
+                  maxHeight: "calc(100vh - 120px)", // adjust 120px based on header/top spacing
                   overflowY: "auto",
-                  // "& .MuiTextField-root": {
-                  //   "& .MuiInputBase-input": {
-                  //     fontSize: "10px",
-                  //     padding: "8px 10px",
-                  //   },
-                  //   "& .MuiInputLabel-root": {
-                  //     fontSize: "10px",
-                  //   },
-                  // },
                   "& .MuiInputBase-root": {
                     fontSize: "10px",
                     height: "30px", // fixes vertical alignment
