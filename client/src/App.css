@@ -6,6 +6,8 @@ html, body, #root {
   padding: 0;
   width: 100%;
   overflow-x: hidden;
+  overflow-y: hidden;
+  
 }
 
 *, *:before, *:after {
@@ -140,7 +142,7 @@ body {
 
 :root {
   --main-top-margin: -10vh;
-  --table-header-padding: 6px 6px;
+  --table-header-padding: 0 6px;
   --table-header-min-width: 30px;
 }
 
@@ -154,6 +156,7 @@ body {
   flex-direction: column;
   align-items: stretch;
   overflow-x: hidden;
+  overflow-y: hidden;
   width: 100%;
   margin-top: var(--main-top-margin);
 }

@@ -187,9 +187,6 @@ function App() {
   return (
     <div className="app-flex-root">
       <aside className="side-menu">
-        {/* <IconButton sx={{ color: "#fff", mb: 3 }}>
-          <MenuIcon />
-        </IconButton> */}
         <Tooltip title="Training Summary" placement="right">
           <IconButton
             onClick={() => {
@@ -214,60 +211,37 @@ function App() {
           </IconButton>
         </Tooltip>
       </aside>
+
       <main className="main-content-flex">
         <div className="page-header">Employee Training Records</div>
-        <Container>
+        <Container
+          maxWidth={false} // VERY IMPORTANT
+          disableGutters
+          sx={{
+            width: "100%",
+            px: "14px", // no side padding at any size
+          }}
+        >
+          <Box>
+            <Typography variant="h6">Employee Training Records</Typography>
+          </Box>
           {showTable && (
             <>
-              {/* <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  width: "100%",
-                  mb: 2,
-                }}
-              >
-                <TextField
-                  size="small"
-                  label="Search"
-                  placeholder="Search in table..."
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  fullWidth
-                />
-                <Button
-                  variant="contained"
-                  color="success"
-                  onClick={() => exportToExcel(trainings)}
-                  sx={{ ml: 2, height: "fit-content" }}
-                >
-                  Export to Excel
-                </Button>
-              </Box> */}
               <Box
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "space-between",
+                  justifyContent: "flex-end",
                   width: "100%",
                   mb: 2,
                   gap: 2,
                 }}
               >
-                <TextField
-                  size="small"
-                  label="Search"
-                  placeholder="Search in table..."
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  sx={{ width: 300 }} // control width instead of fullWidth
-                />
-
                 <Button
                   variant="contained"
                   color="success"
                   onClick={() => exportToExcel(trainings)}
+                  sx={{ marginRight: "4px" }}
                 >
                   Export to Excel
                 </Button>
@@ -278,7 +252,8 @@ function App() {
                 sx={{
                   width: "100%",
                   overflowX: "auto",
-                  height: "80%",
+                  height: "70%",
+                  scrollbarWidth: "thin",
                 }}
               >
                 <Table
@@ -431,8 +406,18 @@ function App() {
                         Actions
                       </TableCell>
                     </TableRow>
-                    {/* <TableRow>
-                      <TableCell>
+                    <TableRow
+                      sx={{
+                        "& .MuiInputBase-root": {
+                          height: 32, // reduce overall height
+                          fontSize: "12px", // reduce text size
+                        },
+                        "& .MuiSelect-select": {
+                          padding: "6px 8px", // reduce inner padding
+                        },
+                      }}
+                    >
+                      <TableCell sx={{ backgroundColor: "#9ACBD0" }}>
                         <TextField
                           size="small"
                           select
@@ -446,6 +431,26 @@ function App() {
                             }))
                           }
                           fullWidth
+                          SelectProps={{
+                            // display placeholder on the select field
+                            displayEmpty: true, // IMPORTANT
+                            renderValue: (selected: any) => {
+                              if (selected === "") {
+                                return (
+                                  <MenuItem
+                                    sx={{
+                                      color: "#999",
+                                      fontSize: "12px",
+                                      fontStyle: "italic",
+                                    }}
+                                  >
+                                    Filter
+                                  </MenuItem>
+                                );
+                              }
+                              return selected;
+                            },
+                          }}
                         >
                           <MenuItem value="">All</MenuItem>
                           {projectNameOptions.map((option) => (
@@ -455,19 +460,22 @@ function App() {
                           ))}
                         </TextField>
                       </TableCell>
-                      <TableCell>
+                      <TableCell sx={{ backgroundColor: "#9ACBD0" }}>
                         <TextField
                           size="small"
                           variant="outlined"
                           placeholder="Filter"
                           value={filters.empId}
                           onChange={(e) =>
-                            setFilters((f) => ({ ...f, empId: e.target.value }))
+                            setFilters((f) => ({
+                              ...f,
+                              empId: e.target.value,
+                            }))
                           }
                           fullWidth
                         />
                       </TableCell>
-                      <TableCell>
+                      <TableCell sx={{ backgroundColor: "#9ACBD0" }}>
                         <TextField
                           size="small"
                           variant="outlined"
@@ -482,7 +490,7 @@ function App() {
                           fullWidth
                         />
                       </TableCell>
-                      <TableCell>
+                      <TableCell sx={{ backgroundColor: "#9ACBD0" }}>
                         <TextField
                           size="small"
                           variant="outlined"
@@ -497,7 +505,7 @@ function App() {
                           fullWidth
                         />
                       </TableCell>
-                      <TableCell>
+                      <TableCell sx={{ backgroundColor: "#9ACBD0" }}>
                         <TextField
                           size="small"
                           variant="outlined"
@@ -512,7 +520,7 @@ function App() {
                           fullWidth
                         />
                       </TableCell>
-                      <TableCell>
+                      <TableCell sx={{ backgroundColor: "#9ACBD0" }}>
                         <TextField
                           size="small"
                           select
@@ -526,6 +534,25 @@ function App() {
                             }))
                           }
                           fullWidth
+                          SelectProps={{
+                            displayEmpty: true, // IMPORTANT
+                            renderValue: (selected: any) => {
+                              if (selected === "") {
+                                return (
+                                  <MenuItem
+                                    sx={{
+                                      color: "#999",
+                                      fontSize: "12px",
+                                      fontStyle: "italic",
+                                    }}
+                                  >
+                                    Filter
+                                  </MenuItem>
+                                );
+                              }
+                              return selected;
+                            },
+                          }}
                         >
                           <MenuItem value="">All</MenuItem>
                           {trainingTypeOptions.map((option) => (
@@ -535,7 +562,7 @@ function App() {
                           ))}
                         </TextField>
                       </TableCell>
-                      <TableCell>
+                      <TableCell sx={{ backgroundColor: "#9ACBD0" }}>
                         <TextField
                           size="small"
                           type="date"
@@ -551,7 +578,7 @@ function App() {
                           InputLabelProps={{ shrink: true }}
                         />
                       </TableCell>
-                      <TableCell>
+                      <TableCell sx={{ backgroundColor: "#9ACBD0" }}>
                         <TextField
                           size="small"
                           type="date"
@@ -567,7 +594,7 @@ function App() {
                           InputLabelProps={{ shrink: true }}
                         />
                       </TableCell>
-                      <TableCell>
+                      <TableCell sx={{ backgroundColor: "#9ACBD0" }}>
                         <TextField
                           size="small"
                           select
@@ -580,6 +607,25 @@ function App() {
                             }))
                           }
                           fullWidth
+                          SelectProps={{
+                            displayEmpty: true, // IMPORTANT
+                            renderValue: (selected: any) => {
+                              if (selected === "") {
+                                return (
+                                  <MenuItem
+                                    sx={{
+                                      color: "#999",
+                                      fontSize: "12px",
+                                      fontStyle: "italic",
+                                    }}
+                                  >
+                                    Filter
+                                  </MenuItem>
+                                );
+                              }
+                              return selected;
+                            },
+                          }}
                         >
                           <MenuItem value="">All</MenuItem>
                           {statusOptions.map((option) => (
@@ -589,7 +635,7 @@ function App() {
                           ))}
                         </TextField>
                       </TableCell>
-                      <TableCell>
+                      <TableCell sx={{ backgroundColor: "#9ACBD0" }}>
                         <TextField
                           size="small"
                           variant="outlined"
@@ -604,8 +650,8 @@ function App() {
                           fullWidth
                         />
                       </TableCell>
-                      <TableCell />
-                    </TableRow> */}
+                      <TableCell sx={{ backgroundColor: "#9ACBD0" }} />
+                    </TableRow>
                   </TableHead>
                   <TableBody>
                     {filteredRows.map((t) => (
@@ -707,154 +753,207 @@ function App() {
             </>
           )}
           {showForm && (
-            <Box
-              component="form"
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-                // mt: 4,
-                background:
-                  "linear-gradient(to right,rgb(221, 227, 236),rgb(190, 168, 240),rgb(241, 177, 209) 100%)",
-                p: 2,
-                borderRadius: 2,
-                boxShadow: 2,
-                minWidth: 350,
-                alignSelf: "center",
-                height: "90vh", // or fixed height like 500px
-                overflowY: "auto",
-              }}
-            >
-              <Typography variant="h6" gutterBottom>
-                {editId ? "Edit Training" : "Add Training"}
-              </Typography>
-              <TextField
-                select
-                label="Project Name"
-                name="projectName"
-                value={form.projectName}
-                onChange={handleChange}
-                required
-                sx={{ width: "100%" }}
-              >
-                {projectNameOptions.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <TextField
-                label="EMP ID"
-                name="empId"
-                value={form.empId}
-                onChange={handleChange}
-                required
-                sx={{ width: "100%" }}
-              />
-              <TextField
-                label="Employee Name"
-                name="employeeName"
-                value={form.employeeName}
-                onChange={handleChange}
-                required
-                sx={{ width: "100%" }}
-              />
-              <TextField
-                label="Course"
-                name="course"
-                value={form.course}
-                onChange={handleChange}
-                required
-                sx={{ width: "100%" }}
-              />
-              <TextField
-                label="Trainer Name"
-                name="trainerName"
-                value={form.trainerName}
-                onChange={handleChange}
-                required
-                sx={{ width: "100%" }}
-              />
-              <TextField
-                select
-                label="Training Type"
-                name="trainingType"
-                value={form.trainingType}
-                onChange={handleChange}
-                required
-                sx={{ width: "100%" }}
-              >
-                {trainingTypeOptions.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <TextField
-                label="Start Date"
-                name="startDate"
-                type="date"
-                value={form.startDate}
-                onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-                required
-                sx={{ width: "100%" }}
-              />
-              <TextField
-                label="End Date"
-                name="endDate"
-                type="date"
-                value={form.endDate}
-                onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-                required
-                sx={{ width: "100%" }}
-              />
-              <TextField
-                select
-                label="Status"
-                name="status"
-                value={form.status}
-                onChange={handleChange}
-                required
-                sx={{ width: "100%" }}
-              >
-                {statusOptions.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <TextField
-                label="% Completed"
-                name="percentCompleted"
-                type="number"
-                value={form.percentCompleted ?? ""}
-                onChange={handleChange}
-                inputProps={{ min: 0, max: 100 }}
-                required
-                sx={{ width: "100%" }}
-              />
+            <Box sx={{ marginTop: "10px" }}>
               <Box
+                component="form"
                 sx={{
                   display: "flex",
-                  justifyContent: "flex-end",
+                  flexDirection: "column",
                   gap: 2,
-                  mt: 2,
+                  // mt: 4,
+                  background:
+                    "linear-gradient(to right,rgb(221, 227, 236),rgb(190, 168, 240),rgb(241, 177, 209) 100%)",
+                  p: 1,
+                  borderRadius: 2,
+                  boxShadow: 2,
+                  minWidth: 350,
+                  alignSelf: "center",
+                  height: "85vh", // or fixed height like 500px
+                  overflowY: "auto",
+                  // "& .MuiTextField-root": {
+                  //   "& .MuiInputBase-input": {
+                  //     fontSize: "10px",
+                  //     padding: "8px 10px",
+                  //   },
+                  //   "& .MuiInputLabel-root": {
+                  //     fontSize: "10px",
+                  //   },
+                  // },
+                  "& .MuiInputBase-root": {
+                    fontSize: "10px",
+                    height: "30px", // fixes vertical alignment
+                  },
+                  "& .MuiInputBase-input": {
+                    padding: "4px 10px", // reduce inner padding
+                    fontSize: "10px",
+                  },
+                  "& .MuiInputLabel-root": {
+                    fontSize: "10px",
+                    transform: "translate(10px, 8px) scale(1)", // adjust vertical alignment
+                  },
+                  "& .MuiInputLabel-shrink": {
+                    transform: "translate(10px, -6px) scale(0.75)", // float position when shrunk
+                  },
                 }}
               >
-                <Button
-                  onClick={() => {
-                    setShowForm(false);
-                    setShowTable(true);
-                    handleClose();
+                <Typography
+                  variant="subtitle1"
+                  gutterBottom
+                  sx={{ fontWeight: "bold" }}
+                >
+                  {editId ? "Edit Training" : "Add Training"}
+                </Typography>
+                <TextField
+                  select
+                  size="small"
+                  label="Project Name"
+                  name="projectName"
+                  value={form.projectName}
+                  onChange={handleChange}
+                  required
+                >
+                  {projectNameOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <TextField
+                  label="EMP ID"
+                  name="empId"
+                  value={form.empId}
+                  onChange={handleChange}
+                  required
+                  sx={{ width: "100%" }}
+                />
+                <TextField
+                  label="Employee Name"
+                  name="employeeName"
+                  value={form.employeeName}
+                  onChange={handleChange}
+                  required
+                  sx={{ width: "100%" }}
+                />
+                <TextField
+                  label="Course"
+                  name="course"
+                  value={form.course}
+                  onChange={handleChange}
+                  required
+                  sx={{ width: "100%" }}
+                />
+                <TextField
+                  label="Trainer Name"
+                  name="trainerName"
+                  value={form.trainerName}
+                  onChange={handleChange}
+                  required
+                  sx={{ width: "100%" }}
+                />
+                <TextField
+                  select
+                  label="Training Type"
+                  name="trainingType"
+                  value={form.trainingType}
+                  onChange={handleChange}
+                  required
+                  sx={{ width: "100%" }}
+                >
+                  {trainingTypeOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 2, // space between the fields
+                    width: "100%",
                   }}
                 >
-                  Cancel
-                </Button>
-                <Button onClick={handleSubmit} variant="contained">
-                  {editId ? "Update" : "Add"}
-                </Button>
+                  <TextField
+                    label="Start Date"
+                    name="startDate"
+                    type="date"
+                    value={form.startDate}
+                    onChange={handleChange}
+                    InputLabelProps={{ shrink: true }}
+                    required
+                    sx={{ width: "100%" }}
+                  />
+                  <TextField
+                    label="End Date"
+                    name="endDate"
+                    type="date"
+                    value={form.endDate}
+                    onChange={handleChange}
+                    InputLabelProps={{ shrink: true }}
+                    required
+                    sx={{ width: "100%" }}
+                  />
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 2, // space between the fields
+                    width: "100%",
+                  }}
+                >
+                  <TextField
+                    select
+                    label="Status"
+                    name="status"
+                    value={form.status}
+                    onChange={handleChange}
+                    required
+                    sx={{ width: "100%" }}
+                  >
+                    {statusOptions.map((option) => (
+                      <MenuItem key={option} value={option}>
+                        {option}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                  <TextField
+                    label="% Completed"
+                    name="percentCompleted"
+                    type="number"
+                    value={form.percentCompleted ?? ""}
+                    onChange={handleChange}
+                    inputProps={{ min: 0, max: 100 }}
+                    required
+                    sx={{
+                      width: "100%",
+                    }}
+                  />
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    gap: 2,
+                  }}
+                >
+                  <Button
+                    sx={{ fontSize: "10px", fontWeight: "Medium" }}
+                    onClick={() => {
+                      setShowForm(false);
+                      setShowTable(true);
+                      handleClose();
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    sx={{ fontSize: "10px", fontWeight: "Medium" }}
+                    onClick={handleSubmit}
+                    variant="contained"
+                  >
+                    {editId ? "Update" : "Add"}
+                  </Button>
+                </Box>
               </Box>
             </Box>
           )}
