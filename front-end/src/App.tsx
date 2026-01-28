@@ -63,7 +63,6 @@ function App() {
   const [editId, setEditId] = useState<string | null>(null);
   const [showTable, setShowTable] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [searchText, setSearchText] = useState("");
 
   const [filters, setFilters] = useState({
     empId: "",
@@ -146,43 +145,43 @@ function App() {
     fetchTrainings();
   };
 
-  const filteredRows = trainings.filter((row) => {
-    const search = searchText.toLowerCase();
+  // const filteredRows = trainings.filter((row) => {
+  //   const search = searchText.toLowerCase();
 
-    return (
-      row.projectName?.toLowerCase().includes(search) ||
-      row.empId?.toLowerCase().includes(search) ||
-      row.employeeName?.toLowerCase().includes(search) ||
-      row.course?.toLowerCase().includes(search) ||
-      row.trainerName?.toLowerCase().includes(search) ||
-      row.trainingType?.toLowerCase().includes(search) ||
-      row.status?.toLowerCase().includes(search) ||
-      row.endDate?.includes(search)
-    );
-  });
-  // const filteredTrainings = trainings.filter((t) => {
   //   return (
-  //     (!filters.empId ||
-  //       t.empId.toLowerCase().includes(filters.empId.toLowerCase())) &&
-  //     (!filters.employeeName ||
-  //       t.employeeName
-  //         .toLowerCase()
-  //         .includes(filters.employeeName.toLowerCase())) &&
-  //     (!filters.course ||
-  //       t.course.toLowerCase().includes(filters.course.toLowerCase())) &&
-  //     (!filters.trainerName ||
-  //       t.trainerName
-  //         .toLowerCase()
-  //         .includes(filters.trainerName.toLowerCase())) &&
-  //     (!filters.trainingType || t.trainingType === filters.trainingType) &&
-  //     (!filters.startDate || t.startDate.slice(0, 10) === filters.startDate) &&
-  //     (!filters.endDate || t.endDate.slice(0, 10) === filters.endDate) &&
-  //     (!filters.status || t.status === filters.status) &&
-  //     (!filters.percentCompleted ||
-  //       String(t.percentCompleted ?? "").includes(filters.percentCompleted)) &&
-  //     (!filters.projectName || t.projectName === filters.projectName)
+  //     row.projectName?.toLowerCase().includes(search) ||
+  //     row.empId?.toLowerCase().includes(search) ||
+  //     row.employeeName?.toLowerCase().includes(search) ||
+  //     row.course?.toLowerCase().includes(search) ||
+  //     row.trainerName?.toLowerCase().includes(search) ||
+  //     row.trainingType?.toLowerCase().includes(search) ||
+  //     row.status?.toLowerCase().includes(search) ||
+  //     row.endDate?.includes(search)
   //   );
   // });
+  const filteredTrainings = trainings.filter((t) => {
+    return (
+      (!filters.empId ||
+        t.empId.toLowerCase().includes(filters.empId.toLowerCase())) &&
+      (!filters.employeeName ||
+        t.employeeName
+          .toLowerCase()
+          .includes(filters.employeeName.toLowerCase())) &&
+      (!filters.course ||
+        t.course.toLowerCase().includes(filters.course.toLowerCase())) &&
+      (!filters.trainerName ||
+        t.trainerName
+          .toLowerCase()
+          .includes(filters.trainerName.toLowerCase())) &&
+      (!filters.trainingType || t.trainingType === filters.trainingType) &&
+      (!filters.startDate || t.startDate.slice(0, 10) === filters.startDate) &&
+      (!filters.endDate || t.endDate.slice(0, 10) === filters.endDate) &&
+      (!filters.status || t.status === filters.status) &&
+      (!filters.percentCompleted ||
+        String(t.percentCompleted ?? "").includes(filters.percentCompleted)) &&
+      (!filters.projectName || t.projectName === filters.projectName)
+    );
+  });
 
   return (
     <div className="app-flex-root">
@@ -661,7 +660,7 @@ function App() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {filteredRows.map((t) => (
+                    {filteredTrainings.map((t) => (
                       <TableRow
                         key={t._id}
                         sx={{
