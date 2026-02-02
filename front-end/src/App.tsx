@@ -78,7 +78,7 @@ function App() {
   });
 
   const fetchTrainings = async () => {
-    const res = await axios.get("/api/trainings");
+    const res = await axios.get("http://10.192.190.158:5002/api/trainings");
     setTrainings(res.data);
   };
 
