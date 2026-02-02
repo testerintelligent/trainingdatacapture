@@ -67,8 +67,8 @@ const swaggerOptions = {
       description: 'API for managing employee training records',
     },
     servers: [
-      { url: `http://localhost:${process.env.PORT || 5002}` },
-      { url: `http://10.192.190.158:${process.env.PORT || 5002}` }
+     //{ url: `http://localhost:${process.env.PORT || 5002}` },
+      { url: `http://10.192.190.158:${process.env.PORT}` }
     ],
     tags: [
       { name: 'Trainings', description: 'Operations related to employee training records' }

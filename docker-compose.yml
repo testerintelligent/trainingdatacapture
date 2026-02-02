@@ -13,6 +13,8 @@
         context: ./front-end
       ports:
         - "8002:80"
+    networks: # <--- ADD THIS
+      - training-mern-network
     
     mongo:
       image: mongo:latest
