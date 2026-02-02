@@ -132,16 +132,16 @@ function App() {
       return;
     }
     if (editId) {
-      await axios.put(`/api/trainings/${editId}`, form);
+      await axios.put(`http://10.192.190.158:5002/api/trainings/${editId}`, form);
     } else {
-      await axios.post("/api/trainings", form);
+      await axios.post("http://10.192.190.158:5002/api/trainings", form);
     }
     fetchTrainings();
     handleClose();
   };
 
   const handleDelete = async (id: string) => {
-    await axios.delete(`/api/trainings/${id}`);
+    await axios.delete(`http://10.192.190.158:5002/api/trainings/${id}`);
     fetchTrainings();
   };
 
