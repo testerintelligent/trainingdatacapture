@@ -6,6 +6,8 @@
         - "5002:5002"
       networks:
         - training-mern-network
+      depends_on:
+        - mongo
       
 
     frontend: 
