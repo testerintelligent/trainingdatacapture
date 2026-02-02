@@ -67,8 +67,8 @@ const swaggerOptions = {
       description: 'API for managing employee training records',
     },
     servers: [
-      { url: `http://localhost:${process.env.PORT || 5000}` },
-      { url: `http://10.192.190.130:${process.env.PORT || 5000}` }
+      { url: `http://localhost:${process.env.PORT || 5002}` },
+      { url: `http://10.192.190.158:${process.env.PORT || 5002}` }
     ],
     tags: [
       { name: 'Trainings', description: 'Operations related to employee training records' }
@@ -209,5 +209,5 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *         description: Training record deleted
  */
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5002;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

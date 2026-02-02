@@ -1,0 +1,26 @@
+  services: 
+    backend:
+      build:
+        context: ./back-end
+      ports:
+        - "5002:5002"
+      networks:
+        - training-mern-network
+      
+
+    frontend: 
+      build: 
+        context: ./front-end
+      ports:
+        - "8002:80"
+    
+    mongo:
+      image: mongo:latest
+      ports:
+        - "27019:27017"
+      networks:
+        - training-mern-network
+      
+  networks:
+    training-mern-network:
+      driver: bridge
