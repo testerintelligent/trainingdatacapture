@@ -15,8 +15,8 @@ pipeline {
             steps {
                 script {
                     sh """
-                     echo "Down the docker Container" | sudo -S docker-compose down
-                     echo "Build and up the docker Container" | sudo docker-compose up --build -d
+                     echo "Down the docker Container" | sudo -S docker compose down
+                     echo "Build and up the docker Container" | sudo docker compose up --build -d
                     """
                 }
             }
