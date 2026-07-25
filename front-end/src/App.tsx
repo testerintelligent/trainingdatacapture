@@ -16,11 +16,15 @@ import {
   MenuItem,
   IconButton,
   Tooltip,
+  Grid,
+  Divider,
+  Avatar,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import SchoolIcon from "@mui/icons-material/School";
 // import MenuIcon from "@mui/icons-material/Menu";
 import { exportToExcel } from "./exportToExcel";
 import "./App.css";
@@ -78,6 +82,8 @@ function App() {
   });
 
   const fetchTrainings = async () => {
+    //const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/trainings`);
+    //const res = await axios.get("http://localhost:5002/api/trainings");
     const res = await axios.get("http://10.192.190.158:5002/api/trainings");
     setTrainings(res.data);
   };
@@ -132,8 +138,10 @@ function App() {
       return;
     }
     if (editId) {
+      //await axios.put(`http://localhost:5002/api/trainings/${editId}`, form);
       await axios.put(`http://10.192.190.158:5002/api/trainings/${editId}`, form);
     } else {
+      //await axios.post("http://localhost:5002/api/trainings", form);
       await axios.post("http://10.192.190.158:5002/api/trainings", form);
     }
     fetchTrainings();
@@ -141,6 +149,7 @@ function App() {
   };
 
   const handleDelete = async (id: string) => {
+    //await axios.delete(`http://localhost:5002/api/trainings/${id}`);
     await axios.delete(`http://10.192.190.158:5002/api/trainings/${id}`);
     fetchTrainings();
   };
@@ -212,26 +221,37 @@ function App() {
       </aside>
 
       <main className="main-content-flex">
-        <div className="page-header">Employee Training Records</div>
+        <div
+          className="page-header"
+          style={{
+            marginTop: "100px",
+            background: "linear-gradient(90deg, #006A71 0%, #48A6A7 100%)",
+            WebkitTextFillColor: "#fff",
+            color: "#fff",
+            borderRadius: "10px",
+            padding: "6px 12px",
+            boxShadow: "0 4px 14px rgba(0, 106, 113, 0.35)",
+          }}
+        >
+          Employee Training Records
+        </div>
         <Container
           maxWidth={false} // VERY IMPORTANT
           disableGutters
           sx={{
             width: "100%",
-            px: "14px", // no side padding at any size
+            px: "2px", // 2px gap between left and right
           }}
         >
           {showTable && (
             <>
-              <Box>
-                <Typography variant="h6">Employee Training Records</Typography>
-              </Box>
               <Box
                 sx={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "flex-end",
                   width: "100%",
+                  mt: 2,
                   mb: 2,
                   gap: 2,
                 }}
@@ -761,202 +781,256 @@ function App() {
           {showForm && (
             <Box
               sx={{
-                mt: 1,
-                mx: { xs: 1, sm: "15%" }, // small margin on mobile, 10% on desktop
+                mt: 4,
+                mx: 0,
+                mb: 4,
+                maxWidth: { xs: "100%", md: "68%" },
               }}
             >
-              <Box>
-                <Typography variant="h6">Employee Training Records</Typography>
-              </Box>
               <Box
                 component="form"
                 sx={{
+                  background: "#ffffff",
+                  borderRadius: 3,
+                  boxShadow: "0 4px 24px rgba(0, 106, 113, 0.12)",
+                  border: "1px solid #E5EEEF",
+                  overflow: "hidden",
+                  maxHeight: "calc(100vh - 120px)",
                   display: "flex",
                   flexDirection: "column",
-                  gap: 2,
-                  mt: 4,
-                  background:
-                    "linear-gradient(to right,rgb(221, 227, 236),rgb(190, 168, 240),rgb(241, 177, 209) 100%)",
-                  p: 1,
-                  borderRadius: 2,
-                  boxShadow: 2,
-                  minWidth: 350,
-                  alignSelf: "center",
-                  maxHeight: "calc(100vh - 120px)", // adjust 120px based on header/top spacing
-                  overflowY: "auto",
-                  "& .MuiInputBase-root": {
-                    fontSize: "10px",
-                    height: "30px", // fixes vertical alignment
-                  },
-                  "& .MuiInputBase-input": {
-                    padding: "4px 10px", // reduce inner padding
-                    fontSize: "10px",
-                  },
-                  "& .MuiInputLabel-root": {
-                    fontSize: "10px",
-                    transform: "translate(10px, 8px) scale(1)", // adjust vertical alignment
-                  },
-                  "& .MuiInputLabel-shrink": {
-                    transform: "translate(10px, -6px) scale(0.75)", // float position when shrunk
-                  },
                 }}
               >
-                <Typography
-                  variant="subtitle1"
-                  gutterBottom
-                  sx={{ fontWeight: "bold" }}
-                >
-                  {editId ? "Edit Training" : "Add Training"}
-                </Typography>
-                <TextField
-                  select
-                  size="small"
-                  label="Project Name"
-                  name="projectName"
-                  value={form.projectName}
-                  onChange={handleChange}
-                  required
-                >
-                  {projectNameOptions.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </TextField>
-                <TextField
-                  label="EMP ID"
-                  name="empId"
-                  value={form.empId}
-                  onChange={handleChange}
-                  required
-                  sx={{ width: "100%" }}
-                />
-                <TextField
-                  label="Employee Name"
-                  name="employeeName"
-                  value={form.employeeName}
-                  onChange={handleChange}
-                  required
-                  sx={{ width: "100%" }}
-                />
-                <TextField
-                  label="Course"
-                  name="course"
-                  value={form.course}
-                  onChange={handleChange}
-                  required
-                  sx={{ width: "100%" }}
-                />
-                <TextField
-                  label="Trainer Name"
-                  name="trainerName"
-                  value={form.trainerName}
-                  onChange={handleChange}
-                  required
-                  sx={{ width: "100%" }}
-                />
-                <TextField
-                  select
-                  label="Training Type"
-                  name="trainingType"
-                  value={form.trainingType}
-                  onChange={handleChange}
-                  required
-                  sx={{ width: "100%" }}
-                >
-                  {trainingTypeOptions.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </TextField>
+                {/* Header */}
                 <Box
                   sx={{
                     display: "flex",
-                    gap: 2, // space between the fields
-                    width: "100%",
+                    alignItems: "center",
+                    gap: 1.5,
+                    px: { xs: 2.5, sm: 4 },
+                    py: 2.5,
+                    background:
+                      "linear-gradient(90deg, #006A71 0%, #48A6A7 100%)",
                   }}
                 >
-                  <TextField
-                    label="Start Date"
-                    name="startDate"
-                    type="date"
-                    value={form.startDate}
-                    onChange={handleChange}
-                    InputLabelProps={{ shrink: true }}
-                    required
-                    sx={{ width: "100%" }}
-                  />
-                  <TextField
-                    label="End Date"
-                    name="endDate"
-                    type="date"
-                    value={form.endDate}
-                    onChange={handleChange}
-                    InputLabelProps={{ shrink: true }}
-                    required
-                    sx={{ width: "100%" }}
-                  />
-                </Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    gap: 2, // space between the fields
-                    width: "100%",
-                  }}
-                >
-                  <TextField
-                    select
-                    label="Status"
-                    name="status"
-                    value={form.status}
-                    onChange={handleChange}
-                    required
-                    sx={{ width: "100%" }}
-                  >
-                    {statusOptions.map((option) => (
-                      <MenuItem key={option} value={option}>
-                        {option}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                  <TextField
-                    label="% Completed"
-                    name="percentCompleted"
-                    type="number"
-                    value={form.percentCompleted ?? ""}
-                    onChange={handleChange}
-                    inputProps={{ min: 0, max: 100 }}
-                    required
+                  <Avatar
                     sx={{
-                      width: "100%",
+                      bgcolor: "rgba(255,255,255,0.18)",
+                      color: "#fff",
+                      width: 40,
+                      height: 40,
                     }}
-                  />
+                  >
+                    <SchoolIcon fontSize="small" />
+                  </Avatar>
+                  <Box>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{ color: "#fff", fontWeight: 700, lineHeight: 1.2 }}
+                    >
+                      {editId ? "Edit Training" : "Add Training"}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "rgba(255,255,255,0.85)" }}
+                    >
+                      {editId
+                        ? "Update the details for this training record"
+                        : "Fill in the details to create a new training record"}
+                    </Typography>
+                  </Box>
                 </Box>
 
+                {/* Fields */}
+                <Box
+                  sx={{
+                    px: { xs: 2.5, sm: 4 },
+                    py: 3,
+                    overflowY: "auto",
+                  }}
+                >
+                  <Grid container spacing={2.5}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TextField
+                        select
+                        fullWidth
+                        label="Project Name"
+                        name="projectName"
+                        value={form.projectName}
+                        onChange={handleChange}
+                        required
+                      >
+                        {projectNameOptions.map((option) => (
+                          <MenuItem key={option} value={option}>
+                            {option}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TextField
+                        fullWidth
+                        label="EMP ID"
+                        name="empId"
+                        value={form.empId}
+                        onChange={handleChange}
+                        required
+                      />
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TextField
+                        fullWidth
+                        label="Employee Name"
+                        name="employeeName"
+                        value={form.employeeName}
+                        onChange={handleChange}
+                        required
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TextField
+                        fullWidth
+                        label="Trainer Name"
+                        name="trainerName"
+                        value={form.trainerName}
+                        onChange={handleChange}
+                        required
+                      />
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TextField
+                        fullWidth
+                        label="Course"
+                        name="course"
+                        value={form.course}
+                        onChange={handleChange}
+                        required
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TextField
+                        select
+                        fullWidth
+                        label="Training Type"
+                        name="trainingType"
+                        value={form.trainingType}
+                        onChange={handleChange}
+                        required
+                      >
+                        {trainingTypeOptions.map((option) => (
+                          <MenuItem key={option} value={option}>
+                            {option}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TextField
+                        fullWidth
+                        label="Start Date"
+                        name="startDate"
+                        type="date"
+                        value={form.startDate}
+                        onChange={handleChange}
+                        InputLabelProps={{ shrink: true }}
+                        required
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TextField
+                        fullWidth
+                        label="End Date"
+                        name="endDate"
+                        type="date"
+                        value={form.endDate}
+                        onChange={handleChange}
+                        InputLabelProps={{ shrink: true }}
+                        required
+                      />
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TextField
+                        select
+                        fullWidth
+                        label="Status"
+                        name="status"
+                        value={form.status}
+                        onChange={handleChange}
+                        required
+                      >
+                        {statusOptions.map((option) => (
+                          <MenuItem key={option} value={option}>
+                            {option}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TextField
+                        fullWidth
+                        label="% Completed"
+                        name="percentCompleted"
+                        type="number"
+                        value={form.percentCompleted ?? ""}
+                        onChange={handleChange}
+                        inputProps={{ min: 0, max: 100 }}
+                        required
+                      />
+                    </Grid>
+                  </Grid>
+                </Box>
+
+                <Divider />
+
+                {/* Actions */}
                 <Box
                   sx={{
                     display: "flex",
                     justifyContent: "flex-end",
-                    gap: 2,
+                    gap: 1.5,
+                    px: { xs: 2.5, sm: 4 },
+                    py: 2,
+                    background: "#F8FBFB",
                   }}
                 >
                   <Button
-                    sx={{ fontSize: "10px", fontWeight: "Medium" }}
+                    variant="outlined"
                     onClick={() => {
                       setShowForm(false);
                       setShowTable(true);
                       handleClose();
                     }}
+                    sx={{
+                      textTransform: "none",
+                      fontWeight: 600,
+                      borderColor: "#CBD5E0",
+                      color: "#4A5568",
+                      minWidth: 300,
+                    }}
                   >
                     Cancel
                   </Button>
                   <Button
-                    sx={{ fontSize: "10px", fontWeight: "Medium" }}
                     onClick={handleSubmit}
                     variant="contained"
+                    sx={{
+                      textTransform: "none",
+                      fontWeight: 600,
+                      background:
+                        "linear-gradient(90deg, #006A71 0%, #48A6A7 100%)",
+                      boxShadow: "none",
+                      minWidth: 300,
+                      "&:hover": {
+                        background:
+                          "linear-gradient(90deg, #005258 0%, #3b8f90 100%)",
+                        boxShadow: "none",
+                      },
+                    }}
                   >
-                    {editId ? "Update" : "Add"}
+                    {editId ? "Update Training" : "Add Training"}
                   </Button>
                 </Box>
               </Box>
