@@ -82,9 +82,9 @@ function App() {
   });
 
   const fetchTrainings = async () => {
-    //const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/trainings`);
+    const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/trainings`);
     //const res = await axios.get("http://localhost:5002/api/trainings");
-    const res = await axios.get("http://10.192.190.158:5002/api/trainings");
+    //const res = await axios.get("http://10.192.190.158:5002/api/trainings");
     setTrainings(res.data);
   };
 
@@ -138,11 +138,16 @@ function App() {
       return;
     }
     if (editId) {
+      
+      
       //await axios.put(`http://localhost:5002/api/trainings/${editId}`, form);
-      await axios.put(`http://10.192.190.158:5002/api/trainings/${editId}`, form);
+      //await axios.put(`http://10.192.190.158:5002/api/trainings/${editId}`, form);
+      await axios.put(`${process.env.REACT_APP_API_BASE_URL}/api/trainings/${editId}`, form);
     } else {
       //await axios.post("http://localhost:5002/api/trainings", form);
-      await axios.post("http://10.192.190.158:5002/api/trainings", form);
+      //await axios.post("http://10.192.190.158:5002/api/trainings", form); 
+      await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/trainings`, form); 
+        
     }
     fetchTrainings();
     handleClose();
@@ -150,7 +155,8 @@ function App() {
 
   const handleDelete = async (id: string) => {
     //await axios.delete(`http://localhost:5002/api/trainings/${id}`);
-    await axios.delete(`http://10.192.190.158:5002/api/trainings/${id}`);
+    //await axios.delete(`http://10.192.190.158:5002/api/trainings/${id}`);
+  await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/api/trainings/${id}`);
     fetchTrainings();
   };
 

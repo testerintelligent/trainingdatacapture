@@ -9,6 +9,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+
+const path = require('path');
+const environment = process.env.NODE_ENV || 'development';
+
+require('dotenv').config({
+  path: path.resolve(__dirname, `.env.${environment}`)
+});
+
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
@@ -68,7 +76,9 @@ const swaggerOptions = {
     },
     servers: [
      //{ url: `http://localhost:${process.env.PORT || 5002}` },
-      { url: `http://10.192.190.158:${process.env.PORT}` } // Change URL when commit
+      //{ url: `http://10.192.190.158:${process.env.PORT}` } // Change URL when commit
+      { url: `${process.env.MONGODB_URI}:${process.env.PORT}`} // Change URL when commit
+  
     ],
     tags: [
       { name: 'Trainings', description: 'Operations related to employee training records' }
