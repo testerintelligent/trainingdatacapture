@@ -234,19 +234,19 @@ function App() {
             background: "linear-gradient(90deg, #006A71 0%, #48A6A7 100%)",
             WebkitTextFillColor: "#fff",
             color: "#fff",
-            borderRadius: "10px",
-            padding: "6px 12px",
-            boxShadow: "0 4px 14px rgba(0, 106, 113, 0.35)",
+            borderRadius: "7px",
+            padding: "8px 20px",
+            boxShadow: "0 20px 14px rgba(0, 106, 113, 0.35)",
           }}
         >
-          Employee Training Records
+          Employee Training Records - For Web and API Testing
         </div>
         <Container
           maxWidth={false} // VERY IMPORTANT
           disableGutters
           sx={{
             width: "100%",
-            px: "2px", // 2px gap between left and right
+            px: "8px", // 2px gap between left and right
           }}
         >
           {showTable && (
@@ -788,7 +788,7 @@ function App() {
             <Box
               sx={{
                 mt: 4,
-                mx: 0,
+                mx: "auto",
                 mb: 4,
                 maxWidth: { xs: "100%", md: "68%" },
               }}
