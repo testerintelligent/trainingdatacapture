@@ -17,7 +17,7 @@ COPY . .
 # So to bake in the dev config, copy .env.development over .env.production.local,
 # which is CRA's highest-priority env file and overrides .env.production.
 ARG BUILD_ENV=production
-RUN if [ "$BUILD_ENV" = "development" ]; then cp .env.development .env.production.local; fi
+RUN if [ "$BUILD_ENV" = "development" ]; then cp .env.development .env.production; fi
 
 #build the react app
 RUN npm run build

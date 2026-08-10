@@ -25,4 +25,4 @@ ENV NODE_ENV=production
 # Run node directly (not `npm start`) so the container's NODE_ENV is respected.
 # `npm start` hardcodes NODE_ENV=production in package.json and would silently
 # override whatever was passed in.
-CMD ["node", "index.js"]
+CMD ["npm", "start"]

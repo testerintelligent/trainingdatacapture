@@ -38,7 +38,7 @@ pipeline {
         stage('Display URL') {
             steps {
                 script {
-                    def url = "10.192.190.158:8002"
+                    def url = params.ENVIRONMENT == 'dev' ? '127.0.0.1:8002' : '10.192.190.158:8002'
                     echo "Traning Application is running at ${url}"
                 }
             }
