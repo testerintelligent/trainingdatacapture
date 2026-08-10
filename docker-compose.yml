@@ -1,18 +1,22 @@
-  services: 
+  services:
     backend:
       build:
         context: ./back-end
+      environment:
+        - NODE_ENV=${NODE_ENV:-production}
       ports:
         - "5002:5002"
       networks:
         - training-mern-network
       depends_on:
         - mongo
-      
 
-    frontend: 
-      build: 
+
+    frontend:
+      build:
         context: ./front-end
+        args:
+          BUILD_ENV: ${NODE_ENV:-production}
       ports:
         - "8002:80"
       networks:

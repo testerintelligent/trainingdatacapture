@@ -11,6 +11,14 @@ RUN npm install
 #copy the rest of the app code
 COPY . .
 
+# Build-time environment selector: 'development' or 'production'.
+# CRA's `npm run build` always runs internally with NODE_ENV=production and
+# only reads .env.production(.local) files - it never picks up .env.development.
+# So to bake in the dev config, copy .env.development over .env.production.local,
+# which is CRA's highest-priority env file and overrides .env.production.
+ARG BUILD_ENV=production
+RUN if [ "$BUILD_ENV" = "development" ]; then cp .env.development .env.production.local; fi
+
 #build the react app
 RUN npm run build
 
