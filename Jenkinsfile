@@ -4,6 +4,14 @@ pipeline {
         GIT_REPO_URL = 'https://github.com/testerintelligent/trainingdatacapture.git'
     }
 
+    parameters {
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['prod', 'dev'],   // first value = default, so prod is default
+            description: 'Select the deployment environment'
+        )
+    }
+
     stages {
         stage('Clone Repository') {
             steps {
