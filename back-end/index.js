@@ -75,9 +75,9 @@ const swaggerOptions = {
       description: 'API for managing employee training records',
     },
     servers: [
-     //{ url: `http://localhost:${process.env.PORT || 5002}` },
-      //{ url: `http://10.192.190.158:${process.env.PORT}` } // Change URL when commit
-      { url: `${process.env.REACT_APP_API_BASE_URL}:${process.env.PORT}`} // Change URL when commit
+      //{ url: `${process.env.REACT_APP_API_BASE_URL}:${process.env.PORT}`} // Change URL when commit
+      { url: `${process.env.REACT_APP_API_BASE_URL || 'http://localhost'}:${process.env.PORT || 5002}` }
+
   
     ],
     tags: [
