@@ -26,10 +26,8 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SchoolIcon from "@mui/icons-material/School";
 import AssessmentIcon from "@mui/icons-material/Assessment";
-// import MenuIcon from "@mui/icons-material/Menu";
 import { exportToExcel } from "./exportToExcel";
 import "./App.css";
-import "./responsive.css";
 
 interface Training {
   _id?: string;
@@ -85,8 +83,6 @@ function App() {
 
   const fetchTrainings = async () => {
     const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/trainings`);
-    //const res = await axios.get("http://localhost:5002/api/trainings");
-    //const res = await axios.get("http://10.192.190.158:5002/api/trainings");
     setTrainings(res.data);
   };
 
@@ -140,42 +136,19 @@ function App() {
       return;
     }
     if (editId) {
-      
-      
-      //await axios.put(`http://localhost:5002/api/trainings/${editId}`, form);
-      //await axios.put(`http://10.192.190.158:5002/api/trainings/${editId}`, form);
       await axios.put(`${process.env.REACT_APP_API_BASE_URL}/api/trainings/${editId}`, form);
     } else {
-      //await axios.post("http://localhost:5002/api/trainings", form);
-      //await axios.post("http://10.192.190.158:5002/api/trainings", form); 
-      await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/trainings`, form); 
-        
+      await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/trainings`, form);
     }
     fetchTrainings();
     handleClose();
   };
 
   const handleDelete = async (id: string) => {
-    //await axios.delete(`http://localhost:5002/api/trainings/${id}`);
-    //await axios.delete(`http://10.192.190.158:5002/api/trainings/${id}`);
-  await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/api/trainings/${id}`);
+    await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/api/trainings/${id}`);
     fetchTrainings();
   };
 
-  // const filteredRows = trainings.filter((row) => {
-  //   const search = searchText.toLowerCase();
-
-  //   return (
-  //     row.projectName?.toLowerCase().includes(search) ||
-  //     row.empId?.toLowerCase().includes(search) ||
-  //     row.employeeName?.toLowerCase().includes(search) ||
-  //     row.course?.toLowerCase().includes(search) ||
-  //     row.trainerName?.toLowerCase().includes(search) ||
-  //     row.trainingType?.toLowerCase().includes(search) ||
-  //     row.status?.toLowerCase().includes(search) ||
-  //     row.endDate?.includes(search)
-  //   );
-  // });
   const filteredTrainings = trainings.filter((t) => {
     return (
       (!filters.empId ||
@@ -795,7 +768,6 @@ function App() {
                               flexDirection: "row",
                               justifyContent: "flex-end",
                               alignItems: "center",
-                              // gap: 0.5,
                             }}
                           >
                             <IconButton
