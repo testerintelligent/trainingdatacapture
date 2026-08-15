@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guru's Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Base Styles & Variables --- */
+        :root {
+            --bg-primary: #f0f4f8; /* Light gray-blue */
+            --bg-secondary: #ffffff;
+            --text-primary: #1e293b; /* Dark Slate */
+            --text-secondary: #64748b; /* Medium Slate */
+            --electric-blue: #4f46e5; /* Indigo */
+            --coral: #f97316; /* Orange */
+            --spacing-unit: 8px;
+            --border-radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(79, 70, 229, 0.05), transparent 30%),
+                radial-gradient(circle at 85% 70%, rgba(249, 115, 22, 0.05), transparent 30%);
+            background-attachment: fixed;
+        }
+
+        .custom-gradient {
+            background: linear-gradient(90deg, var(--electric-blue), var(--coral));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* --- Typography --- */
+        h1, h2, h3 {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        h1 {
+            font-size: clamp(1.75rem, 1.3rem + 2.25vw, 3rem);
+        }
+
+        h2 {
+            font-size: clamp(1.5rem, 1.2rem + 1.5vw, 2.25rem);
+            background: linear-gradient(90deg, var(--electric-blue), var(--coral));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+        }
+
+        h3 {
+            font-size: clamp(1rem, 0.9rem + 0.625vw, 1.25rem);
+            margin-bottom: calc(var(--spacing-unit) * 2);
+        }
+
+        p, li, a {
+            font-size: clamp(0.85rem, 0.75rem + 0.5vw, 1rem);
+            color: var(--text-secondary); /* Changed from --text-primary to --text-secondary for body text */
+        }
+
+        a {
+            text-decoration: none;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--text-primary);
+        }
+
+        /* --- Layout & Grid System --- */
+        .main-header {
+            /* This class is no longer used but kept for potential future use */
+        }
+
+        .main-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: var(--spacing-unit) calc(var(--spacing-unit) * 3);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .logo a {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: var(--spacing-unit);
+            list-style: none;
+        }
+
+        .content-area {
+            padding: calc(var(--spacing-unit) * 3);
+        }
+
+        .welcome-section {
+            text-align: center;
+            margin-bottom: calc(var(--spacing-unit) * 4);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: calc(var(--spacing-unit) * 3);
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            padding: calc(var(--spacing-unit) * 3);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+       .card-grid .card:nth-child(1) {
+            background-color: #caedf6; /* Bright Cyan */
+        }
+
+        .card-grid .card:nth-child(1) h3,
+        .card-grid .card:nth-child(1) p,
+        .card-grid .card:nth-child(1) li,
+        .card-grid .card:nth-child(1) a {
+            color: var(--text-primary);
+        }
+
+        .card-grid .card:nth-child(2) {
+            background-color: #f0fdf4; /* Mild Green */
+        }
+
+        .card-grid .card:nth-child(3) {
+            background-color: #fffbeb; /* Mild Amber */
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--electric-blue), var(--coral));
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 0;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.07);
+        }
+
+        .card:hover::before {
+            opacity: 0.05;
+        }
+
+        .card h3, .card ul {
+            position: relative;
+            z-index: 1;
+        }
+
+        .card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: calc(var(--spacing-unit) * 1.5);
+        }
+
+        .card a {
+            display: inline-block;
+            padding: 2px 0;
+        }
+
+        .card a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background: linear-gradient(90deg, var(--electric-blue), var(--coral));
+            transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .card a:hover::after {
+            width: 100%;
+        }
+
+        /* --- Buttons & Interactive Elements --- */
+        .nav-button {
+            padding: var(--spacing-unit) calc(var(--spacing-unit) * 2);
+            border-radius: 12px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-button:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--text-primary);
+        }
+
+        /* --- Mobile Responsiveness --- */
+        @media (max-width: 768px) {
+            .main-nav {
+                flex-direction: column;
+                gap: calc(var(--spacing-unit) * 2);
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- The main-header element has been removed to bring the content to the top -->
+
+    <main class="content-area">
+        <section class="welcome-section">
+            <h2>!!! Welcome Team !!!</h2>
+            <h3>Today is going to be a great day for you</h3>
+            <p>Here are your internal URLs and applications.</p>
+            <br>
+        </section>
+
+        <section class="card-grid">
+            <div class="card">
+                <h3>Guidewire</h3>
+                <ul>
+                    <li><a href="http://10.192.209.132:8180/pc/PolicyCenter.do" target="_blank">PolicyCenter</a></li>
+                    <li><a href="http://10.192.190.131:8580/bc/BillingCenter.do" target="_blank">BillingCenter</a></li>
+                    <li><a href="http://10.192.209.132:8080/cc/ClaimCenter.do" target="_blank">ClaimsCenter</a></li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Internal Dev APPs</h3>
+                <ul>
+                    <li><a href="http://10.192.190.158:8002" target="_blank">TrainingApp</a></li>
+                    <li><a href="http://10.192.190.158:5000/api-docs/" target="_blank">Expleosurance - Swagger UI</a></li>
+                    <br>
+                    <li><a href="http://10.192.190.158:3001" target="_blank">Expleosurance-Policy</a></li>
+                    <li><a href="http://10.192.190.158:3002" target="_blank">Expleosurance-Billing</a></li>
+                    <li><a href="http://10.192.190.158:3003" target="_blank">Expleosurance-Claims</a></li>
+                    <li><a href="http://10.192.190.158:3004" target="_blank">PricingConfig APP</a></li>
+                    <li><a href="http://10.192.190.158:5002/api-docs/" target="_blank">TrainingAPP-Swagger UI</a></li>
+                    <br>
+                    <li><a href="http://10.192.190.133:8080" target="_blank">Jenkins</a></li>
+                    <li><a href="https://gitlab.extend.internal.expleogroup.com/" target="_blank">GitLab</a></li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Internals</h3>
+                <ul>
+                    <li><a href="https://iacfgs.fa.ocs.oraclecloud.com/fscmUI/faces/FuseWelcome" target="_blank">MyHR</a></li>
+                    <li><a href="https://pms.whizible.com/Expleo_prod/default.aspx" target="_blank">Whizible</a></li>
+                    <li><a href="https://psa.expleogroup.com/" target="_blank">Changepoint (Group Timesheet)</a></li>
+                    <li><a href="https://payroll.tanqaa.in/login/" target="_blank">Tanquaa</a></li>
+                    <li><a href="https://myprofile.expleogroup.com/" target="_blank">Myprofile</a></li>
+                    <li><a href="https://app.powerbi.com/groups/me/reports/3b24d471-d6d1-4918-9e04-fa73cf9b13f1/6067a543963fa006cb2b?ctid=3b0e7247-e0d5-44bf-8ed1-d01b18d16ca2&experience=power-bi" target="_blank">RMG_Dashboard</a></li>
+                </ul>
+            </div>
+
+        </section>
+    </main>
+</body>
+</html>
