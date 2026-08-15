@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import {
   Container,
@@ -25,6 +25,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SchoolIcon from "@mui/icons-material/School";
+import AssessmentIcon from "@mui/icons-material/Assessment";
 // import MenuIcon from "@mui/icons-material/Menu";
 import { exportToExcel } from "./exportToExcel";
 import "./App.css";
@@ -65,8 +66,9 @@ function App() {
     projectName: projectNameOptions[0],
   });
   const [editId, setEditId] = useState<string | null>(null);
-  const [showTable, setShowTable] = useState(true);
+  const [showTable, setShowTable] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [showSummary, setShowSummary] = useState(true);
 
   const [filters, setFilters] = useState({
     empId: "",
@@ -198,14 +200,55 @@ function App() {
     );
   });
 
+  // Summary: Project Name + Course -> count of employees who completed it
+  const completionSummary = useMemo(() => {
+    const map = new Map<
+      string,
+      { projectName: string; course: string; completedCount: number }
+    >();
+    trainings.forEach((t) => {
+      if (t.status === "Completed") {
+        const key = `${t.projectName}|||${t.course}`;
+        const existing = map.get(key);
+        if (existing) {
+          existing.completedCount += 1;
+        } else {
+          map.set(key, {
+            projectName: t.projectName,
+            course: t.course,
+            completedCount: 1,
+          });
+        }
+      }
+    });
+    return Array.from(map.values()).sort(
+      (a, b) =>
+        a.projectName.localeCompare(b.projectName) ||
+        a.course.localeCompare(b.course)
+    );
+  }, [trainings]);
+
   return (
     <div className="app-flex-root">
       <aside className="side-menu">
+        <Tooltip title="Completion Summary" placement="right">
+          <IconButton
+            onClick={() => {
+              setShowSummary(true);
+              setShowTable(false);
+              setShowForm(false);
+            }}
+            sx={{ color: showSummary ? "#4299e1" : "#fff" }}
+          >
+            <AssessmentIcon />
+          </IconButton>
+        </Tooltip>
         <Tooltip title="Training Summary" placement="right">
           <IconButton
             onClick={() => {
               setShowTable(true);
               setShowForm(false);
+              setShowSummary(false);
             }}
             sx={{ color: showTable ? "#4299e1" : "#fff" }}
           >
@@ -217,6 +260,7 @@ function App() {
             onClick={() => {
               setShowForm(true);
               setShowTable(false);
+              setShowSummary(false);
               handleOpen();
             }}
             sx={{ color: showForm ? "#4299e1" : "#fff" }}
@@ -231,12 +275,12 @@ function App() {
           className="page-header"
           style={{
             marginTop: "100px",
-            background: "linear-gradient(90deg, #006A71 0%, #48A6A7 100%)",
+            background: "#6846C6",
             WebkitTextFillColor: "#fff",
             color: "#fff",
             borderRadius: "7px",
             padding: "8px 20px",
-            boxShadow: "0 20px 14px rgba(0, 106, 113, 0.35)",
+            boxShadow: "0 20px 14px rgba(104, 70, 198, 0.35)",
           }}
         >
           Employee Training Records - For Web and API Testing
@@ -264,9 +308,12 @@ function App() {
               >
                 <Button
                   variant="contained"
-                  color="success"
                   onClick={() => exportToExcel(trainings)}
-                  sx={{ marginRight: "4px" }}
+                  sx={{
+                    marginRight: "4px",
+                    backgroundColor: "#887bab",
+                    "&:hover": { backgroundColor: "#746991" },
+                  }}
                 >
                   Export to Excel
                 </Button>
@@ -286,7 +333,7 @@ function App() {
                       <TableCell
                         sx={{
                           width: "12.52%",
-                          backgroundColor: "#006A71",
+                          backgroundColor: "#6846C6",
                           color: "#fff",
                           fontWeight: "bold",
                           whiteSpace: "nowrap",
@@ -300,7 +347,7 @@ function App() {
                       <TableCell
                         sx={{
                           width: "10%",
-                          backgroundColor: "#006A71",
+                          backgroundColor: "#6846C6",
                           color: "#fff",
                           fontWeight: "bold",
                           whiteSpace: "nowrap",
@@ -314,7 +361,7 @@ function App() {
                       <TableCell
                         sx={{
                           width: "18.97%",
-                          backgroundColor: "#006A71",
+                          backgroundColor: "#6846C6",
                           color: "#fff",
                           fontWeight: "bold",
                           whiteSpace: "nowrap",
@@ -328,7 +375,7 @@ function App() {
                       <TableCell
                         sx={{
                           width: "18.97%",
-                          backgroundColor: "#006A71",
+                          backgroundColor: "#6846C6",
                           color: "#fff",
                           fontWeight: "bold",
                           whiteSpace: "nowrap",
@@ -342,7 +389,7 @@ function App() {
                       <TableCell
                         sx={{
                           width: "18.97%",
-                          backgroundColor: "#006A71",
+                          backgroundColor: "#6846C6",
                           color: "#fff",
                           fontWeight: "bold",
                           whiteSpace: "nowrap",
@@ -356,7 +403,7 @@ function App() {
                       <TableCell
                         sx={{
                           width: "18.97%",
-                          backgroundColor: "#006A71",
+                          backgroundColor: "#6846C6",
                           color: "#fff",
                           fontWeight: "bold",
                           whiteSpace: "nowrap",
@@ -370,7 +417,7 @@ function App() {
                       <TableCell
                         sx={{
                           width: "12.52%",
-                          backgroundColor: "#006A71",
+                          backgroundColor: "#6846C6",
                           color: "#fff",
                           fontWeight: "bold",
                           whiteSpace: "nowrap",
@@ -384,7 +431,7 @@ function App() {
                       <TableCell
                         sx={{
                           width: "12.52%",
-                          backgroundColor: "#006A71",
+                          backgroundColor: "#6846C6",
                           color: "#fff",
                           fontWeight: "bold",
                           whiteSpace: "nowrap",
@@ -398,7 +445,7 @@ function App() {
                       <TableCell
                         sx={{
                           width: "10%",
-                          backgroundColor: "#006A71",
+                          backgroundColor: "#6846C6",
                           color: "#fff",
                           fontWeight: "bold",
                           whiteSpace: "nowrap",
@@ -412,7 +459,7 @@ function App() {
                       <TableCell
                         sx={{
                           width: "10%",
-                          backgroundColor: "#006A71",
+                          backgroundColor: "#6846C6",
                           color: "#fff",
                           fontWeight: "bold",
                           whiteSpace: "nowrap",
@@ -426,7 +473,7 @@ function App() {
                       <TableCell
                         sx={{
                           width: "5.46%",
-                          backgroundColor: "#006A71",
+                          backgroundColor: "#6846C6",
                           color: "#fff",
                           fontWeight: "bold",
                           whiteSpace: "nowrap",
@@ -449,7 +496,7 @@ function App() {
                         },
                       }}
                     >
-                      <TableCell sx={{ backgroundColor: "#9ACBD0" }}>
+                      <TableCell sx={{ backgroundColor: "#c6adf7" }}>
                         <TextField
                           size="small"
                           select
@@ -492,7 +539,7 @@ function App() {
                           ))}
                         </TextField>
                       </TableCell>
-                      <TableCell sx={{ backgroundColor: "#9ACBD0" }}>
+                      <TableCell sx={{ backgroundColor: "#c6adf7" }}>
                         <TextField
                           size="small"
                           variant="outlined"
@@ -507,7 +554,7 @@ function App() {
                           fullWidth
                         />
                       </TableCell>
-                      <TableCell sx={{ backgroundColor: "#9ACBD0" }}>
+                      <TableCell sx={{ backgroundColor: "#c6adf7" }}>
                         <TextField
                           size="small"
                           variant="outlined"
@@ -522,7 +569,7 @@ function App() {
                           fullWidth
                         />
                       </TableCell>
-                      <TableCell sx={{ backgroundColor: "#9ACBD0" }}>
+                      <TableCell sx={{ backgroundColor: "#c6adf7" }}>
                         <TextField
                           size="small"
                           variant="outlined"
@@ -537,7 +584,7 @@ function App() {
                           fullWidth
                         />
                       </TableCell>
-                      <TableCell sx={{ backgroundColor: "#9ACBD0" }}>
+                      <TableCell sx={{ backgroundColor: "#c6adf7" }}>
                         <TextField
                           size="small"
                           variant="outlined"
@@ -552,7 +599,7 @@ function App() {
                           fullWidth
                         />
                       </TableCell>
-                      <TableCell sx={{ backgroundColor: "#9ACBD0" }}>
+                      <TableCell sx={{ backgroundColor: "#c6adf7" }}>
                         <TextField
                           size="small"
                           select
@@ -594,7 +641,7 @@ function App() {
                           ))}
                         </TextField>
                       </TableCell>
-                      <TableCell sx={{ backgroundColor: "#9ACBD0" }}>
+                      <TableCell sx={{ backgroundColor: "#c6adf7" }}>
                         <TextField
                           size="small"
                           type="date"
@@ -610,7 +657,7 @@ function App() {
                           InputLabelProps={{ shrink: true }}
                         />
                       </TableCell>
-                      <TableCell sx={{ backgroundColor: "#9ACBD0" }}>
+                      <TableCell sx={{ backgroundColor: "#c6adf7" }}>
                         <TextField
                           size="small"
                           type="date"
@@ -626,7 +673,7 @@ function App() {
                           InputLabelProps={{ shrink: true }}
                         />
                       </TableCell>
-                      <TableCell sx={{ backgroundColor: "#9ACBD0" }}>
+                      <TableCell sx={{ backgroundColor: "#c6adf7" }}>
                         <TextField
                           size="small"
                           select
@@ -667,7 +714,7 @@ function App() {
                           ))}
                         </TextField>
                       </TableCell>
-                      <TableCell sx={{ backgroundColor: "#9ACBD0" }}>
+                      <TableCell sx={{ backgroundColor: "#c6adf7" }}>
                         <TextField
                           size="small"
                           variant="outlined"
@@ -682,7 +729,7 @@ function App() {
                           fullWidth
                         />
                       </TableCell>
-                      <TableCell sx={{ backgroundColor: "#9ACBD0" }} />
+                      <TableCell sx={{ backgroundColor: "#c6adf7" }} />
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -695,7 +742,7 @@ function App() {
                             borderBottom: "1px solid #e0e0e0",
                           },
                           "& > *": { paddingTop: 0, paddingBottom: 0 },
-                          backgroundColor: "#9ACBD0",
+                          backgroundColor: "#c6adf7",
                         }}
                       >
                         <TableCell sx={{ width: "12.52%", padding: "0 8px" }}>
@@ -814,8 +861,7 @@ function App() {
                     gap: 1.5,
                     px: { xs: 2.5, sm: 4 },
                     py: 2.5,
-                    background:
-                      "linear-gradient(90deg, #006A71 0%, #48A6A7 100%)",
+                    background: "#6846C6",
                   }}
                 >
                   <Avatar
@@ -1025,13 +1071,11 @@ function App() {
                     sx={{
                       textTransform: "none",
                       fontWeight: 600,
-                      background:
-                        "linear-gradient(90deg, #006A71 0%, #48A6A7 100%)",
+                      background: "#887bab",
                       boxShadow: "none",
                       minWidth: 300,
                       "&:hover": {
-                        background:
-                          "linear-gradient(90deg, #005258 0%, #3b8f90 100%)",
+                        background: "#746991",
                         boxShadow: "none",
                       },
                     }}
@@ -1041,6 +1085,122 @@ function App() {
                 </Box>
               </Box>
             </Box>
+          )}
+          {showSummary && (
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  width: "100%",
+                  mt: 2,
+                  mb: 2,
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{ color: "#6846C6", fontWeight: 700 }}
+                >
+                  Course Completion Summary
+                </Typography>
+              </Box>
+
+              <TableContainer
+                component={Paper}
+                sx={{
+                  maxHeight: 470,
+                  overflowY: "auto",
+                  scrollbarWidth: "thin",
+                }}
+              >
+                <Table stickyHeader>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell
+                        sx={{
+                          width: "40%",
+                          backgroundColor: "#6846C6",
+                          color: "#fff",
+                          fontWeight: "bold",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          fontSize: "16px !important",
+                        }}
+                      >
+                        Project Name
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          width: "40%",
+                          backgroundColor: "#6846C6",
+                          color: "#fff",
+                          fontWeight: "bold",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          fontSize: "16px !important",
+                        }}
+                      >
+                        Course
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          width: "20%",
+                          backgroundColor: "#6846C6",
+                          color: "#fff",
+                          fontWeight: "bold",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          fontSize: "16px !important",
+                        }}
+                      >
+                        No of Employees Completed
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {completionSummary.length === 0 ? (
+                      <TableRow>
+                        <TableCell
+                          colSpan={3}
+                          align="center"
+                          sx={{ backgroundColor: "#c6adf7" }}
+                        >
+                          No completed training records yet.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      completionSummary.map((row) => (
+                        <TableRow
+                          key={`${row.projectName}-${row.course}`}
+                          sx={{
+                            height: 44,
+                            "&:not(:last-child)": {
+                              borderBottom: "1px solid #e0e0e0",
+                            },
+                            "& > *": { paddingTop: 0, paddingBottom: 0 },
+                            backgroundColor: "#c6adf7",
+                          }}
+                        >
+                          <TableCell sx={{ width: "40%", padding: "0 8px" }}>
+                            {row.projectName}
+                          </TableCell>
+                          <TableCell sx={{ width: "40%", padding: "0 8px" }}>
+                            {row.course}
+                          </TableCell>
+                          <TableCell sx={{ width: "20%", padding: "0 8px" }}>
+                            {row.completedCount}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </>
           )}
         </Container>
       </main>
