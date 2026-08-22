@@ -23,6 +23,15 @@
       - training-mern-network # <--- Make sure this is here!
 
     
+    dashboard:
+      build:
+        context: ./dashboard
+      ports:
+        - "8003:80"
+      networks:
+        - training-mern-network
+
+
     mongo:
       image: mongo:latest
       ports:
