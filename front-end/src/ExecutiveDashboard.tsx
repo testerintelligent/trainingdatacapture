@@ -1,32 +1,94 @@
-import React, { useMemo } from "react";
-import { Box, Paper, Typography, Avatar } from "@mui/material";
+import React, { useId, useMemo } from "react";
+import { Box, Paper, Typography, Avatar, Divider } from "@mui/material";
 import HourglassBottomIcon from "@mui/icons-material/HourglassBottom";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
 import type { Training } from "./App";
 
 interface ExecutiveDashboardProps {
   trainings: Training[];
 }
 
-interface TrendPoint {
-  date: string; // ISO yyyy-mm-dd
-  count: number;
+interface ChartSeries {
+  name: string;
+  color: string;
+  values: number[];
 }
+
+interface CardTrend {
+  data: number[];
+  deltaPct: number | null;
+  periodLabel: string;
+}
+
+const Sparkline: React.FC<{ data: number[]; color?: string }> = ({
+  data,
+  color = "#6846C6",
+}) => {
+  const gradientId = useId();
+  const width = 120;
+  const height = 40;
+  const padding = 4;
+
+  if (data.length === 0) return null;
+
+  const max = Math.max(...data, 1);
+  const min = Math.min(...data, 0);
+  const range = max - min || 1;
+  const stepX = data.length > 1 ? (width - padding * 2) / (data.length - 1) : 0;
+  const lastIndex = data.length - 1;
+
+  const xOf = (i: number) => padding + i * stepX;
+  const yOf = (v: number) =>
+    height - padding - ((v - min) / range) * (height - padding * 2);
+
+  const linePoints = data.map((v, i) => `${xOf(i)},${yOf(v)}`).join(" ");
+  const areaPoints = `${xOf(0)},${height - padding} ${linePoints} ${xOf(
+    lastIndex
+  )},${height - padding}`;
+
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
+      role="img"
+      aria-label="Trend of completions over recent months"
+    >
+      <defs>
+        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity={0.3} />
+          <stop offset="100%" stopColor={color} stopOpacity={0} />
+        </linearGradient>
+      </defs>
+      <polygon points={areaPoints} fill={`url(#${gradientId})`} />
+      <polyline
+        points={linePoints}
+        fill="none"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx={xOf(lastIndex)} cy={yOf(data[lastIndex])} r={3} fill={color} />
+    </svg>
+  );
+};
 
 const StatCard: React.FC<{
   icon: React.ReactNode;
   label: string;
   value: number;
   accent: string;
-}> = ({ icon, label, value, accent }) => (
+  trend?: CardTrend;
+}> = ({ icon, label, value, accent, trend }) => (
   <Paper
     elevation={0}
     sx={{
       flex: "1 1 240px",
-      display: "flex",
-      alignItems: "center",
-      gap: 2.5,
       p: 3,
       borderRadius: 3,
       border: "1px solid #E5EEEF",
@@ -34,22 +96,73 @@ const StatCard: React.FC<{
       background: "#ffffff",
     }}
   >
-    <Avatar sx={{ bgcolor: accent, width: 56, height: 56 }}>{icon}</Avatar>
-    <Box>
-      <Typography
-        variant="h3"
-        sx={{ fontWeight: 800, color: "#2d2540", lineHeight: 1.1 }}
-      >
-        {value}
-      </Typography>
-      <Typography variant="body1" sx={{ color: "#6b7280", fontWeight: 600 }}>
-        {label}
-      </Typography>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 2.5 }}>
+      <Avatar sx={{ bgcolor: accent, width: 56, height: 56 }}>{icon}</Avatar>
+      <Box>
+        <Typography
+          variant="h3"
+          sx={{ fontWeight: 800, color: "#2d2540", lineHeight: 1.1 }}
+        >
+          {value}
+        </Typography>
+        <Typography variant="body1" sx={{ color: "#6b7280", fontWeight: 600 }}>
+          {label}
+        </Typography>
+      </Box>
     </Box>
+
+    {trend && trend.data.length > 0 && (
+      <>
+        <Divider sx={{ my: 2 }} />
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 2,
+          }}
+        >
+          <Box>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+              {trend.deltaPct === null || trend.deltaPct === 0 ? (
+                <TrendingFlatIcon sx={{ fontSize: 16, color: "#6b7280" }} />
+              ) : trend.deltaPct > 0 ? (
+                <ArrowUpwardIcon sx={{ fontSize: 16, color: "#2e7d32" }} />
+              ) : (
+                <ArrowDownwardIcon sx={{ fontSize: 16, color: "#c62828" }} />
+              )}
+              <Typography
+                variant="body2"
+                sx={{
+                  fontWeight: 700,
+                  color:
+                    trend.deltaPct === null || trend.deltaPct === 0
+                      ? "#6b7280"
+                      : trend.deltaPct > 0
+                      ? "#2e7d32"
+                      : "#c62828",
+                }}
+              >
+                {trend.deltaPct === null
+                  ? "No prior data"
+                  : `${trend.deltaPct > 0 ? "+" : ""}${trend.deltaPct}%`}
+              </Typography>
+            </Box>
+            <Typography variant="caption" sx={{ color: "#94a3b8" }}>
+              {trend.periodLabel}
+            </Typography>
+          </Box>
+          <Sparkline data={trend.data} color={accent} />
+        </Box>
+      </>
+    )}
   </Paper>
 );
 
-const CompletionTrendChart: React.FC<{ data: TrendPoint[] }> = ({ data }) => {
+const MultiSeriesTrendChart: React.FC<{
+  categories: string[];
+  series: ChartSeries[];
+}> = ({ categories, series }) => {
   const width = 900;
   const height = 340;
   const margin = { top: 24, right: 32, bottom: 64, left: 48 };
@@ -62,27 +175,24 @@ const CompletionTrendChart: React.FC<{ data: TrendPoint[] }> = ({ data }) => {
     return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
   };
 
-  if (data.length === 0) {
+  if (categories.length === 0) {
     return (
       <Box sx={{ py: 8, textAlign: "center", color: "#94a3b8" }}>
         <Typography variant="body1">
-          No completed training records yet.
+          No training records with an end date yet.
         </Typography>
       </Box>
     );
   }
 
-  const maxCount = Math.max(...data.map((d) => d.count));
+  const maxCount = Math.max(1, ...series.flatMap((s) => s.values));
   const yMax = Math.max(4, Math.ceil(maxCount * 1.2));
-  const stepX = data.length > 1 ? innerWidth / (data.length - 1) : 0;
+  const stepX =
+    categories.length > 1 ? innerWidth / (categories.length - 1) : 0;
 
-  const xOf = (i: number) => (data.length === 1 ? innerWidth / 2 : i * stepX);
+  const xOf = (i: number) =>
+    categories.length === 1 ? innerWidth / 2 : i * stepX;
   const yOf = (v: number) => innerHeight - (v / yMax) * innerHeight;
-
-  const linePoints = data.map((d, i) => `${xOf(i)},${yOf(d.count)}`).join(" ");
-  const areaPoints = `${xOf(0)},${innerHeight} ${linePoints} ${xOf(
-    data.length - 1
-  )},${innerHeight}`;
 
   const gridLines = 4;
   const yTicks = Array.from({ length: gridLines + 1 }, (_, i) =>
@@ -90,67 +200,115 @@ const CompletionTrendChart: React.FC<{ data: TrendPoint[] }> = ({ data }) => {
   );
 
   return (
-    <Box sx={{ width: "100%", overflowX: "auto" }}>
-      <svg
-        viewBox={`0 0 ${width} ${height}`}
-        width="100%"
-        height={height}
-        role="img"
-        aria-label="Line chart of training completions over time"
-      >
-        <defs>
-          <linearGradient id="execTrendFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#6846C6" stopOpacity={0.35} />
-            <stop offset="100%" stopColor="#6846C6" stopOpacity={0} />
-          </linearGradient>
-        </defs>
-        <g transform={`translate(${margin.left},${margin.top})`}>
-          {yTicks.map((t) => (
-            <g key={t}>
-              <line
-                x1={0}
-                x2={innerWidth}
-                y1={yOf(t)}
-                y2={yOf(t)}
-                stroke="#E5EEEF"
-                strokeWidth={1}
+    <Box sx={{ width: "100%" }}>
+      <Box sx={{ display: "flex", gap: 3, mb: 1.5, flexWrap: "wrap" }}>
+        {series.map((s) => (
+          <Box key={s.name} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box
+              sx={{
+                width: 10,
+                height: 10,
+                borderRadius: "50%",
+                backgroundColor: s.color,
+              }}
+            />
+            <Typography variant="body2" sx={{ color: "#4A5568", fontWeight: 600 }}>
+              {s.name}
+            </Typography>
+          </Box>
+        ))}
+      </Box>
+
+      <Box sx={{ width: "100%", overflowX: "auto" }}>
+        <svg
+          viewBox={`0 0 ${width} ${height}`}
+          width="100%"
+          height={height}
+          role="img"
+          aria-label="Line chart of training completions and in-progress trainings over time"
+        >
+          <defs>
+            <linearGradient id="execTrendFill" x1="0" y1="0" x2="0" y2="1">
+              <stop
+                offset="0%"
+                stopColor={series[0]?.color ?? "#6846C6"}
+                stopOpacity={0.3}
               />
-              <text
-                x={-10}
-                y={yOf(t)}
-                textAnchor="end"
-                dominantBaseline="middle"
-                fontSize={12}
-                fill="#6b7280"
-              >
-                {t}
-              </text>
-            </g>
-          ))}
+              <stop
+                offset="100%"
+                stopColor={series[0]?.color ?? "#6846C6"}
+                stopOpacity={0}
+              />
+            </linearGradient>
+          </defs>
+          <g transform={`translate(${margin.left},${margin.top})`}>
+            {yTicks.map((t) => (
+              <g key={t}>
+                <line
+                  x1={0}
+                  x2={innerWidth}
+                  y1={yOf(t)}
+                  y2={yOf(t)}
+                  stroke="#E5EEEF"
+                  strokeWidth={1}
+                />
+                <text
+                  x={-10}
+                  y={yOf(t)}
+                  textAnchor="end"
+                  dominantBaseline="middle"
+                  fontSize={12}
+                  fill="#6b7280"
+                >
+                  {t}
+                </text>
+              </g>
+            ))}
 
-          <polygon points={areaPoints} fill="url(#execTrendFill)" />
-          <polyline
-            points={linePoints}
-            fill="none"
-            stroke="#6846C6"
-            strokeWidth={3}
-            strokeLinejoin="round"
-            strokeLinecap="round"
-          />
+            {series.map((s, sIdx) => {
+              const linePoints = s.values
+                .map((v, i) => `${xOf(i)},${yOf(v)}`)
+                .join(" ");
+              const areaPoints =
+                sIdx === 0
+                  ? `${xOf(0)},${innerHeight} ${linePoints} ${xOf(
+                      categories.length - 1
+                    )},${innerHeight}`
+                  : null;
+              return (
+                <g key={s.name}>
+                  {areaPoints && (
+                    <polygon points={areaPoints} fill="url(#execTrendFill)" />
+                  )}
+                  <polyline
+                    points={linePoints}
+                    fill="none"
+                    stroke={s.color}
+                    strokeWidth={3}
+                    strokeDasharray={sIdx === 0 ? undefined : "6 4"}
+                    strokeLinejoin="round"
+                    strokeLinecap="round"
+                  />
+                  {s.values.map((v, i) => (
+                    <circle
+                      key={`${s.name}-${categories[i]}`}
+                      cx={xOf(i)}
+                      cy={yOf(v)}
+                      r={5}
+                      fill="#ffffff"
+                      stroke={s.color}
+                      strokeWidth={3}
+                    >
+                      <title>{`${s.name} • ${formatDate(categories[i])}: ${v}`}</title>
+                    </circle>
+                  ))}
+                </g>
+              );
+            })}
 
-          {data.map((d, i) => (
-            <g key={d.date}>
-              <circle
-                cx={xOf(i)}
-                cy={yOf(d.count)}
-                r={5}
-                fill="#ffffff"
-                stroke="#6846C6"
-                strokeWidth={3}
-              >
-                <title>{`${formatDate(d.date)}: ${d.count} completed`}</title>
-              </circle>
+            {categories.map((c, i) => (
               <text
+                key={c}
                 x={xOf(i)}
                 y={innerHeight + 24}
                 textAnchor="end"
@@ -158,29 +316,29 @@ const CompletionTrendChart: React.FC<{ data: TrendPoint[] }> = ({ data }) => {
                 fill="#6b7280"
                 transform={`rotate(-35 ${xOf(i)} ${innerHeight + 24})`}
               >
-                {formatDate(d.date)}
+                {formatDate(c)}
               </text>
-            </g>
-          ))}
+            ))}
 
-          <line
-            x1={0}
-            y1={innerHeight}
-            x2={innerWidth}
-            y2={innerHeight}
-            stroke="#CBD5E0"
-            strokeWidth={1}
-          />
-          <line
-            x1={0}
-            y1={0}
-            x2={0}
-            y2={innerHeight}
-            stroke="#CBD5E0"
-            strokeWidth={1}
-          />
-        </g>
-      </svg>
+            <line
+              x1={0}
+              y1={innerHeight}
+              x2={innerWidth}
+              y2={innerHeight}
+              stroke="#CBD5E0"
+              strokeWidth={1}
+            />
+            <line
+              x1={0}
+              y1={0}
+              x2={0}
+              y2={innerHeight}
+              stroke="#CBD5E0"
+              strokeWidth={1}
+            />
+          </g>
+        </svg>
+      </Box>
     </Box>
   );
 };
@@ -197,18 +355,97 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
     [trainings]
   );
 
-  const trendData = useMemo<TrendPoint[]>(() => {
+  // Completed vs. In Progress counts, grouped by training end date, so both
+  // statuses can be compared on the same timeline.
+  const trendSeries = useMemo(() => {
+    const completedMap = new Map<string, number>();
+    const inProgressMap = new Map<string, number>();
+    trainings.forEach((t) => {
+      if (!t.endDate) return;
+      const key = t.endDate.slice(0, 10);
+      if (t.status === "Completed") {
+        completedMap.set(key, (completedMap.get(key) || 0) + 1);
+      } else if (t.status === "In Progress") {
+        inProgressMap.set(key, (inProgressMap.get(key) || 0) + 1);
+      }
+    });
+
+    const categories = Array.from(
+      new Set(
+        Array.from(completedMap.keys()).concat(
+          Array.from(inProgressMap.keys())
+        )
+      )
+    ).sort((a, b) => a.localeCompare(b));
+
+    const series: ChartSeries[] = [
+      {
+        name: "Completed",
+        color: "#6846C6",
+        values: categories.map((d) => completedMap.get(d) || 0),
+      },
+      {
+        name: "In Progress",
+        color: "#887bab",
+        values: categories.map((d) => inProgressMap.get(d) || 0),
+      },
+    ];
+
+    return { categories, series };
+  }, [trainings]);
+
+  // Completions grouped by month, used to show how completions this month
+  // compare with the past few months.
+  const monthlyCompleted = useMemo(() => {
     const map = new Map<string, number>();
     trainings.forEach((t) => {
       if (t.status === "Completed" && t.endDate) {
-        const key = t.endDate.slice(0, 10);
-        map.set(key, (map.get(key) || 0) + 1);
+        const d = new Date(t.endDate);
+        if (!Number.isNaN(d.getTime())) {
+          const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+            2,
+            "0"
+          )}`;
+          map.set(key, (map.get(key) || 0) + 1);
+        }
       }
     });
     return Array.from(map.entries())
-      .map(([date, count]) => ({ date, count }))
-      .sort((a, b) => a.date.localeCompare(b.date));
+      .map(([month, count]) => ({ month, count }))
+      .sort((a, b) => a.month.localeCompare(b.month));
   }, [trainings]);
+
+  const completedTrend = useMemo<CardTrend>(() => {
+    const recent = monthlyCompleted.slice(-6);
+    const formatMonth = (key: string) => {
+      const [y, m] = key.split("-").map(Number);
+      return new Date(y, m - 1, 1).toLocaleDateString(undefined, {
+        month: "short",
+        year: "numeric",
+      });
+    };
+
+    if (recent.length < 2) {
+      return {
+        data: recent.map((m) => m.count),
+        deltaPct: null,
+        periodLabel: "Not enough history yet",
+      };
+    }
+
+    const prev = recent[recent.length - 2].count;
+    const curr = recent[recent.length - 1].count;
+    const deltaPct =
+      prev > 0 ? Math.round(((curr - prev) / prev) * 100) : curr > 0 ? 100 : 0;
+
+    return {
+      data: recent.map((m) => m.count),
+      deltaPct,
+      periodLabel: `${formatMonth(
+        recent[recent.length - 2].month
+      )} vs ${formatMonth(recent[recent.length - 1].month)}`,
+    };
+  }, [monthlyCompleted]);
 
   return (
     <Box sx={{ pb: 4 }}>
@@ -233,6 +470,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
           label="Trainings Completed"
           value={completedCount}
           accent="#6846C6"
+          trend={completedTrend}
         />
       </Box>
 
@@ -252,14 +490,17 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
             variant="subtitle1"
             sx={{ fontWeight: 700, color: "#2d2540" }}
           >
-            Course Completions Over Time
+            Course Progress Over Time
           </Typography>
         </Box>
         <Typography variant="body2" sx={{ color: "#6b7280", mb: 2 }}>
-          Number of employees who completed a course, grouped by training end
-          date
+          Number of employees completed vs. still in progress, grouped by
+          training end date
         </Typography>
-        <CompletionTrendChart data={trendData} />
+        <MultiSeriesTrendChart
+          categories={trendSeries.categories}
+          series={trendSeries.series}
+        />
       </Paper>
     </Box>
   );

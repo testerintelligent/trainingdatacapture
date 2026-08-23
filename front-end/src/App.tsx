@@ -67,8 +67,8 @@ function App() {
   });
   const [editId, setEditId] = useState<string | null>(null);
   const [showTable, setShowTable] = useState(false);
-  const [showForm, setShowForm] = useState(false);
-  const [showSummary, setShowSummary] = useState(true);
+  const [showForm, setShowForm] = useState(true);
+  const [showSummary, setShowSummary] = useState(false);
   const [showExecutive, setShowExecutive] = useState(false);
 
   const [filters, setFilters] = useState({
@@ -207,17 +207,18 @@ function App() {
   return (
     <div className="app-flex-root">
       <aside className="side-menu">
-        <Tooltip title="Completion Summary" placement="right">
+        <Tooltip title="Add Training" placement="right">
           <IconButton
             onClick={() => {
-              setShowSummary(true);
+              setShowForm(true);
               setShowTable(false);
-              setShowForm(false);
+              setShowSummary(false);
               setShowExecutive(false);
+              handleOpen();
             }}
-            sx={{ color: showSummary ? "#4299e1" : "#fff" }}
+            sx={{ color: showForm ? "#4299e1" : "#fff" }}
           >
-            <AssessmentIcon />
+            <AddCircleIcon />
           </IconButton>
         </Tooltip>
         <Tooltip title="Training Summary" placement="right">
@@ -233,18 +234,17 @@ function App() {
             <DashboardIcon />
           </IconButton>
         </Tooltip>
-        <Tooltip title="Add Training" placement="right">
+        <Tooltip title="Completion Summary" placement="right">
           <IconButton
             onClick={() => {
-              setShowForm(true);
+              setShowSummary(true);
               setShowTable(false);
-              setShowSummary(false);
+              setShowForm(false);
               setShowExecutive(false);
-              handleOpen();
             }}
-            sx={{ color: showForm ? "#4299e1" : "#fff" }}
+            sx={{ color: showSummary ? "#4299e1" : "#fff" }}
           >
-            <AddCircleIcon />
+            <AssessmentIcon />
           </IconButton>
         </Tooltip>
         <Tooltip title="Executive Dashboard" placement="right">
