@@ -26,10 +26,12 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SchoolIcon from "@mui/icons-material/School";
 import AssessmentIcon from "@mui/icons-material/Assessment";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import { exportToExcel } from "./exportToExcel";
+import ExecutiveDashboard from "./ExecutiveDashboard";
 import "./App.css";
 
-interface Training {
+export interface Training {
   _id?: string;
   empId: string;
   employeeName: string;
@@ -67,6 +69,7 @@ function App() {
   const [showTable, setShowTable] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [showSummary, setShowSummary] = useState(true);
+  const [showExecutive, setShowExecutive] = useState(false);
 
   const [filters, setFilters] = useState({
     empId: "",
@@ -210,6 +213,7 @@ function App() {
               setShowSummary(true);
               setShowTable(false);
               setShowForm(false);
+              setShowExecutive(false);
             }}
             sx={{ color: showSummary ? "#4299e1" : "#fff" }}
           >
@@ -222,6 +226,7 @@ function App() {
               setShowTable(true);
               setShowForm(false);
               setShowSummary(false);
+              setShowExecutive(false);
             }}
             sx={{ color: showTable ? "#4299e1" : "#fff" }}
           >
@@ -234,11 +239,25 @@ function App() {
               setShowForm(true);
               setShowTable(false);
               setShowSummary(false);
+              setShowExecutive(false);
               handleOpen();
             }}
             sx={{ color: showForm ? "#4299e1" : "#fff" }}
           >
             <AddCircleIcon />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Executive Dashboard" placement="right">
+          <IconButton
+            onClick={() => {
+              setShowExecutive(true);
+              setShowSummary(false);
+              setShowTable(false);
+              setShowForm(false);
+            }}
+            sx={{ color: showExecutive ? "#4299e1" : "#fff" }}
+          >
+            <TrendingUpIcon />
           </IconButton>
         </Tooltip>
       </aside>
@@ -775,6 +794,7 @@ function App() {
                               onClick={() => {
                                 setShowForm(true);
                                 setShowTable(false);
+                                setShowExecutive(false);
                                 handleOpen(t);
                               }}
                               size="small"
@@ -1174,6 +1194,7 @@ function App() {
               </TableContainer>
             </>
           )}
+          {showExecutive && <ExecutiveDashboard trainings={trainings} />}
         </Container>
       </main>
     </div>
