@@ -449,7 +449,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
 
   return (
     <Box sx={{ pb: 4 }}>
-      <Box sx={{ width: "100%", mt: 2, mb: 3 }}>
+      <Box sx={{ width: "100%", mt: 0, mb: 3 }}>
         <Typography variant="h6" sx={{ color: "#6846C6", fontWeight: 700 }}>
           Executive Training Dashboard
         </Typography>
