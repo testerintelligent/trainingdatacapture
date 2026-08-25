@@ -61,6 +61,10 @@ const candidateSchema = new mongoose.Schema({
   programmingLanguageSkill: { type: Number, enum: ratingValues, required: true },
   databaseSkill: { type: Number, enum: ratingValues, required: true },
   attitudeTowardsLearning: { type: Number, enum: ratingValues, required: true },
+  l1ConductedBy: { type: String },
+  l1Status: { type: String, enum: ['', 'Selected', 'Non Selected', 'On Hold'], default: '' },
+  l2ConductedBy: { type: String },
+  l2Status: { type: String, enum: ['', 'Selected', 'Non Selected', 'On Hold'], default: '' },
 }, { timestamps: true });
 const Candidate = recruitmentConnection.model('Candidate', candidateSchema);
 
@@ -302,6 +306,16 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *         attitudeTowardsLearning:
  *           type: number
  *           enum: [1, 2, 3, 4, 5]
+ *         l1ConductedBy:
+ *           type: string
+ *         l1Status:
+ *           type: string
+ *           enum: ['', Selected, Non Selected, On Hold]
+ *         l2ConductedBy:
+ *           type: string
+ *         l2Status:
+ *           type: string
+ *           enum: ['', Selected, Non Selected, On Hold]
  */
 
 /**

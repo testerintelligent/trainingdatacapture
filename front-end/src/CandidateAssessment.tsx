@@ -23,9 +23,14 @@ export interface Candidate {
   programmingLanguageSkill: number;
   databaseSkill: number;
   attitudeTowardsLearning: number;
+  l1ConductedBy: string;
+  l1Status: string;
+  l2ConductedBy: string;
+  l2Status: string;
 }
 
 export const ratingOptions = [1, 2, 3, 4, 5];
+export const interviewStatusOptions = ["Selected", "Non Selected", "On Hold"];
 
 export const emptyCandidate: Candidate = {
   candidateName: "",
@@ -37,6 +42,10 @@ export const emptyCandidate: Candidate = {
   programmingLanguageSkill: 1,
   databaseSkill: 1,
   attitudeTowardsLearning: 1,
+  l1ConductedBy: "",
+  l1Status: "",
+  l2ConductedBy: "",
+  l2Status: "",
 };
 
 interface CandidateAssessmentProps {
@@ -284,6 +293,64 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                 required
               >
                 {ratingOptions.map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                fullWidth
+                label="L1 Conducted By"
+                name="l1ConductedBy"
+                value={form.l1ConductedBy}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                select
+                fullWidth
+                label="L1 Status"
+                name="l1Status"
+                value={form.l1Status}
+                onChange={handleChange}
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                {interviewStatusOptions.map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                fullWidth
+                label="L2 Conducted By"
+                name="l2ConductedBy"
+                value={form.l2ConductedBy}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                select
+                fullWidth
+                label="L2 Status"
+                name="l2Status"
+                value={form.l2Status}
+                onChange={handleChange}
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                {interviewStatusOptions.map((option) => (
                   <MenuItem key={option} value={option}>
                     {option}
                   </MenuItem>
