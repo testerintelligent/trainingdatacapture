@@ -28,9 +28,11 @@ import SchoolIcon from "@mui/icons-material/School";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
+import SummarizeIcon from "@mui/icons-material/Summarize";
 import { exportToExcel } from "./exportToExcel";
 import ExecutiveDashboard from "./ExecutiveDashboard";
-import CandidateAssessment from "./CandidateAssessment";
+import CandidateAssessment, { Candidate } from "./CandidateAssessment";
+import CandidateSummary from "./CandidateSummary";
 import "./App.css";
 
 export interface Training {
@@ -73,6 +75,39 @@ function App() {
   const [showSummary, setShowSummary] = useState(false);
   const [showExecutive, setShowExecutive] = useState(false);
   const [showRecruitment, setShowRecruitment] = useState(false);
+  const [showCandidateSummary, setShowCandidateSummary] = useState(false);
+
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [editingCandidate, setEditingCandidate] = useState<Candidate | null>(null);
+
+  const fetchCandidates = async () => {
+    const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/candidates`);
+    setCandidates(res.data);
+  };
+
+  useEffect(() => {
+    fetchCandidates();
+  }, []);
+
+  const handleCandidateEdit = (candidate: Candidate) => {
+    setEditingCandidate(candidate);
+    setShowRecruitment(true);
+    setShowCandidateSummary(false);
+    setShowExecutive(false);
+    setShowSummary(false);
+    setShowTable(false);
+    setShowForm(false);
+  };
+
+  const handleCandidateDelete = async (id: string) => {
+    await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/api/candidates/${id}`);
+    fetchCandidates();
+  };
+
+  const handleCandidateDone = () => {
+    fetchCandidates();
+    setEditingCandidate(null);
+  };
 
   const [filters, setFilters] = useState({
     empId: "",
@@ -218,6 +253,7 @@ function App() {
               setShowSummary(false);
               setShowExecutive(false);
               setShowRecruitment(false);
+              setShowCandidateSummary(false);
               handleOpen();
             }}
             sx={{ color: showForm ? "#4299e1" : "#fff" }}
@@ -233,6 +269,7 @@ function App() {
               setShowSummary(false);
               setShowExecutive(false);
               setShowRecruitment(false);
+              setShowCandidateSummary(false);
             }}
             sx={{ color: showTable ? "#4299e1" : "#fff" }}
           >
@@ -247,6 +284,7 @@ function App() {
               setShowForm(false);
               setShowExecutive(false);
               setShowRecruitment(false);
+              setShowCandidateSummary(false);
             }}
             sx={{ color: showSummary ? "#4299e1" : "#fff" }}
           >
@@ -261,6 +299,7 @@ function App() {
               setShowTable(false);
               setShowForm(false);
               setShowRecruitment(false);
+              setShowCandidateSummary(false);
             }}
             sx={{ color: showExecutive ? "#4299e1" : "#fff" }}
           >
@@ -270,15 +309,32 @@ function App() {
         <Tooltip title="Candidate Assessment" placement="right">
           <IconButton
             onClick={() => {
+              setEditingCandidate(null);
               setShowRecruitment(true);
               setShowExecutive(false);
               setShowSummary(false);
               setShowTable(false);
               setShowForm(false);
+              setShowCandidateSummary(false);
             }}
             sx={{ color: showRecruitment ? "#4299e1" : "#fff" }}
           >
             <HowToRegIcon />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Candidate Summary" placement="right">
+          <IconButton
+            onClick={() => {
+              setShowCandidateSummary(true);
+              setShowRecruitment(false);
+              setShowExecutive(false);
+              setShowSummary(false);
+              setShowTable(false);
+              setShowForm(false);
+            }}
+            sx={{ color: showCandidateSummary ? "#4299e1" : "#fff" }}
+          >
+            <SummarizeIcon />
           </IconButton>
         </Tooltip>
       </aside>
@@ -1216,7 +1272,19 @@ function App() {
             </>
           )}
           {showExecutive && <ExecutiveDashboard trainings={trainings} />}
-          {showRecruitment && <CandidateAssessment />}
+          {showRecruitment && (
+            <CandidateAssessment
+              editingCandidate={editingCandidate}
+              onDone={handleCandidateDone}
+            />
+          )}
+          {showCandidateSummary && (
+            <CandidateSummary
+              candidates={candidates}
+              onEdit={handleCandidateEdit}
+              onDelete={handleCandidateDelete}
+            />
+          )}
         </Container>
       </main>
     </div>
