@@ -23,6 +23,7 @@ export interface Candidate {
   programmingLanguageSkill: number;
   databaseSkill: number;
   attitudeTowardsLearning: number;
+  devExperience: number;
   l1ConductedBy: string;
   l1Status: string;
   l2ConductedBy: string;
@@ -42,6 +43,7 @@ export const emptyCandidate: Candidate = {
   programmingLanguageSkill: 1,
   databaseSkill: 1,
   attitudeTowardsLearning: 1,
+  devExperience: 1,
   l1ConductedBy: "",
   l1Status: "",
   l2ConductedBy: "",
@@ -71,6 +73,7 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
       "programmingLanguageSkill",
       "databaseSkill",
       "attitudeTowardsLearning",
+      "devExperience",
     ].includes(name);
     setForm({
       ...form,
@@ -289,6 +292,24 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                 label="Attitude Towards Learning New Things"
                 name="attitudeTowardsLearning"
                 value={form.attitudeTowardsLearning}
+                onChange={handleChange}
+                required
+              >
+                {ratingOptions.map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                select
+                fullWidth
+                label="Dev Experience"
+                name="devExperience"
+                value={form.devExperience}
                 onChange={handleChange}
                 required
               >

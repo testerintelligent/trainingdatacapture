@@ -61,6 +61,7 @@ const candidateSchema = new mongoose.Schema({
   programmingLanguageSkill: { type: Number, enum: ratingValues, required: true },
   databaseSkill: { type: Number, enum: ratingValues, required: true },
   attitudeTowardsLearning: { type: Number, enum: ratingValues, required: true },
+  devExperience: { type: Number, enum: ratingValues, required: true },
   l1ConductedBy: { type: String },
   l1Status: { type: String, enum: ['', 'Selected', 'Non Selected', 'On Hold'], default: '' },
   l2ConductedBy: { type: String },
@@ -282,6 +283,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *         - programmingLanguageSkill
  *         - databaseSkill
  *         - attitudeTowardsLearning
+ *         - devExperience
  *       properties:
  *         candidateName:
  *           type: string
@@ -304,6 +306,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *           type: number
  *           enum: [1, 2, 3, 4, 5]
  *         attitudeTowardsLearning:
+ *           type: number
+ *           enum: [1, 2, 3, 4, 5]
+ *         devExperience:
  *           type: number
  *           enum: [1, 2, 3, 4, 5]
  *         l1ConductedBy:

@@ -33,6 +33,7 @@ const tableHeaders = [
   "Programming Language Skill",
   "Database Skill",
   "Attitude Towards Learning",
+  "Dev Experience",
   "L1 Conducted By",
   "L1 Status",
   "L2 Conducted By",
@@ -145,6 +146,9 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   </TableCell>
                   <TableCell sx={{ padding: "0 8px" }}>
                     {c.attitudeTowardsLearning}
+                  </TableCell>
+                  <TableCell sx={{ padding: "0 8px" }}>
+                    {c.devExperience}
                   </TableCell>
                   <TableCell sx={{ padding: "0 8px" }}>
                     {c.l1ConductedBy}
