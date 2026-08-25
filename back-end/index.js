@@ -26,6 +26,14 @@ const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', () => console.log('Connected to MongoDB - trainingData'));
 
+// Separate MongoDB connection for the recruitment database
+const recruitmentConnection = mongoose.createConnection(process.env.RECRUITMENT_MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+recruitmentConnection.on('error', console.error.bind(console, 'MongoDB connection error (recruitment):'));
+recruitmentConnection.once('open', () => console.log('Connected to MongoDB - recruitment'));
+
 // Employee Training Schema
 const trainingSchema = new mongoose.Schema({
   empId: { type: String, required: true },
@@ -40,6 +48,21 @@ const trainingSchema = new mongoose.Schema({
   projectName: { type: String, enum: process.env.PROJECT_NAMES ? process.env.PROJECT_NAMES.split(',') : ['ABC', 'CDE', 'EFG','HIJ','KLM'], required: true },
 });
 const Training = mongoose.model('Training', trainingSchema);
+
+// Candidate Assessment Schema (stored in the recruitment database)
+const ratingValues = [1, 2, 3, 4, 5];
+const candidateSchema = new mongoose.Schema({
+  candidateName: { type: String, required: true },
+  candidateEmail: { type: String, required: true },
+  course: { type: String, required: true },
+  department: { type: String, required: true },
+  communication: { type: Number, enum: ratingValues, required: true },
+  technicalSkill: { type: Number, enum: ratingValues, required: true },
+  programmingLanguageSkill: { type: Number, enum: ratingValues, required: true },
+  databaseSkill: { type: Number, enum: ratingValues, required: true },
+  attitudeTowardsLearning: { type: Number, enum: ratingValues, required: true },
+}, { timestamps: true });
+const Candidate = recruitmentConnection.model('Candidate', candidateSchema);
 
 // CRUD Endpoints
 app.get('/api/trainings', async (req, res) => {
@@ -65,6 +88,28 @@ app.delete('/api/trainings/:id', async (req, res) => {
   res.status(204).end();
 });
 
+// Candidate Assessment CRUD Endpoints
+app.get('/api/candidates', async (req, res) => {
+  const candidates = await Candidate.find();
+  res.json(candidates);
+});
+
+app.post('/api/candidates', async (req, res) => {
+  const candidate = new Candidate(req.body);
+  await candidate.save();
+  res.status(201).json(candidate);
+});
+
+app.put('/api/candidates/:id', async (req, res) => {
+  const candidate = await Candidate.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  res.json(candidate);
+});
+
+app.delete('/api/candidates/:id', async (req, res) => {
+  await Candidate.findByIdAndDelete(req.params.id);
+  res.status(204).end();
+});
+
 // Swagger API documentation
 const swaggerOptions = {
   definition: {
@@ -78,7 +123,8 @@ const swaggerOptions = {
       { url: `${process.env.REACT_APP_API_BASE_URL || 'http://localhost'}:${process.env.PORT || 5002}` }
     ],
     tags: [
-      { name: 'Trainings', description: 'Operations related to employee training records' }
+      { name: 'Trainings', description: 'Operations related to employee training records' },
+      { name: 'Candidates', description: 'Operations related to candidate assessment records' }
     ]
   },
   apis: ['./index.js'], // Path to the API docs
@@ -214,6 +260,120 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *     responses:
  *       204:
  *         description: Training record deleted
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Candidate:
+ *       type: object
+ *       required:
+ *         - candidateName
+ *         - candidateEmail
+ *         - course
+ *         - department
+ *         - communication
+ *         - technicalSkill
+ *         - programmingLanguageSkill
+ *         - databaseSkill
+ *         - attitudeTowardsLearning
+ *       properties:
+ *         candidateName:
+ *           type: string
+ *         candidateEmail:
+ *           type: string
+ *         course:
+ *           type: string
+ *         department:
+ *           type: string
+ *         communication:
+ *           type: number
+ *           enum: [1, 2, 3, 4, 5]
+ *         technicalSkill:
+ *           type: number
+ *           enum: [1, 2, 3, 4, 5]
+ *         programmingLanguageSkill:
+ *           type: number
+ *           enum: [1, 2, 3, 4, 5]
+ *         databaseSkill:
+ *           type: number
+ *           enum: [1, 2, 3, 4, 5]
+ *         attitudeTowardsLearning:
+ *           type: number
+ *           enum: [1, 2, 3, 4, 5]
+ */
+
+/**
+ * @swagger
+ * /api/candidates:
+ *   get:
+ *     summary: Get all candidate assessment records
+ *     tags: [Candidates]
+ *     responses:
+ *       200:
+ *         description: List of candidate assessment records
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Candidate'
+ *   post:
+ *     summary: Create a new candidate assessment record
+ *     tags: [Candidates]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Candidate'
+ *     responses:
+ *       201:
+ *         description: Candidate assessment record created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Candidate'
+ */
+
+/**
+ * @swagger
+ * /api/candidates/{id}:
+ *   put:
+ *     summary: Update a candidate assessment record
+ *     tags: [Candidates]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Candidate'
+ *     responses:
+ *       200:
+ *         description: Candidate assessment record updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Candidate'
+ *   delete:
+ *     summary: Delete a candidate assessment record
+ *     tags: [Candidates]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Candidate assessment record deleted
  */
 
 const PORT = process.env.PORT || 5002;

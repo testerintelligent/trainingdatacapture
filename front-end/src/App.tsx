@@ -27,8 +27,10 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SchoolIcon from "@mui/icons-material/School";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import HowToRegIcon from "@mui/icons-material/HowToReg";
 import { exportToExcel } from "./exportToExcel";
 import ExecutiveDashboard from "./ExecutiveDashboard";
+import CandidateAssessment from "./CandidateAssessment";
 import "./App.css";
 
 export interface Training {
@@ -70,6 +72,7 @@ function App() {
   const [showForm, setShowForm] = useState(true);
   const [showSummary, setShowSummary] = useState(false);
   const [showExecutive, setShowExecutive] = useState(false);
+  const [showRecruitment, setShowRecruitment] = useState(false);
 
   const [filters, setFilters] = useState({
     empId: "",
@@ -214,6 +217,7 @@ function App() {
               setShowTable(false);
               setShowSummary(false);
               setShowExecutive(false);
+              setShowRecruitment(false);
               handleOpen();
             }}
             sx={{ color: showForm ? "#4299e1" : "#fff" }}
@@ -228,6 +232,7 @@ function App() {
               setShowForm(false);
               setShowSummary(false);
               setShowExecutive(false);
+              setShowRecruitment(false);
             }}
             sx={{ color: showTable ? "#4299e1" : "#fff" }}
           >
@@ -241,6 +246,7 @@ function App() {
               setShowTable(false);
               setShowForm(false);
               setShowExecutive(false);
+              setShowRecruitment(false);
             }}
             sx={{ color: showSummary ? "#4299e1" : "#fff" }}
           >
@@ -254,10 +260,25 @@ function App() {
               setShowSummary(false);
               setShowTable(false);
               setShowForm(false);
+              setShowRecruitment(false);
             }}
             sx={{ color: showExecutive ? "#4299e1" : "#fff" }}
           >
             <TrendingUpIcon />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Candidate Assessment" placement="right">
+          <IconButton
+            onClick={() => {
+              setShowRecruitment(true);
+              setShowExecutive(false);
+              setShowSummary(false);
+              setShowTable(false);
+              setShowForm(false);
+            }}
+            sx={{ color: showRecruitment ? "#4299e1" : "#fff" }}
+          >
+            <HowToRegIcon />
           </IconButton>
         </Tooltip>
       </aside>
@@ -1195,6 +1216,7 @@ function App() {
             </>
           )}
           {showExecutive && <ExecutiveDashboard trainings={trainings} />}
+          {showRecruitment && <CandidateAssessment />}
         </Container>
       </main>
     </div>
