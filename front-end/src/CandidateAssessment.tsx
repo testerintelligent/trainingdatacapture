@@ -25,8 +25,10 @@ export interface Candidate {
   attitudeTowardsLearning: number;
   devExperience: number;
   l1ConductedBy: string;
+  l1ConductedDate: string;
   l1Status: string;
   l2ConductedBy: string;
+  l2ConductedDate: string;
   l2Status: string;
   createdAt?: string;
   updatedAt?: string;
@@ -47,8 +49,10 @@ export const emptyCandidate: Candidate = {
   attitudeTowardsLearning: 1,
   devExperience: 1,
   l1ConductedBy: "",
+  l1ConductedDate: "",
   l1Status: "",
   l2ConductedBy: "",
+  l2ConductedDate: "",
   l2Status: "",
 };
 
@@ -334,6 +338,18 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
+                fullWidth
+                label="L1 Conducted Date"
+                name="l1ConductedDate"
+                type="date"
+                value={form.l1ConductedDate}
+                onChange={handleChange}
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
                 select
                 fullWidth
                 label="L1 Status"
@@ -351,7 +367,6 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                 ))}
               </TextField>
             </Grid>
-
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 fullWidth
@@ -359,6 +374,18 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                 name="l2ConductedBy"
                 value={form.l2ConductedBy}
                 onChange={handleChange}
+              />
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                fullWidth
+                label="L2 Conducted Date"
+                name="l2ConductedDate"
+                type="date"
+                value={form.l2ConductedDate}
+                onChange={handleChange}
+                InputLabelProps={{ shrink: true }}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>

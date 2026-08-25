@@ -63,8 +63,10 @@ const candidateSchema = new mongoose.Schema({
   attitudeTowardsLearning: { type: Number, enum: ratingValues, required: true },
   devExperience: { type: Number, enum: ratingValues, required: true },
   l1ConductedBy: { type: String },
+  l1ConductedDate: { type: Date },
   l1Status: { type: String, enum: ['', 'Selected', 'Non Selected', 'On Hold'], default: '' },
   l2ConductedBy: { type: String },
+  l2ConductedDate: { type: Date },
   l2Status: { type: String, enum: ['', 'Selected', 'Non Selected', 'On Hold'], default: '' },
 }, { timestamps: true });
 const Candidate = recruitmentConnection.model('Candidate', candidateSchema);
@@ -99,14 +101,22 @@ app.get('/api/candidates', async (req, res) => {
   res.json(candidates);
 });
 
+// Empty date-input strings ('') would fail Mongoose's Date cast, so normalize
+// blank L1/L2 conducted dates to null before writing to the database.
+const normalizeCandidateDates = (body) => ({
+  ...body,
+  l1ConductedDate: body.l1ConductedDate || null,
+  l2ConductedDate: body.l2ConductedDate || null,
+});
+
 app.post('/api/candidates', async (req, res) => {
-  const candidate = new Candidate(req.body);
+  const candidate = new Candidate(normalizeCandidateDates(req.body));
   await candidate.save();
   res.status(201).json(candidate);
 });
 
 app.put('/api/candidates/:id', async (req, res) => {
-  const candidate = await Candidate.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  const candidate = await Candidate.findByIdAndUpdate(req.params.id, normalizeCandidateDates(req.body), { new: true });
   res.json(candidate);
 });
 
@@ -313,11 +323,17 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *           enum: [1, 2, 3, 4, 5]
  *         l1ConductedBy:
  *           type: string
+ *         l1ConductedDate:
+ *           type: string
+ *           format: date
  *         l1Status:
  *           type: string
  *           enum: ['', Selected, Non Selected, On Hold]
  *         l2ConductedBy:
  *           type: string
+ *         l2ConductedDate:
+ *           type: string
+ *           format: date
  *         l2Status:
  *           type: string
  *           enum: ['', Selected, Non Selected, On Hold]

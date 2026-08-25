@@ -89,23 +89,23 @@ const StatCard: React.FC<{
     elevation={0}
     sx={{
       flex: "1 1 240px",
-      p: 3,
+      p: 1.75,
       borderRadius: 3,
       border: "1px solid #E5EEEF",
       boxShadow: "0 4px 24px rgba(0, 106, 113, 0.12)",
       background: "#ffffff",
     }}
   >
-    <Box sx={{ display: "flex", alignItems: "center", gap: 2.5 }}>
-      <Avatar sx={{ bgcolor: accent, width: 56, height: 56 }}>{icon}</Avatar>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+      <Avatar sx={{ bgcolor: accent, width: 40, height: 40 }}>{icon}</Avatar>
       <Box>
         <Typography
-          variant="h3"
+          variant="h4"
           sx={{ fontWeight: 800, color: "#2d2540", lineHeight: 1.1 }}
         >
           {value}
         </Typography>
-        <Typography variant="body1" sx={{ color: "#6b7280", fontWeight: 600 }}>
+        <Typography variant="body2" sx={{ color: "#6b7280", fontWeight: 600 }}>
           {label}
         </Typography>
       </Box>
@@ -113,7 +113,7 @@ const StatCard: React.FC<{
 
     {trend && trend.data.length > 0 && (
       <>
-        <Divider sx={{ my: 2 }} />
+        <Divider sx={{ my: 1 }} />
         <Box
           sx={{
             display: "flex",
@@ -164,8 +164,8 @@ const MultiSeriesTrendChart: React.FC<{
   series: ChartSeries[];
 }> = ({ categories, series }) => {
   const width = 900;
-  const height = 340;
-  const margin = { top: 24, right: 32, bottom: 64, left: 48 };
+  const height = 220;
+  const margin = { top: 16, right: 32, bottom: 56, left: 48 };
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
@@ -177,7 +177,7 @@ const MultiSeriesTrendChart: React.FC<{
 
   if (categories.length === 0) {
     return (
-      <Box sx={{ py: 8, textAlign: "center", color: "#94a3b8" }}>
+      <Box sx={{ py: 3, textAlign: "center", color: "#94a3b8" }}>
         <Typography variant="body1">
           No training records with an end date yet.
         </Typography>
@@ -448,8 +448,17 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
   }, [monthlyCompleted]);
 
   return (
-    <Box sx={{ pb: 4 }}>
-      <Box sx={{ width: "100%", mt: 0, mb: 3 }}>
+    <Box
+      sx={{
+        pb: 1,
+        height: "100%",
+        maxHeight: "calc(100vh - 200px)",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
+    >
+      <Box sx={{ width: "100%", mt: 0, mb: 1.5, flex: "0 0 auto" }}>
         <Typography variant="h6" sx={{ color: "#6846C6", fontWeight: 700 }}>
           Executive Training Dashboard
         </Typography>
@@ -458,7 +467,15 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
         </Typography>
       </Box>
 
-      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, mb: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 2,
+          mb: 1.5,
+          flex: "0 0 auto",
+        }}
+      >
         <StatCard
           icon={<HourglassBottomIcon />}
           label="Trainings In Progress"
@@ -477,11 +494,14 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
       <Paper
         elevation={0}
         sx={{
-          p: 3,
+          p: 2,
           borderRadius: 3,
           border: "1px solid #E5EEEF",
           boxShadow: "0 4px 24px rgba(0, 106, 113, 0.12)",
           background: "#ffffff",
+          flex: "1 1 auto",
+          minHeight: 0,
+          overflow: "hidden",
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
@@ -493,7 +513,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
             Course Progress Over Time
           </Typography>
         </Box>
-        <Typography variant="body2" sx={{ color: "#6b7280", mb: 2 }}>
+        <Typography variant="body2" sx={{ color: "#6b7280", mb: 1 }}>
           Number of employees completed vs. still in progress, grouped by
           training end date
         </Typography>

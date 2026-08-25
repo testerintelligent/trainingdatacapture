@@ -352,7 +352,7 @@ function App() {
             boxShadow: "0 20px 14px rgba(104, 70, 198, 0.35)",
           }}
         >
-          Employee Training Records - For Web and API Testing
+          Work Ready
         </div>
         <Container
           maxWidth={false} // VERY IMPORTANT
@@ -927,9 +927,9 @@ function App() {
                   sx={{
                     display: "flex",
                     alignItems: "center",
-                    gap: 1.5,
+                    gap: 1,
                     px: { xs: 2.5, sm: 4 },
-                    py: 2.5,
+                    py: 1.25,
                     background: "#6846C6",
                   }}
                 >
@@ -937,22 +937,22 @@ function App() {
                     sx={{
                       bgcolor: "rgba(255,255,255,0.18)",
                       color: "#fff",
-                      width: 40,
-                      height: 40,
+                      width: 28,
+                      height: 28,
                     }}
                   >
-                    <SchoolIcon fontSize="small" />
+                    <SchoolIcon sx={{ fontSize: 16 }} />
                   </Avatar>
                   <Box>
                     <Typography
-                      variant="subtitle1"
+                      variant="subtitle2"
                       sx={{ color: "#fff", fontWeight: 700, lineHeight: 1.2 }}
                     >
                       {editId ? "Edit Training" : "Add Training"}
                     </Typography>
                     <Typography
-                      variant="body2"
-                      sx={{ color: "rgba(255,255,255,0.85)" }}
+                      variant="caption"
+                      sx={{ color: "rgba(255,255,255,0.85)", lineHeight: 1.2 }}
                     >
                       {editId
                         ? "Update the details for this training record"
