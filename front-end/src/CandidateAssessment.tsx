@@ -28,6 +28,8 @@ export interface Candidate {
   l1Status: string;
   l2ConductedBy: string;
   l2Status: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export const ratingOptions = [1, 2, 3, 4, 5];

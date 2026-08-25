@@ -38,6 +38,8 @@ const tableHeaders = [
   "L1 Status",
   "L2 Conducted By",
   "L2 Status",
+  "Submitted On",
+  "Last Updated",
   "Actions",
 ];
 
@@ -161,6 +163,12 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   </TableCell>
                   <TableCell sx={{ padding: "0 8px" }}>
                     {c.l2Status}
+                  </TableCell>
+                  <TableCell sx={{ padding: "0 8px", whiteSpace: "nowrap" }}>
+                    {c.createdAt ? new Date(c.createdAt).toLocaleString() : ""}
+                  </TableCell>
+                  <TableCell sx={{ padding: "0 8px", whiteSpace: "nowrap" }}>
+                    {c.updatedAt ? new Date(c.updatedAt).toLocaleString() : ""}
                   </TableCell>
                   <TableCell align="right" sx={{ padding: "0 8px" }}>
                     <Box
