@@ -183,7 +183,7 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
           }}
         >
           <Grid container spacing={1.5}>
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 size="small"
                 fullWidth
@@ -194,7 +194,7 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                 required
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 size="small"
                 fullWidth
@@ -207,7 +207,7 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
               />
             </Grid>
 
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 size="small"
                 fullWidth
@@ -218,7 +218,7 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                 required
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 size="small"
                 fullWidth
@@ -342,6 +342,9 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
               </TextField>
             </Grid>
 
+            <Grid size={12}>
+              <Box sx={{ borderTop: "3px solid #6846C6", mt: "5px", mb: "5px" }} />
+            </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <TextField
                 size="small"
@@ -384,6 +387,10 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                   </MenuItem>
                 ))}
               </TextField>
+            </Grid>
+
+            <Grid size={12}>
+              <Box sx={{ borderTop: "3px solid #6846C6", mt: "5px", mb: "5px" }} />
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <TextField
