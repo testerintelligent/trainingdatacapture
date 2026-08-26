@@ -116,7 +116,7 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
         mt: 4,
         mx: "auto",
         mb: 4,
-        maxWidth: { xs: "100%", md: "68%" },
+        maxWidth: { xs: "100%", md: "85%" },
       }}
     >
       <Box
@@ -127,6 +127,7 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
           boxShadow: "0 4px 24px rgba(0, 106, 113, 0.12)",
           border: "1px solid #E5EEEF",
           overflow: "hidden",
+          maxHeight: "calc(100vh - 120px)",
           display: "flex",
           flexDirection: "column",
         }}
@@ -173,13 +174,18 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
         {/* Fields */}
         <Box
           sx={{
-            px: { xs: 2.5, sm: 4 },
-            py: 3,
+            px: { xs: 2, sm: 3 },
+            py: 2,
+            overflowY: "auto",
+            "& .MuiInputBase-root": { fontSize: "0.85rem" },
+            "& .MuiInputLabel-root": { fontSize: "0.85rem" },
+            "& .MuiMenuItem-root": { fontSize: "0.85rem" },
           }}
         >
-          <Grid container spacing={2.5}>
-            <Grid size={{ xs: 12, sm: 6 }}>
+          <Grid container spacing={1.5}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <TextField
+                size="small"
                 fullWidth
                 label="Candidate Name"
                 name="candidateName"
@@ -188,8 +194,9 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                 required
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <TextField
+                size="small"
                 fullWidth
                 label="Candidate Email ID"
                 name="candidateEmail"
@@ -200,8 +207,9 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
               />
             </Grid>
 
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <TextField
+                size="small"
                 fullWidth
                 label="Course"
                 name="course"
@@ -210,8 +218,9 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                 required
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <TextField
+                size="small"
                 fullWidth
                 label="Department"
                 name="department"
@@ -221,8 +230,9 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
               />
             </Grid>
 
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <TextField
+                size="small"
                 select
                 fullWidth
                 label="Communication"
@@ -238,8 +248,9 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                 ))}
               </TextField>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <TextField
+                size="small"
                 select
                 fullWidth
                 label="Technical Skill"
@@ -256,8 +267,9 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
               </TextField>
             </Grid>
 
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <TextField
+                size="small"
                 select
                 fullWidth
                 label="Programming Language Skill"
@@ -273,8 +285,9 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                 ))}
               </TextField>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <TextField
+                size="small"
                 select
                 fullWidth
                 label="Database Skill"
@@ -291,8 +304,9 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
               </TextField>
             </Grid>
 
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <TextField
+                size="small"
                 select
                 fullWidth
                 label="Attitude Towards Learning New Things"
@@ -309,8 +323,9 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
               </TextField>
             </Grid>
 
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <TextField
+                size="small"
                 select
                 fullWidth
                 label="Dev Experience"
@@ -327,8 +342,9 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
               </TextField>
             </Grid>
 
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <TextField
+                size="small"
                 fullWidth
                 label="L1 Conducted By"
                 name="l1ConductedBy"
@@ -336,8 +352,9 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                 onChange={handleChange}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <TextField
+                size="small"
                 fullWidth
                 label="L1 Conducted Date"
                 name="l1ConductedDate"
@@ -348,8 +365,9 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
               />
             </Grid>
 
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <TextField
+                size="small"
                 select
                 fullWidth
                 label="L1 Status"
@@ -367,8 +385,9 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                 ))}
               </TextField>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <TextField
+                size="small"
                 fullWidth
                 label="L2 Conducted By"
                 name="l2ConductedBy"
@@ -377,8 +396,9 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
               />
             </Grid>
 
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <TextField
+                size="small"
                 fullWidth
                 label="L2 Conducted Date"
                 name="l2ConductedDate"
@@ -388,8 +408,9 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                 InputLabelProps={{ shrink: true }}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <TextField
+                size="small"
                 select
                 fullWidth
                 label="L2 Status"

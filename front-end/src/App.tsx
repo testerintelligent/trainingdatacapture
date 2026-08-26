@@ -10,6 +10,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   Paper,
   TextField,
@@ -33,6 +34,7 @@ import { exportToExcel } from "./exportToExcel";
 import ExecutiveDashboard from "./ExecutiveDashboard";
 import CandidateAssessment, { Candidate } from "./CandidateAssessment";
 import CandidateSummary from "./CandidateSummary";
+import { useElementHeight } from "./useElementHeight";
 import "./App.css";
 
 export interface Training {
@@ -54,6 +56,7 @@ const trainingTypeOptions = ["Udemy", "Coursera", "Classroom", "Virtual"];
 const projectNameOptions = (
   process.env.REACT_APP_PROJECT_NAMES || "ABC,CDE,EFG,HIJ,KLM"
 ).split(",");
+const ROWS_PER_PAGE = 15;
 
 function App() {
   const [trainings, setTrainings] = useState<Training[]>([]);
@@ -79,6 +82,8 @@ function App() {
 
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [editingCandidate, setEditingCandidate] = useState<Candidate | null>(null);
+  const [trainingLabelRowRef, trainingLabelRowHeight] =
+    useElementHeight<HTMLTableRowElement>();
 
   const fetchCandidates = async () => {
     const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/candidates`);
@@ -107,6 +112,12 @@ function App() {
   const handleCandidateDone = () => {
     fetchCandidates();
     setEditingCandidate(null);
+    setShowCandidateSummary(true);
+    setShowRecruitment(false);
+    setShowExecutive(false);
+    setShowSummary(false);
+    setShowTable(false);
+    setShowForm(false);
   };
 
   const [filters, setFilters] = useState({
@@ -213,6 +224,21 @@ function App() {
       (!filters.projectName || t.projectName === filters.projectName)
     );
   });
+
+  const [trainingsPage, setTrainingsPage] = useState(0);
+
+  useEffect(() => {
+    setTrainingsPage(0);
+  }, [filters, trainings]);
+
+  const paginatedTrainings = useMemo(
+    () =>
+      filteredTrainings.slice(
+        trainingsPage * ROWS_PER_PAGE,
+        trainingsPage * ROWS_PER_PAGE + ROWS_PER_PAGE
+      ),
+    [filteredTrainings, trainingsPage]
+  );
 
   // Summary: Project Name + Course -> count of employees who completed it
   const completionSummary = useMemo(() => {
@@ -391,14 +417,23 @@ function App() {
               <TableContainer
                 component={Paper}
                 sx={{
-                  maxHeight: 470, // set your desired height
+                  maxHeight: 760, // fits 15 rows without an inner scrollbar
                   overflowY: "auto",
                   scrollbarWidth: "thin",
                 }}
               >
                 <Table stickyHeader>
                   <TableHead>
-                    <TableRow>
+                    <TableRow
+                      ref={trainingLabelRowRef}
+                      sx={{
+                        "& .MuiTableCell-root": {
+                          position: "sticky",
+                          top: 0,
+                          zIndex: 3,
+                        },
+                      }}
+                    >
                       <TableCell
                         sx={{
                           width: "12.52%",
@@ -562,6 +597,11 @@ function App() {
                         },
                         "& .MuiSelect-select": {
                           padding: "6px 8px", // reduce inner padding
+                        },
+                        "& .MuiTableCell-root": {
+                          position: "sticky",
+                          top: trainingLabelRowHeight,
+                          zIndex: 2,
                         },
                       }}
                     >
@@ -802,7 +842,7 @@ function App() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {filteredTrainings.map((t) => (
+                    {paginatedTrainings.map((t) => (
                       <TableRow
                         key={t._id}
                         sx={{
@@ -898,6 +938,14 @@ function App() {
                   </TableBody>
                 </Table>
               </TableContainer>
+              <TablePagination
+                component="div"
+                count={filteredTrainings.length}
+                page={trainingsPage}
+                onPageChange={(_e, newPage) => setTrainingsPage(newPage)}
+                rowsPerPage={ROWS_PER_PAGE}
+                rowsPerPageOptions={[ROWS_PER_PAGE]}
+              />
             </>
           )}
           {showForm && (

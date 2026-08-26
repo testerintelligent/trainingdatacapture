@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -7,6 +7,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   Paper,
   IconButton,
@@ -19,6 +20,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { exportToExcel } from "./exportToExcel";
 import type { Candidate } from "./CandidateAssessment";
 import { ratingOptions, interviewStatusOptions } from "./CandidateAssessment";
+import { useElementHeight } from "./useElementHeight";
 
 interface CandidateSummaryProps {
   candidates: Candidate[];
@@ -27,25 +29,25 @@ interface CandidateSummaryProps {
 }
 
 const tableHeaders = [
-  { label: "Candidate Name", width: "6%" },
-  { label: "Candidate Email ID", width: "7%" },
-  { label: "Course", width: "5%" },
-  { label: "Department", width: "5%" },
-  { label: "Communication", width: "5%" },
-  { label: "Technical Skill", width: "5%" },
-  { label: "Programming Language Skill", width: "6%" },
-  { label: "Database Skill", width: "5%" },
-  { label: "Attitude Towards Learning", width: "6%" },
-  { label: "Dev Experience", width: "5%" },
-  { label: "L1 Conducted By", width: "5%" },
-  { label: "L1 Conducted Date", width: "5%" },
-  { label: "L1 Status", width: "4%" },
-  { label: "L2 Conducted By", width: "5%" },
-  { label: "L2 Conducted Date", width: "5%" },
-  { label: "L2 Status", width: "4%" },
-  { label: "Submitted On", width: "6%" },
-  { label: "Last Updated", width: "6%" },
-  { label: "Actions", width: "5%" },
+  { label: "Candidate Name" },
+  { label: "Candidate Email ID" },
+  { label: "Course" },
+  { label: "Department" },
+  { label: "Communication" },
+  { label: "Technical Skill" },
+  { label: "Programming Language Skill" },
+  { label: "Database Skill" },
+  { label: "Attitude Towards Learning" },
+  { label: "Dev Experience" },
+  { label: "L1 Conducted By" },
+  { label: "L1 Conducted Date" },
+  { label: "L1 Status" },
+  { label: "L2 Conducted By" },
+  { label: "L2 Conducted Date" },
+  { label: "L2 Status" },
+  { label: "Submitted On" },
+  { label: "Last Updated" },
+  { label: "Actions" },
 ];
 
 interface CandidateFilters {
@@ -90,13 +92,14 @@ const emptyFilters: CandidateFilters = {
   updatedAt: "",
 };
 
+const BODY_ROW_HEIGHT = 32; // 50% of the app-wide default .MuiTableRow-root height (64px)
+
 const bodyCellSx = {
-  padding: "4px 6px",
+  padding: "2px 8px",
   fontSize: "9.9px !important",
-  whiteSpace: "normal !important" as const,
-  overflowWrap: "anywhere" as const,
-  maxWidth: "none !important",
-  verticalAlign: "top" as const,
+  lineHeight: 1.2,
+  whiteSpace: "nowrap !important" as const,
+  verticalAlign: "middle" as const,
 };
 
 const filterRenderValue = (selected: any) => {
@@ -110,8 +113,12 @@ const filterRenderValue = (selected: any) => {
   return selected;
 };
 
+const ROWS_PER_PAGE = 15;
+
 function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProps) {
   const [filters, setFilters] = useState<CandidateFilters>(emptyFilters);
+  const [labelRowRef, labelRowHeight] = useElementHeight<HTMLTableRowElement>();
+  const [page, setPage] = useState(0);
 
   const setFilter = (field: keyof CandidateFilters) => (
     e: React.ChangeEvent<HTMLInputElement>
@@ -156,6 +163,19 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
     );
   }, [candidates, filters]);
 
+  useEffect(() => {
+    setPage(0);
+  }, [filters, candidates]);
+
+  const paginatedCandidates = useMemo(
+    () =>
+      filteredCandidates.slice(
+        page * ROWS_PER_PAGE,
+        page * ROWS_PER_PAGE + ROWS_PER_PAGE
+      ),
+    [filteredCandidates, page]
+  );
+
   return (
     <>
       <Box
@@ -186,30 +206,30 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
       <TableContainer
         component={Paper}
         sx={{
-          width: "50%",
-          maxHeight: 235,
+          width: "100%",
+          maxHeight: 560,
           overflowY: "auto",
-          overflowX: "hidden",
+          overflowX: "auto",
           scrollbarWidth: "thin",
         }}
       >
-        <Table stickyHeader sx={{ tableLayout: "fixed", width: "100%" }}>
+        <Table stickyHeader sx={{ tableLayout: "auto", width: "100%" }}>
           <TableHead>
-            <TableRow>
+            <TableRow ref={labelRowRef}>
               {tableHeaders.map((header) => (
                 <TableCell
                   key={header.label}
                   sx={{
-                    width: header.width,
-                    maxWidth: "none !important",
                     backgroundColor: "#6846C6",
                     color: "#fff",
                     fontWeight: "bold",
-                    whiteSpace: "normal !important",
-                    overflowWrap: "break-word",
+                    whiteSpace: "nowrap !important",
                     lineHeight: 1.2,
-                    padding: "6px 6px",
+                    padding: "6px 10px",
                     fontSize: "10.8px !important",
+                    position: "sticky",
+                    top: 0,
+                    zIndex: 3,
                   }}
                 >
                   {header.label}
@@ -224,6 +244,11 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                 },
                 "& .MuiSelect-select": {
                   padding: "6px 8px",
+                },
+                "& .MuiTableCell-root": {
+                  position: "sticky",
+                  top: labelRowHeight,
+                  zIndex: 2,
                 },
               }}
             >
@@ -516,10 +541,11 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                 </TableCell>
               </TableRow>
             ) : (
-              filteredCandidates.map((c) => (
+              paginatedCandidates.map((c) => (
                 <TableRow
                   key={c._id}
                   sx={{
+                    height: BODY_ROW_HEIGHT,
                     "&:not(:last-child)": {
                       borderBottom: "1px solid #e0e0e0",
                     },
@@ -593,6 +619,15 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
           </TableBody>
         </Table>
       </TableContainer>
+      <TablePagination
+        component="div"
+        count={filteredCandidates.length}
+        page={page}
+        onPageChange={(_e, newPage) => setPage(newPage)}
+        rowsPerPage={ROWS_PER_PAGE}
+        rowsPerPageOptions={[ROWS_PER_PAGE]}
+        sx={{ width: "100%" }}
+      />
     </>
   );
 }
