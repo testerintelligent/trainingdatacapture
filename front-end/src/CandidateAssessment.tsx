@@ -343,97 +343,143 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
             </Grid>
 
             <Grid size={12}>
-              <Box sx={{ borderTop: "3px solid #6846C6", mt: "5px", mb: "5px" }} />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-              <TextField
-                size="small"
-                fullWidth
-                label="L1 Conducted By"
-                name="l1ConductedBy"
-                value={form.l1ConductedBy}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-              <TextField
-                size="small"
-                fullWidth
-                label="L1 Conducted Date"
-                name="l1ConductedDate"
-                type="date"
-                value={form.l1ConductedDate}
-                onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-              <TextField
-                size="small"
-                select
-                fullWidth
-                label="L1 Status"
-                name="l1Status"
-                value={form.l1Status}
-                onChange={handleChange}
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  fontWeight: 700,
+                  color: "#6846C6",
+                  mt: 1,
+                  mb: 0.5,
+                }}
               >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                {interviewStatusOptions.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </TextField>
+                L1 Interview
+              </Typography>
+            </Grid>
+            <Grid size={12}>
+              <Box
+                sx={{
+                  backgroundColor: "transparent",
+                  border: "1px solid #6846C6",
+                  borderRadius: 1,
+                  p: 1.5,
+                }}
+              >
+                <Grid container spacing={1.5}>
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <TextField
+                      size="small"
+                      fullWidth
+                      label="L1 Conducted By"
+                      name="l1ConductedBy"
+                      value={form.l1ConductedBy}
+                      onChange={handleChange}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <TextField
+                      size="small"
+                      fullWidth
+                      label="L1 Conducted Date"
+                      name="l1ConductedDate"
+                      type="date"
+                      value={form.l1ConductedDate}
+                      onChange={handleChange}
+                      InputLabelProps={{ shrink: true }}
+                    />
+                  </Grid>
+
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <TextField
+                      size="small"
+                      select
+                      fullWidth
+                      label="L1 Status"
+                      name="l1Status"
+                      value={form.l1Status}
+                      onChange={handleChange}
+                    >
+                      <MenuItem value="">
+                        <em>None</em>
+                      </MenuItem>
+                      {interviewStatusOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                </Grid>
+              </Box>
             </Grid>
 
             <Grid size={12}>
-              <Box sx={{ borderTop: "3px solid #6846C6", mt: "5px", mb: "5px" }} />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-              <TextField
-                size="small"
-                fullWidth
-                label="L2 Conducted By"
-                name="l2ConductedBy"
-                value={form.l2ConductedBy}
-                onChange={handleChange}
-              />
-            </Grid>
-
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-              <TextField
-                size="small"
-                fullWidth
-                label="L2 Conducted Date"
-                name="l2ConductedDate"
-                type="date"
-                value={form.l2ConductedDate}
-                onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-              <TextField
-                size="small"
-                select
-                fullWidth
-                label="L2 Status"
-                name="l2Status"
-                value={form.l2Status}
-                onChange={handleChange}
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  fontWeight: 700,
+                  color: "#6846C6",
+                  mt: 1,
+                  mb: 0.5,
+                }}
               >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                {interviewStatusOptions.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </TextField>
+                L2 Interview
+              </Typography>
+            </Grid>
+            <Grid size={12}>
+              <Box
+                sx={{
+                  backgroundColor: "transparent",
+                  border: "1px solid #6846C6",
+                  borderRadius: 1,
+                  p: 1.5,
+                }}
+              >
+                <Grid container spacing={1.5}>
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <TextField
+                      size="small"
+                      fullWidth
+                      label="L2 Conducted By"
+                      name="l2ConductedBy"
+                      value={form.l2ConductedBy}
+                      onChange={handleChange}
+                    />
+                  </Grid>
+
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <TextField
+                      size="small"
+                      fullWidth
+                      label="L2 Conducted Date"
+                      name="l2ConductedDate"
+                      type="date"
+                      value={form.l2ConductedDate}
+                      onChange={handleChange}
+                      InputLabelProps={{ shrink: true }}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <TextField
+                      size="small"
+                      select
+                      fullWidth
+                      label="L2 Status"
+                      name="l2Status"
+                      value={form.l2Status}
+                      onChange={handleChange}
+                    >
+                      <MenuItem value="">
+                        <em>None</em>
+                      </MenuItem>
+                      {interviewStatusOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                </Grid>
+              </Box>
             </Grid>
           </Grid>
         </Box>

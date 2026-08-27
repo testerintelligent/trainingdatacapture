@@ -183,14 +183,15 @@ const MultiSeriesTrendChart: React.FC<{
     return () => observer.disconnect();
   }, []);
 
-  const margin = { top: 16, right: 32, bottom: 56, left: 48 };
+  const margin = { top: 16, right: 32, bottom: 72, left: 48 };
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
   const formatDate = (iso: string) => {
-    const d = new Date(iso);
+    // categories are "YYYY-MM" month buckets
+    const d = new Date(`${iso}-01`);
     if (Number.isNaN(d.getTime())) return iso;
-    return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    return d.toLocaleDateString(undefined, { month: "short", year: "numeric" });
   };
 
   if (categories.length === 0) {
@@ -211,6 +212,27 @@ const MultiSeriesTrendChart: React.FC<{
   const xOf = (i: number) =>
     categories.length === 1 ? innerWidth / 2 : i * stepX;
   const yOf = (v: number) => innerHeight - (v / yMax) * innerHeight;
+
+  // Turns a list of points into a smooth, wave-like SVG path (Catmull-Rom
+  // style curve through each point) instead of straight line segments.
+  const buildWavePath = (points: [number, number][]) => {
+    if (points.length === 0) return "";
+    if (points.length === 1) return `M ${points[0][0]},${points[0][1]}`;
+    const smoothing = 0.2;
+    let d = `M ${points[0][0]},${points[0][1]}`;
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i === 0 ? i : i - 1];
+      const p1 = points[i];
+      const p2 = points[i + 1];
+      const p3 = points[i + 2 < points.length ? i + 2 : i + 1];
+      const cp1x = p1[0] + (p2[0] - p0[0]) * smoothing;
+      const cp1y = p1[1] + (p2[1] - p0[1]) * smoothing;
+      const cp2x = p2[0] - (p3[0] - p1[0]) * smoothing;
+      const cp2y = p2[1] - (p3[1] - p1[1]) * smoothing;
+      d += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2[0]},${p2[1]}`;
+    }
+    return d;
+  };
 
   const gridLines = 2;
   const yTicks = Array.from({ length: gridLines + 1 }, (_, i) =>
@@ -296,22 +318,26 @@ const MultiSeriesTrendChart: React.FC<{
             ))}
 
             {series.map((s, sIdx) => {
-              const linePoints = s.values
-                .map((v, i) => `${xOf(i)},${yOf(v)}`)
-                .join(" ");
-              const areaPoints =
-                sIdx === 0
-                  ? `${xOf(0)},${innerHeight} ${linePoints} ${xOf(
-                      categories.length - 1
-                    )},${innerHeight}`
+              const points: [number, number][] = s.values.map((v, i) => [
+                xOf(i),
+                yOf(v),
+              ]);
+              const linePath = buildWavePath(points);
+              const areaPath =
+                sIdx === 0 && points.length > 1
+                  ? `M ${points[0][0]},${innerHeight} L ${points[0][0]},${
+                      points[0][1]
+                    } ${linePath.slice(linePath.indexOf("C"))} L ${
+                      points[points.length - 1][0]
+                    },${innerHeight} Z`
                   : null;
               return (
                 <g key={s.name}>
-                  {areaPoints && (
-                    <polygon points={areaPoints} fill="url(#execTrendFill)" />
+                  {areaPath && (
+                    <path d={areaPath} fill="url(#execTrendFill)" stroke="none" />
                   )}
-                  <polyline
-                    points={linePoints}
+                  <path
+                    d={linePath}
                     fill="none"
                     stroke={s.color}
                     strokeWidth={3}
@@ -340,11 +366,11 @@ const MultiSeriesTrendChart: React.FC<{
               <text
                 key={c}
                 x={xOf(i)}
-                y={innerHeight + 24}
+                y={innerHeight + 18}
                 textAnchor="end"
                 fontSize={12}
                 fill="#6b7280"
-                transform={`rotate(-35 ${xOf(i)} ${innerHeight + 24})`}
+                transform={`rotate(-35 ${xOf(i)} ${innerHeight + 18})`}
               >
                 {formatDate(c)}
               </text>
@@ -385,14 +411,14 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
     [trainings]
   );
 
-  // Completed vs. In Progress counts, grouped by training end date, so both
+  // Completed vs. In Progress counts, grouped by training end month, so both
   // statuses can be compared on the same timeline.
   const trendSeries = useMemo(() => {
     const completedMap = new Map<string, number>();
     const inProgressMap = new Map<string, number>();
     trainings.forEach((t) => {
       if (!t.endDate) return;
-      const key = t.endDate.slice(0, 10);
+      const key = t.endDate.slice(0, 7); // YYYY-MM
       if (t.status === "Completed") {
         completedMap.set(key, (completedMap.get(key) || 0) + 1);
       } else if (t.status === "In Progress") {
@@ -529,9 +555,8 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
           border: "1px solid #E5EEEF",
           boxShadow: "0 4px 24px rgba(0, 106, 113, 0.12)",
           background: "#ffffff",
-          maxHeight: "50%",
           flex: "1 1 auto",
-          minHeight: 0,
+          minHeight: 360,
           overflow: "hidden",
           display: "flex",
           flexDirection: "column",
@@ -548,9 +573,9 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
         </Box>
         <Typography variant="body2" sx={{ color: "#6b7280", mb: 1, flex: "0 0 auto" }}>
           Number of employees completed vs. still in progress, grouped by
-          training end date
+          training end month
         </Typography>
-        <Box sx={{ flex: "1 1 auto", minHeight: 200 }}>
+        <Box sx={{ flex: "1 1 auto", minHeight: 240 }}>
           <MultiSeriesTrendChart
             categories={trendSeries.categories}
             series={trendSeries.series}
