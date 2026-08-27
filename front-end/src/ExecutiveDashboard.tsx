@@ -481,10 +481,11 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
     <Box
       sx={{
         pb: 1,
-        minHeight: "100%",
+        height: "100%",
+        maxHeight: "calc(100vh - 200px)",
         display: "flex",
         flexDirection: "column",
-        overflow: "visible",
+        overflow: "auto",
       }}
     >
       <Box sx={{ width: "100%", mt: 0, mb: 1.5, flex: "0 0 auto" }}>
@@ -528,9 +529,9 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
           border: "1px solid #E5EEEF",
           boxShadow: "0 4px 24px rgba(0, 106, 113, 0.12)",
           background: "#ffffff",
-          height: "40%",
-          flex: "0 0 40%",
-          minHeight: 380,
+          maxHeight: "50%",
+          flex: "1 1 auto",
+          minHeight: 0,
           overflow: "hidden",
           display: "flex",
           flexDirection: "column",
@@ -549,7 +550,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
           Number of employees completed vs. still in progress, grouped by
           training end date
         </Typography>
-        <Box sx={{ flex: "1 1 auto", minHeight: 260 }}>
+        <Box sx={{ flex: "1 1 auto", minHeight: 200 }}>
           <MultiSeriesTrendChart
             categories={trendSeries.categories}
             series={trendSeries.series}
