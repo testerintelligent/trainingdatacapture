@@ -1,4 +1,4 @@
-import React, { useId, useMemo } from "react";
+import React, { useId, useMemo, useRef, useState, useLayoutEffect } from "react";
 import { Box, Paper, Typography, Avatar, Divider } from "@mui/material";
 import HourglassBottomIcon from "@mui/icons-material/HourglassBottom";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -163,8 +163,26 @@ const MultiSeriesTrendChart: React.FC<{
   categories: string[];
   series: ChartSeries[];
 }> = ({ categories, series }) => {
-  const width = 900;
-  const height = 220;
+  // Measure the wrapper so the chart always renders at 100% of the space
+  // its container gives it, instead of a fixed pixel size.
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [{ width, height }, setSize] = useState({ width: 900, height: 220 });
+
+  useLayoutEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const update = () => {
+      const rect = el.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        setSize({ width: rect.width, height: rect.height });
+      }
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   const margin = { top: 16, right: 32, bottom: 56, left: 48 };
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
@@ -200,8 +218,16 @@ const MultiSeriesTrendChart: React.FC<{
   );
 
   return (
-    <Box sx={{ width: "100%" }}>
-      <Box sx={{ display: "flex", gap: 3, mb: 1.5, flexWrap: "wrap" }}>
+    <Box
+      sx={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        minHeight: 0,
+      }}
+    >
+      <Box sx={{ display: "flex", gap: 3, mb: 1.5, flexWrap: "wrap", flex: "0 0 auto" }}>
         {series.map((s) => (
           <Box key={s.name} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Box
@@ -219,11 +245,15 @@ const MultiSeriesTrendChart: React.FC<{
         ))}
       </Box>
 
-      <Box sx={{ width: "100%", overflowX: "auto" }}>
+      <Box
+        ref={containerRef}
+        sx={{ width: "100%", flex: "1 1 auto", minHeight: 0 }}
+      >
         <svg
           viewBox={`0 0 ${width} ${height}`}
           width="100%"
-          height={height}
+          height="100%"
+          preserveAspectRatio="none"
           role="img"
           aria-label="Line chart of training completions and in-progress trainings over time"
         >
@@ -502,9 +532,11 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
           flex: "1 1 auto",
           minHeight: 0,
           overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5, flex: "0 0 auto" }}>
           <ShowChartIcon sx={{ color: "#6846C6" }} />
           <Typography
             variant="subtitle1"
@@ -513,14 +545,16 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
             Course Progress Over Time
           </Typography>
         </Box>
-        <Typography variant="body2" sx={{ color: "#6b7280", mb: 1 }}>
+        <Typography variant="body2" sx={{ color: "#6b7280", mb: 1, flex: "0 0 auto" }}>
           Number of employees completed vs. still in progress, grouped by
           training end date
         </Typography>
-        <MultiSeriesTrendChart
-          categories={trendSeries.categories}
-          series={trendSeries.series}
-        />
+        <Box sx={{ flex: "1 1 auto", minHeight: 0 }}>
+          <MultiSeriesTrendChart
+            categories={trendSeries.categories}
+            series={trendSeries.series}
+          />
+        </Box>
       </Paper>
     </Box>
   );
