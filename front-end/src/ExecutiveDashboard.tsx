@@ -212,7 +212,7 @@ const MultiSeriesTrendChart: React.FC<{
     categories.length === 1 ? innerWidth / 2 : i * stepX;
   const yOf = (v: number) => innerHeight - (v / yMax) * innerHeight;
 
-  const gridLines = 4;
+  const gridLines = 2;
   const yTicks = Array.from({ length: gridLines + 1 }, (_, i) =>
     Math.round((yMax / gridLines) * i)
   );
@@ -481,11 +481,10 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
     <Box
       sx={{
         pb: 1,
-        height: "100%",
-        maxHeight: "calc(100vh - 200px)",
+        minHeight: "100%",
         display: "flex",
         flexDirection: "column",
-        overflow: "hidden",
+        overflow: "visible",
       }}
     >
       <Box sx={{ width: "100%", mt: 0, mb: 1.5, flex: "0 0 auto" }}>
@@ -529,8 +528,9 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
           border: "1px solid #E5EEEF",
           boxShadow: "0 4px 24px rgba(0, 106, 113, 0.12)",
           background: "#ffffff",
-          flex: "1 1 auto",
-          minHeight: 0,
+          height: "40%",
+          flex: "0 0 40%",
+          minHeight: 380,
           overflow: "hidden",
           display: "flex",
           flexDirection: "column",
@@ -549,7 +549,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
           Number of employees completed vs. still in progress, grouped by
           training end date
         </Typography>
-        <Box sx={{ flex: "1 1 auto", minHeight: 0 }}>
+        <Box sx={{ flex: "1 1 auto", minHeight: 260 }}>
           <MultiSeriesTrendChart
             categories={trendSeries.categories}
             series={trendSeries.series}
