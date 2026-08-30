@@ -56,7 +56,7 @@ const trainingTypeOptions = ["Udemy", "Coursera", "Classroom", "Virtual"];
 const projectNameOptions = (
   process.env.REACT_APP_PROJECT_NAMES || "ABC,CDE,EFG,HIJ,KLM"
 ).split(",");
-const ROWS_PER_PAGE = 15;
+const ROWS_PER_PAGE = 10;
 const COMPLETION_ROWS_PER_PAGE = 10;
 
 function App() {
