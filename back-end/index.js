@@ -80,6 +80,9 @@ app.get('/api/trainings', async (req, res) => {
 });
 
 app.post('/api/trainings', async (req, res) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ error: 'Request body is required.' });
+  }
   const data = { ...req.body, startDate: new Date(req.body.startDate), endDate: new Date(req.body.endDate) };
   const training = new Training(data);
   await training.save();
@@ -92,6 +95,9 @@ app.get('/api/trainings/employee/:empId', async (req, res) => {
 });
 
 app.put('/api/trainings/:id', async (req, res) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ error: 'Request body is required.' });
+  }
   const data = { ...req.body, startDate: new Date(req.body.startDate), endDate: new Date(req.body.endDate) };
   const training = await Training.findByIdAndUpdate(req.params.id, data, { new: true });
   res.json(training);
@@ -112,7 +118,7 @@ app.get('/api/candidates', async (req, res) => {
 // blank L1/L2 conducted dates to null before writing to the database.
 // totalScore is always recomputed server-side from the rating fields rather
 // than trusting whatever (if anything) the client sends.
-const normalizeCandidateData = (body) => ({
+const normalizeCandidateData = (body = {}) => ({
   ...body,
   l1ConductedDate: body.l1ConductedDate || null,
   l2ConductedDate: body.l2ConductedDate || null,
@@ -126,12 +132,18 @@ const normalizeCandidateData = (body) => ({
 });
 
 app.post('/api/candidates', async (req, res) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ error: 'Request body is required.' });
+  }
   const candidate = new Candidate(normalizeCandidateData(req.body));
   await candidate.save();
   res.status(201).json(candidate);
 });
 
 app.put('/api/candidates/:id', async (req, res) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ error: 'Request body is required.' });
+  }
   const candidate = await Candidate.findByIdAndUpdate(req.params.id, normalizeCandidateData(req.body), { new: true });
   res.json(candidate);
 });
