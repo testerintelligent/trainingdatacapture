@@ -57,6 +57,7 @@ const projectNameOptions = (
   process.env.REACT_APP_PROJECT_NAMES || "ABC,CDE,EFG,HIJ,KLM"
 ).split(",");
 const ROWS_PER_PAGE = 15;
+const COMPLETION_ROWS_PER_PAGE = 10;
 
 function App() {
   const [trainings, setTrainings] = useState<Training[]>([]);
@@ -267,6 +268,21 @@ function App() {
         a.course.localeCompare(b.course)
     );
   }, [trainings]);
+
+  const [completionPage, setCompletionPage] = useState(0);
+
+  useEffect(() => {
+    setCompletionPage(0);
+  }, [completionSummary]);
+
+  const paginatedCompletionSummary = useMemo(
+    () =>
+      completionSummary.slice(
+        completionPage * COMPLETION_ROWS_PER_PAGE,
+        completionPage * COMPLETION_ROWS_PER_PAGE + COMPLETION_ROWS_PER_PAGE
+      ),
+    [completionSummary, completionPage]
+  );
 
   return (
     <div className="app-flex-root">
@@ -1290,7 +1306,7 @@ function App() {
                         </TableCell>
                       </TableRow>
                     ) : (
-                      completionSummary.map((row) => (
+                      paginatedCompletionSummary.map((row) => (
                         <TableRow
                           key={`${row.projectName}-${row.course}`}
                           sx={{
@@ -1317,6 +1333,14 @@ function App() {
                   </TableBody>
                 </Table>
               </TableContainer>
+              <TablePagination
+                component="div"
+                count={completionSummary.length}
+                page={completionPage}
+                onPageChange={(_e, newPage) => setCompletionPage(newPage)}
+                rowsPerPage={COMPLETION_ROWS_PER_PAGE}
+                rowsPerPageOptions={[COMPLETION_ROWS_PER_PAGE]}
+              />
             </>
           )}
           {showExecutive && <ExecutiveDashboard trainings={trainings} />}
