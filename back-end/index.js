@@ -214,6 +214,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  * /api/trainings:
  *   get:
  *     summary: Get all training records
+ *     tags: [Trainings]
  *     responses:
  *       200:
  *         description: List of training records
@@ -225,6 +226,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *                 $ref: '#/components/schemas/Training'
  *   post:
  *     summary: Create a new training record
+ *     tags: [Trainings]
  *     requestBody:
  *       required: true
  *       content:
@@ -245,6 +247,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  * /api/trainings/{id}:
  *   put:
  *     summary: Update a training record
+ *     tags: [Trainings]
  *     parameters:
  *       - in: path
  *         name: id
@@ -266,6 +269,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *               $ref: '#/components/schemas/Training'
  *   delete:
  *     summary: Delete a training record
+ *     tags: [Trainings]
  *     parameters:
  *       - in: path
  *         name: id
