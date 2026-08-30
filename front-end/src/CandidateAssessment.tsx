@@ -25,6 +25,7 @@ export interface Candidate {
   databaseSkill: number;
   attitudeTowardsLearning: number;
   devExperience: number;
+  totalScore?: number;
   l1ConductedBy: string;
   l1ConductedDate: string;
   l1Status: string;

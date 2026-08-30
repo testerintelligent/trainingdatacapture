@@ -119,7 +119,7 @@ const filterRenderValue = (selected: any) => {
   return selected;
 };
 
-const ROWS_PER_PAGE = 15;
+const ROWS_PER_PAGE = 10;
 
 const MONTH_ABBR = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",

@@ -63,6 +63,7 @@ const candidateSchema = new mongoose.Schema({
   databaseSkill: { type: Number, enum: ratingValues, required: true },
   attitudeTowardsLearning: { type: Number, enum: ratingValues, required: true },
   devExperience: { type: Number, enum: ratingValues, required: true },
+  totalScore: { type: Number },
   l1ConductedBy: { type: String },
   l1ConductedDate: { type: Date },
   l1Status: { type: String, enum: ['', 'Selected', 'Non Selected', 'On Hold'], default: '' },
@@ -109,20 +110,29 @@ app.get('/api/candidates', async (req, res) => {
 
 // Empty date-input strings ('') would fail Mongoose's Date cast, so normalize
 // blank L1/L2 conducted dates to null before writing to the database.
-const normalizeCandidateDates = (body) => ({
+// totalScore is always recomputed server-side from the rating fields rather
+// than trusting whatever (if anything) the client sends.
+const normalizeCandidateData = (body) => ({
   ...body,
   l1ConductedDate: body.l1ConductedDate || null,
   l2ConductedDate: body.l2ConductedDate || null,
+  totalScore:
+    Number(body.communication) +
+    Number(body.technicalSkill) +
+    Number(body.programmingLanguageSkill) +
+    Number(body.databaseSkill) +
+    Number(body.attitudeTowardsLearning) +
+    Number(body.devExperience),
 });
 
 app.post('/api/candidates', async (req, res) => {
-  const candidate = new Candidate(normalizeCandidateDates(req.body));
+  const candidate = new Candidate(normalizeCandidateData(req.body));
   await candidate.save();
   res.status(201).json(candidate);
 });
 
 app.put('/api/candidates/:id', async (req, res) => {
-  const candidate = await Candidate.findByIdAndUpdate(req.params.id, normalizeCandidateDates(req.body), { new: true });
+  const candidate = await Candidate.findByIdAndUpdate(req.params.id, normalizeCandidateData(req.body), { new: true });
   res.json(candidate);
 });
 
@@ -357,6 +367,10 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *         devExperience:
  *           type: number
  *           enum: [0, 1, 2, 3, 4, 5]
+ *         totalScore:
+ *           type: number
+ *           readOnly: true
+ *           description: Sum of communication, technicalSkill, programmingLanguageSkill, databaseSkill, attitudeTowardsLearning and devExperience. Computed server-side; any client-supplied value is ignored.
  *         l1ConductedBy:
  *           type: string
  *         l1ConductedDate:
