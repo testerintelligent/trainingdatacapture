@@ -84,6 +84,11 @@ app.post('/api/trainings', async (req, res) => {
   res.status(201).json(training);
 });
 
+app.get('/api/trainings/employee/:empId', async (req, res) => {
+  const trainings = await Training.find({ empId: req.params.empId });
+  res.json(trainings);
+});
+
 app.put('/api/trainings/:id', async (req, res) => {
   const data = { ...req.body, startDate: new Date(req.body.startDate), endDate: new Date(req.body.endDate) };
   const training = await Training.findByIdAndUpdate(req.params.id, data, { new: true });
@@ -240,6 +245,29 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Training'
+ */
+
+/**
+ * @swagger
+ * /api/trainings/employee/{empId}:
+ *   get:
+ *     summary: Get training records for a specific employee by empId
+ *     tags: [Trainings]
+ *     parameters:
+ *       - in: path
+ *         name: empId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of training records for the employee
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Training'
  */
 
 /**
