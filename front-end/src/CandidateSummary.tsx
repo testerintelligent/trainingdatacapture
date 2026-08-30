@@ -39,6 +39,7 @@ const tableHeaders = [
   { label: "Database Skill" },
   { label: "Attitude Towards Learning" },
   { label: "Dev Experience" },
+  { label: "Total Score" },
   { label: "L1 Conducted By" },
   { label: "L1 Conducted Date" },
   { label: "L1 Status" },
@@ -61,6 +62,7 @@ interface CandidateFilters {
   databaseSkill: string;
   attitudeTowardsLearning: string;
   devExperience: string;
+  totalScore: string;
   l1ConductedBy: string;
   l1ConductedDate: string;
   l1Status: string;
@@ -82,6 +84,7 @@ const emptyFilters: CandidateFilters = {
   databaseSkill: "",
   attitudeTowardsLearning: "",
   devExperience: "",
+  totalScore: "",
   l1ConductedBy: "",
   l1ConductedDate: "",
   l1Status: "",
@@ -114,6 +117,29 @@ const filterRenderValue = (selected: any) => {
 };
 
 const ROWS_PER_PAGE = 15;
+
+const MONTH_ABBR = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+const formatDate = (value?: string) => {
+  if (!value) return "";
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return "";
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = MONTH_ABBR[date.getMonth()];
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+};
+
+const getTotalScore = (c: Candidate) =>
+  c.communication +
+  c.technicalSkill +
+  c.programmingLanguageSkill +
+  c.databaseSkill +
+  c.attitudeTowardsLearning +
+  c.devExperience;
 
 function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProps) {
   const [filters, setFilters] = useState<CandidateFilters>(emptyFilters);
@@ -148,6 +174,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
             filters.attitudeTowardsLearning) &&
         (!filters.devExperience ||
           String(c.devExperience) === filters.devExperience) &&
+        textMatch(String(getTotalScore(c)), filters.totalScore) &&
         textMatch(c.l1ConductedBy, filters.l1ConductedBy) &&
         (!filters.l1ConductedDate ||
           (c.l1ConductedDate ?? "").slice(0, 10) === filters.l1ConductedDate) &&
@@ -193,7 +220,15 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
         </Typography>
         <Button
           variant="contained"
-          onClick={() => exportToExcel(candidates, "candidate_summary.xlsx")}
+          onClick={() =>
+            exportToExcel(
+              candidates.map((c) => ({
+                ...c,
+                totalScore: getTotalScore(c),
+              })),
+              "candidate_summary.xlsx"
+            )
+          }
           sx={{
             backgroundColor: "#887bab",
             "&:hover": { backgroundColor: "#746991" },
@@ -423,6 +458,16 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   size="small"
                   variant="outlined"
                   placeholder="Filter"
+                  value={filters.totalScore}
+                  onChange={setFilter("totalScore")}
+                  fullWidth
+                />
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+                <TextField
+                  size="small"
+                  variant="outlined"
+                  placeholder="Filter"
                   value={filters.l1ConductedBy}
                   onChange={setFilter("l1ConductedBy")}
                   fullWidth
@@ -566,18 +611,15 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                     {c.attitudeTowardsLearning}
                   </TableCell>
                   <TableCell sx={bodyCellSx}>{c.devExperience}</TableCell>
+                  <TableCell sx={bodyCellSx}>{getTotalScore(c)}</TableCell>
                   <TableCell sx={bodyCellSx}>{c.l1ConductedBy}</TableCell>
                   <TableCell sx={bodyCellSx}>
-                    {c.l1ConductedDate
-                      ? new Date(c.l1ConductedDate).toLocaleDateString()
-                      : ""}
+                    {formatDate(c.l1ConductedDate)}
                   </TableCell>
                   <TableCell sx={bodyCellSx}>{c.l1Status}</TableCell>
                   <TableCell sx={bodyCellSx}>{c.l2ConductedBy}</TableCell>
                   <TableCell sx={bodyCellSx}>
-                    {c.l2ConductedDate
-                      ? new Date(c.l2ConductedDate).toLocaleDateString()
-                      : ""}
+                    {formatDate(c.l2ConductedDate)}
                   </TableCell>
                   <TableCell sx={bodyCellSx}>{c.l2Status}</TableCell>
                   <TableCell sx={bodyCellSx}>

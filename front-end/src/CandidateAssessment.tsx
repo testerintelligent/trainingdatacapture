@@ -34,7 +34,7 @@ export interface Candidate {
   updatedAt?: string;
 }
 
-export const ratingOptions = [1, 2, 3, 4, 5];
+export const ratingOptions = [0, 1, 2, 3, 4, 5];
 export const interviewStatusOptions = ["Selected", "Non Selected", "On Hold"];
 
 export const emptyCandidate: Candidate = {
@@ -42,12 +42,12 @@ export const emptyCandidate: Candidate = {
   candidateEmail: "",
   course: "",
   department: "",
-  communication: 1,
-  technicalSkill: 1,
-  programmingLanguageSkill: 1,
-  databaseSkill: 1,
-  attitudeTowardsLearning: 1,
-  devExperience: 1,
+  communication: 0,
+  technicalSkill: 0,
+  programmingLanguageSkill: 0,
+  databaseSkill: 0,
+  attitudeTowardsLearning: 0,
+  devExperience: 0,
   l1ConductedBy: "",
   l1ConductedDate: "",
   l1Status: "",

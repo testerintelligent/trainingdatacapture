@@ -50,7 +50,7 @@ const trainingSchema = new mongoose.Schema({
 const Training = mongoose.model('Training', trainingSchema);
 
 // Candidate Assessment Schema (stored in the recruitment database)
-const ratingValues = [1, 2, 3, 4, 5];
+const ratingValues = [0, 1, 2, 3, 4, 5];
 const candidateSchema = new mongoose.Schema({
   candidateName: { type: String, required: true },
   candidateEmail: { type: String, required: true },
@@ -305,22 +305,22 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *           type: string
  *         communication:
  *           type: number
- *           enum: [1, 2, 3, 4, 5]
+ *           enum: [0, 1, 2, 3, 4, 5]
  *         technicalSkill:
  *           type: number
- *           enum: [1, 2, 3, 4, 5]
+ *           enum: [0, 1, 2, 3, 4, 5]
  *         programmingLanguageSkill:
  *           type: number
- *           enum: [1, 2, 3, 4, 5]
+ *           enum: [0, 1, 2, 3, 4, 5]
  *         databaseSkill:
  *           type: number
- *           enum: [1, 2, 3, 4, 5]
+ *           enum: [0, 1, 2, 3, 4, 5]
  *         attitudeTowardsLearning:
  *           type: number
- *           enum: [1, 2, 3, 4, 5]
+ *           enum: [0, 1, 2, 3, 4, 5]
  *         devExperience:
  *           type: number
- *           enum: [1, 2, 3, 4, 5]
+ *           enum: [0, 1, 2, 3, 4, 5]
  *         l1ConductedBy:
  *           type: string
  *         l1ConductedDate:
