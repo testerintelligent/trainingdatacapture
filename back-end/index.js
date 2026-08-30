@@ -52,6 +52,7 @@ const Training = mongoose.model('Training', trainingSchema);
 // Candidate Assessment Schema (stored in the recruitment database)
 const ratingValues = [0, 1, 2, 3, 4, 5];
 const candidateSchema = new mongoose.Schema({
+  candidateId: { type: String, required: true },
   candidateName: { type: String, required: true },
   candidateEmail: { type: String, required: true },
   course: { type: String, required: true },
@@ -316,6 +317,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *     Candidate:
  *       type: object
  *       required:
+ *         - candidateId
  *         - candidateName
  *         - candidateEmail
  *         - course
@@ -327,6 +329,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *         - attitudeTowardsLearning
  *         - devExperience
  *       properties:
+ *         candidateId:
+ *           type: string
  *         candidateName:
  *           type: string
  *         candidateEmail:

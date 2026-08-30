@@ -29,6 +29,7 @@ interface CandidateSummaryProps {
 }
 
 const tableHeaders = [
+  { label: "Candidate ID" },
   { label: "Candidate Name" },
   { label: "Candidate Email ID" },
   { label: "Course" },
@@ -52,6 +53,7 @@ const tableHeaders = [
 ];
 
 interface CandidateFilters {
+  candidateId: string;
   candidateName: string;
   candidateEmail: string;
   course: string;
@@ -74,6 +76,7 @@ interface CandidateFilters {
 }
 
 const emptyFilters: CandidateFilters = {
+  candidateId: "",
   candidateName: "",
   candidateEmail: "",
   course: "",
@@ -156,6 +159,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
 
     return candidates.filter(
       (c) =>
+        textMatch(c.candidateId, filters.candidateId) &&
         textMatch(c.candidateName, filters.candidateName) &&
         textMatch(c.candidateEmail, filters.candidateEmail) &&
         textMatch(c.course, filters.course) &&
@@ -287,6 +291,16 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                 },
               }}
             >
+              <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+                <TextField
+                  size="small"
+                  variant="outlined"
+                  placeholder="Filter"
+                  value={filters.candidateId}
+                  onChange={setFilter("candidateId")}
+                  fullWidth
+                />
+              </TableCell>
               <TableCell sx={{ backgroundColor: "#c6adf7" }}>
                 <TextField
                   size="small"
@@ -597,6 +611,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                     backgroundColor: "#c6adf7",
                   }}
                 >
+                  <TableCell sx={bodyCellSx}>{c.candidateId}</TableCell>
                   <TableCell sx={bodyCellSx}>{c.candidateName}</TableCell>
                   <TableCell sx={bodyCellSx}>{c.candidateEmail}</TableCell>
                   <TableCell sx={bodyCellSx}>{c.course}</TableCell>

@@ -14,6 +14,7 @@ import HowToRegIcon from "@mui/icons-material/HowToReg";
 
 export interface Candidate {
   _id?: string;
+  candidateId: string;
   candidateName: string;
   candidateEmail: string;
   course: string;
@@ -38,6 +39,7 @@ export const ratingOptions = [0, 1, 2, 3, 4, 5];
 export const interviewStatusOptions = ["Selected", "Non Selected", "On Hold"];
 
 export const emptyCandidate: Candidate = {
+  candidateId: "",
   candidateName: "",
   candidateEmail: "",
   course: "",
@@ -88,6 +90,10 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
   };
 
   const handleSubmit = async () => {
+    if (!form.candidateId.trim()) {
+      alert("Candidate ID is required.");
+      return;
+    }
     if (!form.candidateName.trim()) {
       alert("Candidate Name is required.");
       return;
@@ -183,7 +189,18 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
           }}
         >
           <Grid container spacing={1.5}>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <TextField
+                size="small"
+                fullWidth
+                label="Candidate ID"
+                name="candidateId"
+                value={form.candidateId}
+                onChange={handleChange}
+                required
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
               <TextField
                 size="small"
                 fullWidth
@@ -194,7 +211,7 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                 required
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 4 }}>
               <TextField
                 size="small"
                 fullWidth
