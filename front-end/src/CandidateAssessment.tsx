@@ -123,7 +123,7 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
         mt: 4,
         mx: "auto",
         mb: 4,
-        maxWidth: { xs: "100%", md: "85%" },
+        maxWidth: "100%",
       }}
     >
       <Box

@@ -30,6 +30,7 @@ import AssessmentIcon from "@mui/icons-material/Assessment";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
 import SummarizeIcon from "@mui/icons-material/Summarize";
+import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import { exportToExcel } from "./exportToExcel";
 import ExecutiveDashboard from "./ExecutiveDashboard";
 import CandidateAssessment, { Candidate } from "./CandidateAssessment";
@@ -382,20 +383,35 @@ function App() {
       </aside>
 
       <main className="main-content-flex">
-        <div
+        <Box
           className="page-header"
-          style={{
-            marginTop: "100px",
-            background: "#6846C6",
-            WebkitTextFillColor: "#fff",
-            color: "#fff",
-            borderRadius: "7px",
-            padding: "8px 20px",
-            boxShadow: "0 20px 14px rgba(104, 70, 198, 0.35)",
+          sx={{
+            mt: "100px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 1.5,
+            background: "#ffffff",
+            borderRadius: 3,
+            border: "1px solid #E5EEEF",
+            boxShadow: "0 4px 24px rgba(104, 70, 198, 0.18)",
+            py: 1.5,
           }}
         >
-          Work Ready
-        </div>
+          <Avatar sx={{ bgcolor: "#6846C6", width: 36, height: 36 }}>
+            <WorkspacePremiumIcon sx={{ fontSize: 20 }} />
+          </Avatar>
+          <Typography
+            sx={{
+              color: "#6846C6",
+              fontWeight: 800,
+              fontSize: "1.3rem",
+              letterSpacing: "0.02em",
+            }}
+          >
+            WorkReady
+          </Typography>
+        </Box>
         <Container
           maxWidth={false} // VERY IMPORTANT
           disableGutters
@@ -970,7 +986,7 @@ function App() {
                 mt: 4,
                 mx: "auto",
                 mb: 4,
-                maxWidth: { xs: "100%", md: "68%" },
+                maxWidth: "100%",
               }}
             >
               <Box

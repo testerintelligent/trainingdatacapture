@@ -24,15 +24,10 @@ body {
 }
 
 .page-header {
-  width: 99%;
-  text-align: center;
-  font-weight: 700;
-  font-size: 1.4rem;
-  letter-spacing: 0.02em;
+  width: auto;
   margin-bottom: 16px;
-  margin-top: 0;
-  margin-left: 6px;
-  margin-right: 6px;
+  margin-left: 8px;
+  margin-right: 8px;
   transition: font-size 0.2s;
 }
 
@@ -123,13 +118,6 @@ body {
   }
 }
 
-@media (max-width: 768px) {
-  .page-header {
-    font-size: 1.2rem;
-    margin-top: 16px;
-  }
-}
-
 /* Flexbox Layout for App */
 .app-flex-root {
   display: flex;
@@ -184,7 +172,6 @@ body {
     margin-top: 12vw;
   }
   .page-header {
-    font-size: 1.1rem;
     margin-bottom: 12px;
   }
 }
