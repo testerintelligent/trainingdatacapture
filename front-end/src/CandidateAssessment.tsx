@@ -39,7 +39,7 @@ export interface Candidate {
 }
 
 export const ratingOptions = [0, 1, 2, 3, 4, 5];
-export const interviewStatusOptions = ["Selected", "Non Selected", "On Hold"];
+export const interviewStatusOptions = ["Selected", "Not Selected", "On Hold"];
 
 export const emptyCandidate: Candidate = {
   candidateId: "",
