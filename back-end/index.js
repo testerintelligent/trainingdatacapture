@@ -67,9 +67,11 @@ const candidateSchema = new mongoose.Schema({
   l1ConductedBy: { type: String },
   l1ConductedDate: { type: Date },
   l1Status: { type: String, enum: ['', 'Selected', 'Non Selected', 'On Hold'], default: '' },
+  l1Remarks: { type: String },
   l2ConductedBy: { type: String },
   l2ConductedDate: { type: Date },
   l2Status: { type: String, enum: ['', 'Selected', 'Non Selected', 'On Hold'], default: '' },
+  l2Remarks: { type: String },
 }, { timestamps: true });
 const Candidate = recruitmentConnection.model('Candidate', candidateSchema);
 
@@ -391,6 +393,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *         l1Status:
  *           type: string
  *           enum: ['', Selected, Non Selected, On Hold]
+ *         l1Remarks:
+ *           type: string
  *         l2ConductedBy:
  *           type: string
  *         l2ConductedDate:
@@ -399,6 +403,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *         l2Status:
  *           type: string
  *           enum: ['', Selected, Non Selected, On Hold]
+ *         l2Remarks:
+ *           type: string
  */
 
 /**

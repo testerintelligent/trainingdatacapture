@@ -29,9 +29,11 @@ export interface Candidate {
   l1ConductedBy: string;
   l1ConductedDate: string;
   l1Status: string;
+  l1Remarks: string;
   l2ConductedBy: string;
   l2ConductedDate: string;
   l2Status: string;
+  l2Remarks: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -54,9 +56,11 @@ export const emptyCandidate: Candidate = {
   l1ConductedBy: "",
   l1ConductedDate: "",
   l1Status: "",
+  l1Remarks: "",
   l2ConductedBy: "",
   l2ConductedDate: "",
   l2Status: "",
+  l2Remarks: "",
 };
 
 interface CandidateAssessmentProps {
@@ -426,6 +430,17 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                       ))}
                     </TextField>
                   </Grid>
+
+                  <Grid size={12}>
+                    <TextField
+                      size="small"
+                      fullWidth
+                      label="Remarks"
+                      name="l1Remarks"
+                      value={form.l1Remarks}
+                      onChange={handleChange}
+                    />
+                  </Grid>
                 </Grid>
               </Box>
             </Grid>
@@ -495,6 +510,17 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                         </MenuItem>
                       ))}
                     </TextField>
+                  </Grid>
+
+                  <Grid size={12}>
+                    <TextField
+                      size="small"
+                      fullWidth
+                      label="Remarks"
+                      name="l2Remarks"
+                      value={form.l2Remarks}
+                      onChange={handleChange}
+                    />
                   </Grid>
                 </Grid>
               </Box>
