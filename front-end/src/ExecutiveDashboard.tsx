@@ -2,6 +2,7 @@ import React, { useId, useMemo, useRef, useState, useLayoutEffect } from "react"
 import { Box, Paper, Typography, Avatar, Divider } from "@mui/material";
 import HourglassBottomIcon from "@mui/icons-material/HourglassBottom";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
@@ -167,6 +168,9 @@ const MultiSeriesTrendChart: React.FC<{
   // its container gives it, instead of a fixed pixel size.
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [{ width, height }, setSize] = useState({ width: 900, height: 220 });
+  // Clicking a legend entry isolates that series and switches the others
+  // off; clicking it again (or when nothing is isolated) shows all series.
+  const [soloSeries, setSoloSeries] = useState<string | null>(null);
 
   useLayoutEffect(() => {
     const el = containerRef.current;
@@ -204,7 +208,12 @@ const MultiSeriesTrendChart: React.FC<{
     );
   }
 
-  const maxCount = Math.max(1, ...series.flatMap((s) => s.values));
+  const visibleSeries = soloSeries
+    ? series.filter((s) => s.name === soloSeries)
+    : series;
+  const primaryName = series[0]?.name;
+
+  const maxCount = Math.max(1, ...visibleSeries.flatMap((s) => s.values));
   const yMax = Math.max(4, Math.ceil(maxCount * 1.2));
   const stepX =
     categories.length > 1 ? innerWidth / (categories.length - 1) : 0;
@@ -250,21 +259,38 @@ const MultiSeriesTrendChart: React.FC<{
       }}
     >
       <Box sx={{ display: "flex", gap: 3, mb: 1.5, flexWrap: "wrap", flex: "0 0 auto" }}>
-        {series.map((s) => (
-          <Box key={s.name} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        {series.map((s) => {
+          const isActive = !soloSeries || soloSeries === s.name;
+          return (
             <Box
+              key={s.name}
+              onClick={() =>
+                setSoloSeries((prev) => (prev === s.name ? null : s.name))
+              }
               sx={{
-                width: 10,
-                height: 10,
-                borderRadius: "50%",
-                backgroundColor: s.color,
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                cursor: "pointer",
+                userSelect: "none",
+                opacity: isActive ? 1 : 0.35,
+                transition: "opacity 0.15s ease",
               }}
-            />
-            <Typography variant="body2" sx={{ color: "#4A5568", fontWeight: 600 }}>
-              {s.name}
-            </Typography>
-          </Box>
-        ))}
+            >
+              <Box
+                sx={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: "50%",
+                  backgroundColor: s.color,
+                }}
+              />
+              <Typography variant="body2" sx={{ color: "#4A5568", fontWeight: 600 }}>
+                {s.name}
+              </Typography>
+            </Box>
+          );
+        })}
       </Box>
 
       <Box
@@ -283,12 +309,20 @@ const MultiSeriesTrendChart: React.FC<{
             <linearGradient id="execTrendFill" x1="0" y1="0" x2="0" y2="1">
               <stop
                 offset="0%"
-                stopColor={series[0]?.color ?? "#6846C6"}
+                stopColor={
+                  (soloSeries
+                    ? series.find((s) => s.name === soloSeries)?.color
+                    : series[0]?.color) ?? "#6846C6"
+                }
                 stopOpacity={0.3}
               />
               <stop
                 offset="100%"
-                stopColor={series[0]?.color ?? "#6846C6"}
+                stopColor={
+                  (soloSeries
+                    ? series.find((s) => s.name === soloSeries)?.color
+                    : series[0]?.color) ?? "#6846C6"
+                }
                 stopOpacity={0}
               />
             </linearGradient>
@@ -317,14 +351,19 @@ const MultiSeriesTrendChart: React.FC<{
               </g>
             ))}
 
-            {series.map((s, sIdx) => {
+            {visibleSeries.map((s) => {
+              const isPrimary = s.name === primaryName;
               const points: [number, number][] = s.values.map((v, i) => [
                 xOf(i),
                 yOf(v),
               ]);
               const linePath = buildWavePath(points);
+              // Isolating a series via the legend always fills it in, since
+              // it's the only line on the chart; otherwise only the primary
+              // ("Completed") series gets the area fill.
+              const showArea = soloSeries ? s.name === soloSeries : isPrimary;
               const areaPath =
-                sIdx === 0 && points.length > 1
+                showArea && points.length > 1
                   ? `M ${points[0][0]},${innerHeight} L ${points[0][0]},${
                       points[0][1]
                     } ${linePath.slice(linePath.indexOf("C"))} L ${
@@ -341,7 +380,7 @@ const MultiSeriesTrendChart: React.FC<{
                     fill="none"
                     stroke={s.color}
                     strokeWidth={3}
-                    strokeDasharray={sIdx === 0 ? undefined : "6 4"}
+                    strokeDasharray={isPrimary ? undefined : "6 4"}
                     strokeLinejoin="round"
                     strokeLinecap="round"
                   />
@@ -399,6 +438,62 @@ const MultiSeriesTrendChart: React.FC<{
   );
 };
 
+// Counts trainings of a given status by their end-date month, oldest first.
+const buildMonthlyCounts = (trainings: Training[], status: string) => {
+  const map = new Map<string, number>();
+  trainings.forEach((t) => {
+    if (t.status === status && t.endDate) {
+      const d = new Date(t.endDate);
+      if (!Number.isNaN(d.getTime())) {
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+          2,
+          "0"
+        )}`;
+        map.set(key, (map.get(key) || 0) + 1);
+      }
+    }
+  });
+  return Array.from(map.entries())
+    .map(([month, count]) => ({ month, count }))
+    .sort((a, b) => a.month.localeCompare(b.month));
+};
+
+// Turns monthly counts into the sparkline data + month-over-month delta
+// shown on a StatCard.
+const buildCardTrend = (
+  monthly: { month: string; count: number }[]
+): CardTrend => {
+  const recent = monthly.slice(-6);
+  const formatMonth = (key: string) => {
+    const [y, m] = key.split("-").map(Number);
+    return new Date(y, m - 1, 1).toLocaleDateString(undefined, {
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  if (recent.length < 2) {
+    return {
+      data: recent.map((m) => m.count),
+      deltaPct: null,
+      periodLabel: "Not enough history yet",
+    };
+  }
+
+  const prev = recent[recent.length - 2].count;
+  const curr = recent[recent.length - 1].count;
+  const deltaPct =
+    prev > 0 ? Math.round(((curr - prev) / prev) * 100) : curr > 0 ? 100 : 0;
+
+  return {
+    data: recent.map((m) => m.count),
+    deltaPct,
+    periodLabel: `${formatMonth(
+      recent[recent.length - 2].month
+    )} vs ${formatMonth(recent[recent.length - 1].month)}`,
+  };
+};
+
 const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
   trainings,
 }) => {
@@ -410,12 +505,17 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
     () => trainings.filter((t) => t.status === "Completed").length,
     [trainings]
   );
+  const notStartedCount = useMemo(
+    () => trainings.filter((t) => t.status === "Not Started").length,
+    [trainings]
+  );
 
-  // Completed vs. In Progress counts, grouped by training end month, so both
-  // statuses can be compared on the same timeline.
+  // Completed vs. In Progress vs. Not Started counts, grouped by training end
+  // month, so all three statuses can be compared on the same timeline.
   const trendSeries = useMemo(() => {
     const completedMap = new Map<string, number>();
     const inProgressMap = new Map<string, number>();
+    const notStartedMap = new Map<string, number>();
     trainings.forEach((t) => {
       if (!t.endDate) return;
       const key = t.endDate.slice(0, 7); // YYYY-MM
@@ -423,14 +523,16 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
         completedMap.set(key, (completedMap.get(key) || 0) + 1);
       } else if (t.status === "In Progress") {
         inProgressMap.set(key, (inProgressMap.get(key) || 0) + 1);
+      } else if (t.status === "Not Started") {
+        notStartedMap.set(key, (notStartedMap.get(key) || 0) + 1);
       }
     });
 
     const categories = Array.from(
       new Set(
-        Array.from(completedMap.keys()).concat(
-          Array.from(inProgressMap.keys())
-        )
+        Array.from(completedMap.keys())
+          .concat(Array.from(inProgressMap.keys()))
+          .concat(Array.from(notStartedMap.keys()))
       )
     ).sort((a, b) => a.localeCompare(b));
 
@@ -445,63 +547,30 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
         color: "#887bab",
         values: categories.map((d) => inProgressMap.get(d) || 0),
       },
+      {
+        name: "Not Started",
+        color: "#4299e1",
+        values: categories.map((d) => notStartedMap.get(d) || 0),
+      },
     ];
 
     return { categories, series };
   }, [trainings]);
 
-  // Completions grouped by month, used to show how completions this month
-  // compare with the past few months.
-  const monthlyCompleted = useMemo(() => {
-    const map = new Map<string, number>();
-    trainings.forEach((t) => {
-      if (t.status === "Completed" && t.endDate) {
-        const d = new Date(t.endDate);
-        if (!Number.isNaN(d.getTime())) {
-          const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
-            2,
-            "0"
-          )}`;
-          map.set(key, (map.get(key) || 0) + 1);
-        }
-      }
-    });
-    return Array.from(map.entries())
-      .map(([month, count]) => ({ month, count }))
-      .sort((a, b) => a.month.localeCompare(b.month));
-  }, [trainings]);
-
-  const completedTrend = useMemo<CardTrend>(() => {
-    const recent = monthlyCompleted.slice(-6);
-    const formatMonth = (key: string) => {
-      const [y, m] = key.split("-").map(Number);
-      return new Date(y, m - 1, 1).toLocaleDateString(undefined, {
-        month: "short",
-        year: "numeric",
-      });
-    };
-
-    if (recent.length < 2) {
-      return {
-        data: recent.map((m) => m.count),
-        deltaPct: null,
-        periodLabel: "Not enough history yet",
-      };
-    }
-
-    const prev = recent[recent.length - 2].count;
-    const curr = recent[recent.length - 1].count;
-    const deltaPct =
-      prev > 0 ? Math.round(((curr - prev) / prev) * 100) : curr > 0 ? 100 : 0;
-
-    return {
-      data: recent.map((m) => m.count),
-      deltaPct,
-      periodLabel: `${formatMonth(
-        recent[recent.length - 2].month
-      )} vs ${formatMonth(recent[recent.length - 1].month)}`,
-    };
-  }, [monthlyCompleted]);
+  // Per-status counts grouped by (end date) month, used to show how each
+  // status this month compares with the past few months on its card.
+  const notStartedTrend = useMemo<CardTrend>(
+    () => buildCardTrend(buildMonthlyCounts(trainings, "Not Started")),
+    [trainings]
+  );
+  const inProgressTrend = useMemo<CardTrend>(
+    () => buildCardTrend(buildMonthlyCounts(trainings, "In Progress")),
+    [trainings]
+  );
+  const completedTrend = useMemo<CardTrend>(
+    () => buildCardTrend(buildMonthlyCounts(trainings, "Completed")),
+    [trainings]
+  );
 
   return (
     <Box
@@ -533,10 +602,18 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
         }}
       >
         <StatCard
+          icon={<PendingActionsIcon />}
+          label="Trainings Not Started"
+          value={notStartedCount}
+          accent="#4299e1"
+          trend={notStartedTrend}
+        />
+        <StatCard
           icon={<HourglassBottomIcon />}
           label="Trainings In Progress"
           value={inProgressCount}
           accent="#887bab"
+          trend={inProgressTrend}
         />
         <StatCard
           icon={<CheckCircleIcon />}

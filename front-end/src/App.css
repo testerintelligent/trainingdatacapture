@@ -32,7 +32,7 @@ body {
 }
 
 :root {
-  --main-top-margin: -10vh;
+  --main-top-margin: 24px;
   --table-header-padding: 0 6px;
   --table-header-min-width: 30px;
 }
@@ -128,8 +128,8 @@ body {
 }
 
 .side-menu {
-  flex: 0 0 5%;
-  max-width: 5%;
+  flex: 0 0 8%;
+  max-width: 8%;
   min-width: 60px;
   background: #1a2233;
   display: flex;
@@ -138,6 +138,10 @@ body {
   padding: 32px 0;
   box-shadow: 2px 0 8px rgba(0,0,0,0.08);
   z-index: 2;
+}
+
+.side-menu .MuiSvgIcon-root {
+  font-size: 2.5vw;
 }
 
 @media (max-width: 900px) {

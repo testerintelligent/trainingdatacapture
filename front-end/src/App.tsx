@@ -288,6 +288,34 @@ function App() {
   return (
     <div className="app-flex-root">
       <aside className="side-menu">
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 0.5,
+            mb: 2,
+            width: "100%",
+            px: "4px",
+          }}
+        >
+          <Avatar sx={{ bgcolor: "#6846C6", width: "60%", height: "auto", aspectRatio: "1 / 1" }}>
+            <WorkspacePremiumIcon sx={{ fontSize: "1.4vw" }} />
+          </Avatar>
+          <Typography
+            sx={{
+              color: "#fff",
+              fontWeight: 800,
+              fontSize: "0.65rem",
+              letterSpacing: "0.02em",
+              textAlign: "center",
+              lineHeight: 1.2,
+              wordBreak: "break-word",
+            }}
+          >
+            WorkReady
+          </Typography>
+        </Box>
         <Tooltip title="Add Training" placement="right">
           <IconButton
             onClick={() => {
@@ -383,35 +411,6 @@ function App() {
       </aside>
 
       <main className="main-content-flex">
-        <Box
-          className="page-header"
-          sx={{
-            mt: "100px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 1.5,
-            background: "#ffffff",
-            borderRadius: 3,
-            border: "1px solid #E5EEEF",
-            boxShadow: "0 4px 24px rgba(104, 70, 198, 0.18)",
-            py: 1.5,
-          }}
-        >
-          <Avatar sx={{ bgcolor: "#6846C6", width: 36, height: 36 }}>
-            <WorkspacePremiumIcon sx={{ fontSize: 20 }} />
-          </Avatar>
-          <Typography
-            sx={{
-              color: "#6846C6",
-              fontWeight: 800,
-              fontSize: "1.3rem",
-              letterSpacing: "0.02em",
-            }}
-          >
-            WorkReady
-          </Typography>
-        </Box>
         <Container
           maxWidth={false} // VERY IMPORTANT
           disableGutters

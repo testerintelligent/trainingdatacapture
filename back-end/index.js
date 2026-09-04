@@ -105,6 +105,20 @@ app.put('/api/trainings/:id', async (req, res) => {
   res.json(training);
 });
 
+// Updates a training record by empId rather than Mongo _id. If more than one
+// record exists for the employee, the first match is updated.
+app.put('/api/trainings/employee/:empId', async (req, res) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ error: 'Request body is required.' });
+  }
+  const data = { ...req.body, startDate: new Date(req.body.startDate), endDate: new Date(req.body.endDate) };
+  const training = await Training.findOneAndUpdate({ empId: req.params.empId }, data, { new: true });
+  if (!training) {
+    return res.status(404).json({ error: 'No training record found for the given empId.' });
+  }
+  res.json(training);
+});
+
 app.delete('/api/trainings/:id', async (req, res) => {
   await Training.findByIdAndDelete(req.params.id);
   res.status(204).end();
@@ -293,6 +307,30 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Training'
+ *   put:
+ *     summary: Update a training record by empId (updates the first matching record if more than one exists)
+ *     tags: [Trainings]
+ *     parameters:
+ *       - in: path
+ *         name: empId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Training'
+ *     responses:
+ *       200:
+ *         description: Training record updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Training'
+ *       404:
+ *         description: No training record found for the given empId
  */
 
 /**
