@@ -31,10 +31,12 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
 import SummarizeIcon from "@mui/icons-material/Summarize";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { exportToExcel } from "./exportToExcel";
 import ExecutiveDashboard from "./ExecutiveDashboard";
 import CandidateAssessment, { Candidate } from "./CandidateAssessment";
 import CandidateSummary from "./CandidateSummary";
+import SelectedCandidates from "./SelectedCandidates";
 import { useElementHeight } from "./useElementHeight";
 import "./App.css";
 
@@ -81,6 +83,7 @@ function App() {
   const [showExecutive, setShowExecutive] = useState(false);
   const [showRecruitment, setShowRecruitment] = useState(false);
   const [showCandidateSummary, setShowCandidateSummary] = useState(false);
+  const [showSelectedCandidates, setShowSelectedCandidates] = useState(false);
 
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [editingCandidate, setEditingCandidate] = useState<Candidate | null>(null);
@@ -100,6 +103,7 @@ function App() {
     setEditingCandidate(candidate);
     setShowRecruitment(true);
     setShowCandidateSummary(false);
+    setShowSelectedCandidates(false);
     setShowExecutive(false);
     setShowSummary(false);
     setShowTable(false);
@@ -115,6 +119,7 @@ function App() {
     fetchCandidates();
     setEditingCandidate(null);
     setShowCandidateSummary(true);
+    setShowSelectedCandidates(false);
     setShowRecruitment(false);
     setShowExecutive(false);
     setShowSummary(false);
@@ -325,6 +330,7 @@ function App() {
               setShowExecutive(false);
               setShowRecruitment(false);
               setShowCandidateSummary(false);
+              setShowSelectedCandidates(false);
               handleOpen();
             }}
             sx={{ color: showForm ? "#4299e1" : "#fff" }}
@@ -341,6 +347,7 @@ function App() {
               setShowExecutive(false);
               setShowRecruitment(false);
               setShowCandidateSummary(false);
+              setShowSelectedCandidates(false);
             }}
             sx={{ color: showTable ? "#4299e1" : "#fff" }}
           >
@@ -356,6 +363,7 @@ function App() {
               setShowExecutive(false);
               setShowRecruitment(false);
               setShowCandidateSummary(false);
+              setShowSelectedCandidates(false);
             }}
             sx={{ color: showSummary ? "#4299e1" : "#fff" }}
           >
@@ -371,6 +379,7 @@ function App() {
               setShowForm(false);
               setShowRecruitment(false);
               setShowCandidateSummary(false);
+              setShowSelectedCandidates(false);
             }}
             sx={{ color: showExecutive ? "#4299e1" : "#fff" }}
           >
@@ -387,6 +396,7 @@ function App() {
               setShowTable(false);
               setShowForm(false);
               setShowCandidateSummary(false);
+              setShowSelectedCandidates(false);
             }}
             sx={{ color: showRecruitment ? "#4299e1" : "#fff" }}
           >
@@ -402,10 +412,27 @@ function App() {
               setShowSummary(false);
               setShowTable(false);
               setShowForm(false);
+              setShowSelectedCandidates(false);
             }}
             sx={{ color: showCandidateSummary ? "#4299e1" : "#fff" }}
           >
             <SummarizeIcon />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Selected Candidates" placement="right">
+          <IconButton
+            onClick={() => {
+              setShowSelectedCandidates(true);
+              setShowCandidateSummary(false);
+              setShowRecruitment(false);
+              setShowExecutive(false);
+              setShowSummary(false);
+              setShowTable(false);
+              setShowForm(false);
+            }}
+            sx={{ color: showSelectedCandidates ? "#4299e1" : "#fff" }}
+          >
+            <CheckCircleIcon />
           </IconButton>
         </Tooltip>
       </aside>
@@ -1371,6 +1398,9 @@ function App() {
               onEdit={handleCandidateEdit}
               onDelete={handleCandidateDelete}
             />
+          )}
+          {showSelectedCandidates && (
+            <SelectedCandidates candidates={candidates} />
           )}
         </Container>
       </main>
