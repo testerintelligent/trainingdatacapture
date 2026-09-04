@@ -169,6 +169,29 @@ app.delete('/api/candidates/:id', async (req, res) => {
   res.status(204).end();
 });
 
+// Gets candidate assessment records for a specific candidate by candidateId.
+app.get('/api/candidates/candidate/:candidateId', async (req, res) => {
+  const candidates = await Candidate.find({ candidateId: req.params.candidateId });
+  res.json(candidates);
+});
+
+// Updates a candidate assessment record by candidateId rather than Mongo _id.
+// If more than one record exists for the candidate, the first match is updated.
+app.put('/api/candidates/candidate/:candidateId', async (req, res) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ error: 'Request body is required.' });
+  }
+  const candidate = await Candidate.findOneAndUpdate(
+    { candidateId: req.params.candidateId },
+    normalizeCandidateData(req.body),
+    { new: true }
+  );
+  if (!candidate) {
+    return res.status(404).json({ error: 'No candidate record found for the given candidateId.' });
+  }
+  res.json(candidate);
+});
+
 // Swagger API documentation
 const swaggerOptions = {
   definition: {
@@ -476,6 +499,53 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Candidate'
+ */
+
+/**
+ * @swagger
+ * /api/candidates/candidate/{candidateId}:
+ *   get:
+ *     summary: Get candidate assessment records for a specific candidate by candidateId
+ *     tags: [Candidates]
+ *     parameters:
+ *       - in: path
+ *         name: candidateId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of candidate assessment records for the candidate
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Candidate'
+ *   put:
+ *     summary: Update a candidate assessment record by candidateId (updates the first matching record if more than one exists)
+ *     tags: [Candidates]
+ *     parameters:
+ *       - in: path
+ *         name: candidateId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Candidate'
+ *     responses:
+ *       200:
+ *         description: Candidate assessment record updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Candidate'
+ *       404:
+ *         description: No candidate record found for the given candidateId
  */
 
 /**
