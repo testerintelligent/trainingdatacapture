@@ -134,16 +134,6 @@ app.delete('/api/trainings/employee/:empId', async (req, res) => {
   res.json({ deletedCount: result.deletedCount });
 });
 
-// Looks up an employee's basic details (empId, employeeName) by empId,
-// using the most recently created matching training record as the source.
-app.get('/api/trainings/employee/:empId/details', async (req, res) => {
-  const training = await Training.findOne({ empId: req.params.empId }).sort({ _id: -1 });
-  if (!training) {
-    return res.status(404).json({ error: 'No training record found for the given empId.' });
-  }
-  res.json({ empId: training.empId, employeeName: training.employeeName });
-});
-
 // Candidate Assessment CRUD Endpoints
 app.get('/api/candidates', async (req, res) => {
   const candidates = await Candidate.find();
@@ -403,43 +393,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *               properties:
  *                 deletedCount:
  *                   type: number
- *       404:
- *         description: No training record found for the given empId
- */
-
-/**
- * @swagger
- * components:
- *   schemas:
- *     Employee:
- *       type: object
- *       properties:
- *         empId:
- *           type: string
- *         employeeName:
- *           type: string
- */
-
-/**
- * @swagger
- * /api/trainings/employee/{empId}/details:
- *   get:
- *     summary: Get an employee's basic details by empId
- *     description: Looks up the employee's empId and employeeName from the most recently created training record matching that empId.
- *     tags: [Trainings]
- *     parameters:
- *       - in: path
- *         name: empId
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Employee details
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Employee'
  *       404:
  *         description: No training record found for the given empId
  */
