@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import DownloadIcon from "@mui/icons-material/Download";
 import { exportToExcel } from "./exportToExcel";
 import type { Candidate } from "./CandidateAssessment";
 import { ratingOptions, interviewStatusOptions } from "./CandidateAssessment";
@@ -98,12 +99,12 @@ const emptyFilters: CandidateFilters = {
   updatedAt: "",
 };
 
-const BODY_ROW_HEIGHT = 32; // 50% of the app-wide default .MuiTableRow-root height (64px)
+const BODY_ROW_HEIGHT = 36;
 
 const bodyCellSx = {
-  padding: "2px 8px",
-  fontSize: "9.9px !important",
-  lineHeight: 1.2,
+  padding: "4px 10px",
+  fontSize: "11.5px !important",
+  lineHeight: 1.3,
   whiteSpace: "nowrap !important" as const,
   verticalAlign: "middle" as const,
 };
@@ -111,7 +112,7 @@ const bodyCellSx = {
 const filterRenderValue = (selected: any) => {
   if (selected === "") {
     return (
-      <MenuItem sx={{ color: "#999", fontSize: "10.8px", fontStyle: "italic" }}>
+      <MenuItem sx={{ color: "#999", fontSize: "11.5px", fontStyle: "italic" }}>
         Filter
       </MenuItem>
     );
@@ -224,6 +225,8 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
         </Typography>
         <Button
           variant="contained"
+          disableElevation
+          startIcon={<DownloadIcon />}
           onClick={() =>
             exportToExcel(
               candidates.map((c) => ({
@@ -234,8 +237,9 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
             )
           }
           sx={{
-            backgroundColor: "#887bab",
-            "&:hover": { backgroundColor: "#746991" },
+            backgroundColor: "#F0EBFB",
+            color: "#4E2FA8",
+            "&:hover": { backgroundColor: "#E3D7F8" },
           }}
         >
           Export to Excel
@@ -264,8 +268,8 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                     fontWeight: "bold",
                     whiteSpace: "nowrap !important",
                     lineHeight: 1.2,
-                    padding: "6px 10px",
-                    fontSize: "10.8px !important",
+                    padding: "8px 10px",
+                    fontSize: "12px !important",
                     position: "sticky",
                     top: 0,
                     zIndex: 3,
@@ -279,7 +283,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
               sx={{
                 "& .MuiInputBase-root": {
                   height: 32,
-                  fontSize: "10.8px",
+                  fontSize: "11.5px",
                 },
                 "& .MuiSelect-select": {
                   padding: "6px 8px",
@@ -291,7 +295,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                 },
               }}
             >
-              <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
                   variant="outlined"
@@ -301,7 +305,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   fullWidth
                 />
               </TableCell>
-              <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
                   variant="outlined"
@@ -311,7 +315,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   fullWidth
                 />
               </TableCell>
-              <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
                   variant="outlined"
@@ -321,7 +325,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   fullWidth
                 />
               </TableCell>
-              <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
                   variant="outlined"
@@ -331,7 +335,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   fullWidth
                 />
               </TableCell>
-              <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
                   variant="outlined"
@@ -341,7 +345,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   fullWidth
                 />
               </TableCell>
-              <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
                   select
@@ -362,7 +366,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   ))}
                 </TextField>
               </TableCell>
-              <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
                   select
@@ -383,7 +387,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   ))}
                 </TextField>
               </TableCell>
-              <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
                   select
@@ -404,7 +408,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   ))}
                 </TextField>
               </TableCell>
-              <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
                   select
@@ -425,7 +429,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   ))}
                 </TextField>
               </TableCell>
-              <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
                   select
@@ -446,7 +450,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   ))}
                 </TextField>
               </TableCell>
-              <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
                   select
@@ -467,7 +471,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   ))}
                 </TextField>
               </TableCell>
-              <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
                   variant="outlined"
@@ -477,7 +481,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   fullWidth
                 />
               </TableCell>
-              <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
                   variant="outlined"
@@ -487,7 +491,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   fullWidth
                 />
               </TableCell>
-              <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
                   type="date"
@@ -498,7 +502,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   InputLabelProps={{ shrink: true }}
                 />
               </TableCell>
-              <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
                   select
@@ -519,7 +523,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   ))}
                 </TextField>
               </TableCell>
-              <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
                   variant="outlined"
@@ -529,7 +533,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   fullWidth
                 />
               </TableCell>
-              <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
                   type="date"
@@ -540,7 +544,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   InputLabelProps={{ shrink: true }}
                 />
               </TableCell>
-              <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
                   select
@@ -561,7 +565,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   ))}
                 </TextField>
               </TableCell>
-              <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
                   type="date"
@@ -572,7 +576,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   InputLabelProps={{ shrink: true }}
                 />
               </TableCell>
-              <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
                   type="date"
@@ -583,7 +587,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   InputLabelProps={{ shrink: true }}
                 />
               </TableCell>
-              <TableCell sx={{ backgroundColor: "#c6adf7" }} />
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }} />
             </TableRow>
           </TableHead>
           <TableBody>
@@ -592,7 +596,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                 <TableCell
                   colSpan={tableHeaders.length}
                   align="center"
-                  sx={{ backgroundColor: "#c6adf7" }}
+                  sx={{ backgroundColor: "#FBFAFE" }}
                 >
                   {candidates.length === 0
                     ? "No candidate assessment records yet."
@@ -606,9 +610,9 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   sx={{
                     height: BODY_ROW_HEIGHT,
                     "&:not(:last-child)": {
-                      borderBottom: "1px solid #e0e0e0",
+                      borderBottom: "1px solid #EFEBF7",
                     },
-                    backgroundColor: "#c6adf7",
+                    backgroundColor: "#FBFAFE",
                   }}
                 >
                   <TableCell sx={bodyCellSx}>{c.candidateId}</TableCell>

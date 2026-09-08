@@ -92,7 +92,7 @@ const StatCard: React.FC<{
       flex: "1 1 240px",
       p: 1.75,
       borderRadius: 3,
-      border: "1px solid #E5EEEF",
+      border: "1px solid #E7E3F1",
       boxShadow: "0 4px 24px rgba(0, 106, 113, 0.12)",
       background: "#ffffff",
     }}
@@ -335,7 +335,7 @@ const MultiSeriesTrendChart: React.FC<{
                   x2={innerWidth}
                   y1={yOf(t)}
                   y2={yOf(t)}
-                  stroke="#E5EEEF"
+                  stroke="#E7E3F1"
                   strokeWidth={1}
                 />
                 <text
@@ -420,7 +420,7 @@ const MultiSeriesTrendChart: React.FC<{
               y1={innerHeight}
               x2={innerWidth}
               y2={innerHeight}
-              stroke="#CBD5E0"
+              stroke="#D9D2EC"
               strokeWidth={1}
             />
             <line
@@ -428,7 +428,7 @@ const MultiSeriesTrendChart: React.FC<{
               y1={0}
               x2={0}
               y2={innerHeight}
-              stroke="#CBD5E0"
+              stroke="#D9D2EC"
               strokeWidth={1}
             />
           </g>
@@ -629,7 +629,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
         sx={{
           p: 2,
           borderRadius: 3,
-          border: "1px solid #E5EEEF",
+          border: "1px solid #E7E3F1",
           boxShadow: "0 4px 24px rgba(0, 106, 113, 0.12)",
           background: "#ffffff",
           flex: "1 1 auto",

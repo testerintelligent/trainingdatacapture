@@ -136,7 +136,7 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
           background: "#ffffff",
           borderRadius: 3,
           boxShadow: "0 4px 24px rgba(0, 106, 113, 0.12)",
-          border: "1px solid #E5EEEF",
+          border: "1px solid #E7E3F1",
           overflow: "hidden",
           maxHeight: "calc(100vh - 120px)",
           display: "flex",
@@ -548,7 +548,7 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
               sx={{
                 textTransform: "none",
                 fontWeight: 600,
-                borderColor: "#CBD5E0",
+                borderColor: "#D9D2EC",
                 color: "#4A5568",
                 minWidth: 300,
               }}
@@ -562,11 +562,11 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
             sx={{
               textTransform: "none",
               fontWeight: 600,
-              background: "#887bab",
+              background: "#6846C6",
               boxShadow: "none",
               minWidth: 300,
               "&:hover": {
-                background: "#746991",
+                background: "#4E2FA8",
                 boxShadow: "none",
               },
             }}

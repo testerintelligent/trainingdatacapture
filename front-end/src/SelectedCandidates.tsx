@@ -12,6 +12,7 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
+import DownloadIcon from "@mui/icons-material/Download";
 import { exportToExcel } from "./exportToExcel";
 import type { Candidate } from "./CandidateAssessment";
 
@@ -65,6 +66,8 @@ function SelectedCandidates({ candidates }: SelectedCandidatesProps) {
         </Typography>
         <Button
           variant="contained"
+          disableElevation
+          startIcon={<DownloadIcon />}
           onClick={() =>
             exportToExcel(
               selectedCandidates.map((c) => ({
@@ -77,8 +80,9 @@ function SelectedCandidates({ candidates }: SelectedCandidatesProps) {
             )
           }
           sx={{
-            backgroundColor: "#887bab",
-            "&:hover": { backgroundColor: "#746991" },
+            backgroundColor: "#F0EBFB",
+            color: "#4E2FA8",
+            "&:hover": { backgroundColor: "#E3D7F8" },
           }}
         >
           Export to Excel
@@ -106,7 +110,6 @@ function SelectedCandidates({ candidates }: SelectedCandidatesProps) {
                     color: "#fff",
                     fontWeight: "bold",
                     whiteSpace: "nowrap",
-                    fontSize: "16px !important",
                     position: "sticky",
                     top: 0,
                     zIndex: 3,
@@ -123,7 +126,7 @@ function SelectedCandidates({ candidates }: SelectedCandidatesProps) {
                 <TableCell
                   colSpan={tableHeaders.length}
                   align="center"
-                  sx={{ backgroundColor: "#c6adf7" }}
+                  sx={{ backgroundColor: "#FBFAFE" }}
                 >
                   {candidates.length === 0
                     ? "No candidate assessment records yet."
@@ -137,10 +140,10 @@ function SelectedCandidates({ candidates }: SelectedCandidatesProps) {
                   sx={{
                     height: 44,
                     "&:not(:last-child)": {
-                      borderBottom: "1px solid #e0e0e0",
+                      borderBottom: "1px solid #EFEBF7",
                     },
                     "& > *": { paddingTop: 0, paddingBottom: 0 },
-                    backgroundColor: "#c6adf7",
+                    backgroundColor: "#FBFAFE",
                   }}
                 >
                   <TableCell sx={{ padding: "0 8px" }}>

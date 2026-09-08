@@ -124,6 +124,26 @@ app.delete('/api/trainings/:id', async (req, res) => {
   res.status(204).end();
 });
 
+// Looks up an employee's basic details (empId, employeeName) by employeeId,
+// using the most recently created matching training record as the source.
+app.get('/api/employees/:employeeId', async (req, res) => {
+  const training = await Training.findOne({ empId: req.params.employeeId }).sort({ _id: -1 });
+  if (!training) {
+    return res.status(404).json({ error: 'No employee found for the given employeeId.' });
+  }
+  res.json({ empId: training.empId, employeeName: training.employeeName });
+});
+
+// Deletes every training record for the given employeeId, i.e. the
+// employee's entire training history.
+app.delete('/api/employees/:employeeId', async (req, res) => {
+  const result = await Training.deleteMany({ empId: req.params.employeeId });
+  if (result.deletedCount === 0) {
+    return res.status(404).json({ error: 'No employee found for the given employeeId.' });
+  }
+  res.json({ deletedCount: result.deletedCount });
+});
+
 // Candidate Assessment CRUD Endpoints
 app.get('/api/candidates', async (req, res) => {
   const candidates = await Candidate.find();
@@ -192,6 +212,15 @@ app.put('/api/candidates/candidate/:candidateId', async (req, res) => {
   res.json(candidate);
 });
 
+// Deletes every candidate assessment record for the given candidateId.
+app.delete('/api/candidates/candidate/:candidateId', async (req, res) => {
+  const result = await Candidate.deleteMany({ candidateId: req.params.candidateId });
+  if (result.deletedCount === 0) {
+    return res.status(404).json({ error: 'No candidate record found for the given candidateId.' });
+  }
+  res.json({ deletedCount: result.deletedCount });
+});
+
 // Swagger API documentation
 const swaggerOptions = {
   definition: {
@@ -206,7 +235,8 @@ const swaggerOptions = {
     ],
     tags: [
       { name: 'Trainings', description: 'Operations related to employee training records' },
-      { name: 'Candidates', description: 'Operations related to candidate assessment records' }
+      { name: 'Candidates', description: 'Operations related to candidate assessment records' },
+      { name: 'Employees', description: 'Operations related to employee details' }
     ]
   },
   apis: ['./index.js'], // Path to the API docs
@@ -399,6 +429,65 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  * @swagger
  * components:
  *   schemas:
+ *     Employee:
+ *       type: object
+ *       properties:
+ *         empId:
+ *           type: string
+ *         employeeName:
+ *           type: string
+ */
+
+/**
+ * @swagger
+ * /api/employees/{employeeId}:
+ *   get:
+ *     summary: Get an employee's basic details by employeeId
+ *     description: Looks up the employee's empId and employeeName from the most recently created training record matching that employeeId.
+ *     tags: [Employees]
+ *     parameters:
+ *       - in: path
+ *         name: employeeId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Employee details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Employee'
+ *       404:
+ *         description: No employee found for the given employeeId
+ *   delete:
+ *     summary: Delete all training records for an employee by employeeId
+ *     description: Deletes every training record matching that employeeId, i.e. the employee's entire training history.
+ *     tags: [Employees]
+ *     parameters:
+ *       - in: path
+ *         name: employeeId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Training records deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 deletedCount:
+ *                   type: number
+ *       404:
+ *         description: No employee found for the given employeeId
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
  *     Candidate:
  *       type: object
  *       required:
@@ -544,6 +633,28 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Candidate'
+ *       404:
+ *         description: No candidate record found for the given candidateId
+ *   delete:
+ *     summary: Delete all candidate assessment records for a candidate by candidateId
+ *     description: Deletes every candidate assessment record matching that candidateId.
+ *     tags: [Candidates]
+ *     parameters:
+ *       - in: path
+ *         name: candidateId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Candidate assessment records deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 deletedCount:
+ *                   type: number
  *       404:
  *         description: No candidate record found for the given candidateId
  */

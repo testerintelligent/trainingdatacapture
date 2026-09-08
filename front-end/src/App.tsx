@@ -32,6 +32,7 @@ import HowToRegIcon from "@mui/icons-material/HowToReg";
 import SummarizeIcon from "@mui/icons-material/Summarize";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import DownloadIcon from "@mui/icons-material/Download";
 import { exportToExcel } from "./exportToExcel";
 import ExecutiveDashboard from "./ExecutiveDashboard";
 import CandidateAssessment, { Candidate } from "./CandidateAssessment";
@@ -290,151 +291,115 @@ function App() {
     [completionSummary, completionPage]
   );
 
+  const resetViews = () => {
+    setShowForm(false);
+    setShowTable(false);
+    setShowSummary(false);
+    setShowExecutive(false);
+    setShowRecruitment(false);
+    setShowCandidateSummary(false);
+    setShowSelectedCandidates(false);
+  };
+
+  const navItems = [
+    {
+      key: "form",
+      label: "Add Training",
+      icon: <AddCircleIcon />,
+      active: showForm,
+      onClick: () => {
+        resetViews();
+        setShowForm(true);
+        handleOpen();
+      },
+    },
+    {
+      key: "table",
+      label: "Training Summary",
+      icon: <DashboardIcon />,
+      active: showTable,
+      onClick: () => {
+        resetViews();
+        setShowTable(true);
+      },
+    },
+    {
+      key: "summary",
+      label: "Completion Summary",
+      icon: <AssessmentIcon />,
+      active: showSummary,
+      onClick: () => {
+        resetViews();
+        setShowSummary(true);
+      },
+    },
+    {
+      key: "executive",
+      label: "Executive Dashboard",
+      icon: <TrendingUpIcon />,
+      active: showExecutive,
+      onClick: () => {
+        resetViews();
+        setShowExecutive(true);
+      },
+    },
+    {
+      key: "recruitment",
+      label: "Candidate Assessment",
+      icon: <HowToRegIcon />,
+      active: showRecruitment,
+      onClick: () => {
+        setEditingCandidate(null);
+        resetViews();
+        setShowRecruitment(true);
+      },
+    },
+    {
+      key: "candidateSummary",
+      label: "Candidate Summary",
+      icon: <SummarizeIcon />,
+      active: showCandidateSummary,
+      onClick: () => {
+        resetViews();
+        setShowCandidateSummary(true);
+      },
+    },
+    {
+      key: "selectedCandidates",
+      label: "Selected Candidates",
+      icon: <CheckCircleIcon />,
+      active: showSelectedCandidates,
+      onClick: () => {
+        resetViews();
+        setShowSelectedCandidates(true);
+      },
+    },
+  ];
+
   return (
     <div className="app-flex-root">
       <aside className="side-menu">
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 0.5,
-            mb: 2,
-            width: "100%",
-            px: "4px",
-          }}
-        >
-          <Avatar sx={{ bgcolor: "#6846C6", width: "60%", height: "auto", aspectRatio: "1 / 1" }}>
-            <WorkspacePremiumIcon sx={{ fontSize: "1.4vw" }} />
+        <Box className="sidebar-brand">
+          <Avatar className="sidebar-brand-avatar">
+            <WorkspacePremiumIcon sx={{ fontSize: 20 }} />
           </Avatar>
-          <Typography
-            sx={{
-              color: "#fff",
-              fontWeight: 800,
-              fontSize: "0.65rem",
-              letterSpacing: "0.02em",
-              textAlign: "center",
-              lineHeight: 1.2,
-              wordBreak: "break-word",
-            }}
-          >
-            WorkReady
-          </Typography>
         </Box>
-        <Tooltip title="Add Training" placement="right">
-          <IconButton
-            onClick={() => {
-              setShowForm(true);
-              setShowTable(false);
-              setShowSummary(false);
-              setShowExecutive(false);
-              setShowRecruitment(false);
-              setShowCandidateSummary(false);
-              setShowSelectedCandidates(false);
-              handleOpen();
-            }}
-            sx={{ color: showForm ? "#4299e1" : "#fff" }}
-          >
-            <AddCircleIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Training Summary" placement="right">
-          <IconButton
-            onClick={() => {
-              setShowTable(true);
-              setShowForm(false);
-              setShowSummary(false);
-              setShowExecutive(false);
-              setShowRecruitment(false);
-              setShowCandidateSummary(false);
-              setShowSelectedCandidates(false);
-            }}
-            sx={{ color: showTable ? "#4299e1" : "#fff" }}
-          >
-            <DashboardIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Completion Summary" placement="right">
-          <IconButton
-            onClick={() => {
-              setShowSummary(true);
-              setShowTable(false);
-              setShowForm(false);
-              setShowExecutive(false);
-              setShowRecruitment(false);
-              setShowCandidateSummary(false);
-              setShowSelectedCandidates(false);
-            }}
-            sx={{ color: showSummary ? "#4299e1" : "#fff" }}
-          >
-            <AssessmentIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Executive Dashboard" placement="right">
-          <IconButton
-            onClick={() => {
-              setShowExecutive(true);
-              setShowSummary(false);
-              setShowTable(false);
-              setShowForm(false);
-              setShowRecruitment(false);
-              setShowCandidateSummary(false);
-              setShowSelectedCandidates(false);
-            }}
-            sx={{ color: showExecutive ? "#4299e1" : "#fff" }}
-          >
-            <TrendingUpIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Candidate Assessment" placement="right">
-          <IconButton
-            onClick={() => {
-              setEditingCandidate(null);
-              setShowRecruitment(true);
-              setShowExecutive(false);
-              setShowSummary(false);
-              setShowTable(false);
-              setShowForm(false);
-              setShowCandidateSummary(false);
-              setShowSelectedCandidates(false);
-            }}
-            sx={{ color: showRecruitment ? "#4299e1" : "#fff" }}
-          >
-            <HowToRegIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Candidate Summary" placement="right">
-          <IconButton
-            onClick={() => {
-              setShowCandidateSummary(true);
-              setShowRecruitment(false);
-              setShowExecutive(false);
-              setShowSummary(false);
-              setShowTable(false);
-              setShowForm(false);
-              setShowSelectedCandidates(false);
-            }}
-            sx={{ color: showCandidateSummary ? "#4299e1" : "#fff" }}
-          >
-            <SummarizeIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Selected Candidates" placement="right">
-          <IconButton
-            onClick={() => {
-              setShowSelectedCandidates(true);
-              setShowCandidateSummary(false);
-              setShowRecruitment(false);
-              setShowExecutive(false);
-              setShowSummary(false);
-              setShowTable(false);
-              setShowForm(false);
-            }}
-            sx={{ color: showSelectedCandidates ? "#4299e1" : "#fff" }}
-          >
-            <CheckCircleIcon />
-          </IconButton>
-        </Tooltip>
+
+        <nav className="sidebar-nav">
+          {navItems.map((item) => (
+            <Tooltip key={item.key} title={item.label} placement="right" enterDelay={300}>
+              <Box
+                component="button"
+                type="button"
+                aria-label={item.label}
+                onClick={item.onClick}
+                className={`nav-item${item.active ? " nav-item-active" : ""}`}
+              >
+                <span className="nav-icon">{item.icon}</span>
+              </Box>
+            </Tooltip>
+          ))}
+        </nav>
       </aside>
 
       <main className="main-content-flex">
@@ -461,11 +426,14 @@ function App() {
               >
                 <Button
                   variant="contained"
+                  disableElevation
+                  startIcon={<DownloadIcon />}
                   onClick={() => exportToExcel(trainings)}
                   sx={{
                     marginRight: "4px",
-                    backgroundColor: "#887bab",
-                    "&:hover": { backgroundColor: "#746991" },
+                    backgroundColor: "#F0EBFB",
+                    color: "#4E2FA8",
+                    "&:hover": { backgroundColor: "#E3D7F8" },
                   }}
                 >
                   Export to Excel
@@ -501,7 +469,6 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
-                          fontSize: "16px !important", // increase as needed
                         }}
                       >
                         Project Name
@@ -515,7 +482,6 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
-                          fontSize: "16px !important",
                         }}
                       >
                         EMP ID
@@ -529,7 +495,6 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
-                          fontSize: "16px !important",
                         }}
                       >
                         Employee Name
@@ -543,7 +508,6 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
-                          fontSize: "16px !important",
                         }}
                       >
                         Course
@@ -557,7 +521,6 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
-                          fontSize: "16px !important",
                         }}
                       >
                         Trainer Name
@@ -571,7 +534,6 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
-                          fontSize: "16px !important",
                         }}
                       >
                         Training Type
@@ -585,7 +547,6 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
-                          fontSize: "16px !important",
                         }}
                       >
                         Start Date
@@ -599,7 +560,6 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
-                          fontSize: "16px !important",
                         }}
                       >
                         End Date
@@ -613,7 +573,6 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
-                          fontSize: "16px !important",
                         }}
                       >
                         Status
@@ -627,7 +586,6 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
-                          fontSize: "16px !important",
                         }}
                       >
                         % Completed
@@ -641,7 +599,6 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
-                          fontSize: "16px !important",
                         }}
                       >
                         Actions
@@ -663,7 +620,7 @@ function App() {
                         },
                       }}
                     >
-                      <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+                      <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                         <TextField
                           size="small"
                           select
@@ -706,7 +663,7 @@ function App() {
                           ))}
                         </TextField>
                       </TableCell>
-                      <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+                      <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                         <TextField
                           size="small"
                           variant="outlined"
@@ -721,7 +678,7 @@ function App() {
                           fullWidth
                         />
                       </TableCell>
-                      <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+                      <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                         <TextField
                           size="small"
                           variant="outlined"
@@ -736,7 +693,7 @@ function App() {
                           fullWidth
                         />
                       </TableCell>
-                      <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+                      <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                         <TextField
                           size="small"
                           variant="outlined"
@@ -751,7 +708,7 @@ function App() {
                           fullWidth
                         />
                       </TableCell>
-                      <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+                      <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                         <TextField
                           size="small"
                           variant="outlined"
@@ -766,7 +723,7 @@ function App() {
                           fullWidth
                         />
                       </TableCell>
-                      <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+                      <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                         <TextField
                           size="small"
                           select
@@ -808,7 +765,7 @@ function App() {
                           ))}
                         </TextField>
                       </TableCell>
-                      <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+                      <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                         <TextField
                           size="small"
                           type="date"
@@ -824,7 +781,7 @@ function App() {
                           InputLabelProps={{ shrink: true }}
                         />
                       </TableCell>
-                      <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+                      <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                         <TextField
                           size="small"
                           type="date"
@@ -840,7 +797,7 @@ function App() {
                           InputLabelProps={{ shrink: true }}
                         />
                       </TableCell>
-                      <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+                      <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                         <TextField
                           size="small"
                           select
@@ -881,7 +838,7 @@ function App() {
                           ))}
                         </TextField>
                       </TableCell>
-                      <TableCell sx={{ backgroundColor: "#c6adf7" }}>
+                      <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                         <TextField
                           size="small"
                           variant="outlined"
@@ -896,7 +853,7 @@ function App() {
                           fullWidth
                         />
                       </TableCell>
-                      <TableCell sx={{ backgroundColor: "#c6adf7" }} />
+                      <TableCell sx={{ backgroundColor: "#FBFAFE" }} />
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -906,10 +863,10 @@ function App() {
                         sx={{
                           height: 44,
                           "&:not(:last-child)": {
-                            borderBottom: "1px solid #e0e0e0",
+                            borderBottom: "1px solid #EFEBF7",
                           },
                           "& > *": { paddingTop: 0, paddingBottom: 0 },
-                          backgroundColor: "#c6adf7",
+                          backgroundColor: "#FBFAFE",
                         }}
                       >
                         <TableCell sx={{ width: "12.52%", padding: "0 8px" }}>
@@ -1021,7 +978,7 @@ function App() {
                   background: "#ffffff",
                   borderRadius: 3,
                   boxShadow: "0 4px 24px rgba(0, 106, 113, 0.12)",
-                  border: "1px solid #E5EEEF",
+                  border: "1px solid #E7E3F1",
                   overflow: "hidden",
                   maxHeight: "calc(100vh - 120px)",
                   display: "flex",
@@ -1233,7 +1190,7 @@ function App() {
                     sx={{
                       textTransform: "none",
                       fontWeight: 600,
-                      borderColor: "#CBD5E0",
+                      borderColor: "#D9D2EC",
                       color: "#4A5568",
                       minWidth: 300,
                     }}
@@ -1246,11 +1203,11 @@ function App() {
                     sx={{
                       textTransform: "none",
                       fontWeight: 600,
-                      background: "#887bab",
+                      background: "#6846C6",
                       boxShadow: "none",
                       minWidth: 300,
                       "&:hover": {
-                        background: "#746991",
+                        background: "#4E2FA8",
                         boxShadow: "none",
                       },
                     }}
@@ -1301,7 +1258,6 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
-                          fontSize: "16px !important",
                         }}
                       >
                         Project Name
@@ -1315,7 +1271,6 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
-                          fontSize: "16px !important",
                         }}
                       >
                         Course
@@ -1329,7 +1284,6 @@ function App() {
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
-                          fontSize: "16px !important",
                         }}
                       >
                         No of Employees Completed
@@ -1342,7 +1296,7 @@ function App() {
                         <TableCell
                           colSpan={3}
                           align="center"
-                          sx={{ backgroundColor: "#c6adf7" }}
+                          sx={{ backgroundColor: "#FBFAFE" }}
                         >
                           No completed training records yet.
                         </TableCell>
@@ -1354,10 +1308,10 @@ function App() {
                           sx={{
                             height: 44,
                             "&:not(:last-child)": {
-                              borderBottom: "1px solid #e0e0e0",
+                              borderBottom: "1px solid #EFEBF7",
                             },
                             "& > *": { paddingTop: 0, paddingBottom: 0 },
-                            backgroundColor: "#c6adf7",
+                            backgroundColor: "#FBFAFE",
                           }}
                         >
                           <TableCell sx={{ width: "40%", padding: "0 8px" }}>
