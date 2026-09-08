@@ -124,24 +124,24 @@ app.delete('/api/trainings/:id', async (req, res) => {
   res.status(204).end();
 });
 
-// Looks up an employee's basic details (empId, employeeName) by employeeId,
-// using the most recently created matching training record as the source.
-app.get('/api/employees/:employeeId', async (req, res) => {
-  const training = await Training.findOne({ empId: req.params.employeeId }).sort({ _id: -1 });
-  if (!training) {
-    return res.status(404).json({ error: 'No employee found for the given employeeId.' });
-  }
-  res.json({ empId: training.empId, employeeName: training.employeeName });
-});
-
-// Deletes every training record for the given employeeId, i.e. the
-// employee's entire training history.
-app.delete('/api/employees/:employeeId', async (req, res) => {
-  const result = await Training.deleteMany({ empId: req.params.employeeId });
+// Deletes every training record for the given empId, i.e. the employee's
+// entire training history.
+app.delete('/api/trainings/employee/:empId', async (req, res) => {
+  const result = await Training.deleteMany({ empId: req.params.empId });
   if (result.deletedCount === 0) {
-    return res.status(404).json({ error: 'No employee found for the given employeeId.' });
+    return res.status(404).json({ error: 'No training record found for the given empId.' });
   }
   res.json({ deletedCount: result.deletedCount });
+});
+
+// Looks up an employee's basic details (empId, employeeName) by empId,
+// using the most recently created matching training record as the source.
+app.get('/api/trainings/employee/:empId/details', async (req, res) => {
+  const training = await Training.findOne({ empId: req.params.empId }).sort({ _id: -1 });
+  if (!training) {
+    return res.status(404).json({ error: 'No training record found for the given empId.' });
+  }
+  res.json({ empId: training.empId, employeeName: training.employeeName });
 });
 
 // Candidate Assessment CRUD Endpoints
@@ -235,8 +235,7 @@ const swaggerOptions = {
     ],
     tags: [
       { name: 'Trainings', description: 'Operations related to employee training records' },
-      { name: 'Candidates', description: 'Operations related to candidate assessment records' },
-      { name: 'Employees', description: 'Operations related to employee details' }
+      { name: 'Candidates', description: 'Operations related to candidate assessment records' }
     ]
   },
   apis: ['./index.js'], // Path to the API docs
@@ -384,6 +383,65 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *               $ref: '#/components/schemas/Training'
  *       404:
  *         description: No training record found for the given empId
+ *   delete:
+ *     summary: Delete all training records for an employee by empId
+ *     description: Deletes every training record matching that empId, i.e. the employee's entire training history.
+ *     tags: [Trainings]
+ *     parameters:
+ *       - in: path
+ *         name: empId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Training records deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 deletedCount:
+ *                   type: number
+ *       404:
+ *         description: No training record found for the given empId
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Employee:
+ *       type: object
+ *       properties:
+ *         empId:
+ *           type: string
+ *         employeeName:
+ *           type: string
+ */
+
+/**
+ * @swagger
+ * /api/trainings/employee/{empId}/details:
+ *   get:
+ *     summary: Get an employee's basic details by empId
+ *     description: Looks up the employee's empId and employeeName from the most recently created training record matching that empId.
+ *     tags: [Trainings]
+ *     parameters:
+ *       - in: path
+ *         name: empId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Employee details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Employee'
+ *       404:
+ *         description: No training record found for the given empId
  */
 
 /**
@@ -423,65 +481,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *     responses:
  *       204:
  *         description: Training record deleted
- */
-
-/**
- * @swagger
- * components:
- *   schemas:
- *     Employee:
- *       type: object
- *       properties:
- *         empId:
- *           type: string
- *         employeeName:
- *           type: string
- */
-
-/**
- * @swagger
- * /api/employees/{employeeId}:
- *   get:
- *     summary: Get an employee's basic details by employeeId
- *     description: Looks up the employee's empId and employeeName from the most recently created training record matching that employeeId.
- *     tags: [Employees]
- *     parameters:
- *       - in: path
- *         name: employeeId
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Employee details
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Employee'
- *       404:
- *         description: No employee found for the given employeeId
- *   delete:
- *     summary: Delete all training records for an employee by employeeId
- *     description: Deletes every training record matching that employeeId, i.e. the employee's entire training history.
- *     tags: [Employees]
- *     parameters:
- *       - in: path
- *         name: employeeId
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Training records deleted
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 deletedCount:
- *                   type: number
- *       404:
- *         description: No employee found for the given employeeId
  */
 
 /**
