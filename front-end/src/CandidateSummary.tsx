@@ -42,6 +42,8 @@ const tableHeaders = [
   { label: "Attitude Towards Learning" },
   { label: "Dev Experience" },
   { label: "Total Score" },
+  { label: "Written Test" },
+  { label: "Group Discussion" },
   { label: "L1 Conducted By" },
   { label: "L1 Conducted Date" },
   { label: "L1 Status" },
@@ -66,6 +68,8 @@ interface CandidateFilters {
   attitudeTowardsLearning: string;
   devExperience: string;
   totalScore: string;
+  writtenTestStatus: string;
+  groupDiscussionStatus: string;
   l1ConductedBy: string;
   l1ConductedDate: string;
   l1Status: string;
@@ -89,6 +93,8 @@ const emptyFilters: CandidateFilters = {
   attitudeTowardsLearning: "",
   devExperience: "",
   totalScore: "",
+  writtenTestStatus: "",
+  groupDiscussionStatus: "",
   l1ConductedBy: "",
   l1ConductedDate: "",
   l1Status: "",
@@ -180,6 +186,10 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
         (!filters.devExperience ||
           String(c.devExperience) === filters.devExperience) &&
         textMatch(String(getTotalScore(c)), filters.totalScore) &&
+        (!filters.writtenTestStatus ||
+          c.writtenTestStatus === filters.writtenTestStatus) &&
+        (!filters.groupDiscussionStatus ||
+          c.groupDiscussionStatus === filters.groupDiscussionStatus) &&
         textMatch(c.l1ConductedBy, filters.l1ConductedBy) &&
         (!filters.l1ConductedDate ||
           (c.l1ConductedDate ?? "").slice(0, 10) === filters.l1ConductedDate) &&
@@ -484,6 +494,48 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
               <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
+                  select
+                  variant="outlined"
+                  value={filters.writtenTestStatus}
+                  onChange={setFilter("writtenTestStatus")}
+                  fullWidth
+                  SelectProps={{
+                    displayEmpty: true,
+                    renderValue: filterRenderValue,
+                  }}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {interviewStatusOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
+                <TextField
+                  size="small"
+                  select
+                  variant="outlined"
+                  value={filters.groupDiscussionStatus}
+                  onChange={setFilter("groupDiscussionStatus")}
+                  fullWidth
+                  SelectProps={{
+                    displayEmpty: true,
+                    renderValue: filterRenderValue,
+                  }}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {interviewStatusOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
+                <TextField
+                  size="small"
                   variant="outlined"
                   placeholder="Filter"
                   value={filters.l1ConductedBy}
@@ -631,6 +683,8 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   </TableCell>
                   <TableCell sx={bodyCellSx}>{c.devExperience}</TableCell>
                   <TableCell sx={bodyCellSx}>{getTotalScore(c)}</TableCell>
+                  <TableCell sx={bodyCellSx}>{c.writtenTestStatus}</TableCell>
+                  <TableCell sx={bodyCellSx}>{c.groupDiscussionStatus}</TableCell>
                   <TableCell sx={bodyCellSx}>{c.l1ConductedBy}</TableCell>
                   <TableCell sx={bodyCellSx}>
                     {formatDate(c.l1ConductedDate)}

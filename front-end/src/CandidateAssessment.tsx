@@ -150,7 +150,7 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
           boxShadow: "0 4px 24px rgba(0, 106, 113, 0.12)",
           border: "1px solid #E7E3F1",
           overflow: "hidden",
-          height: "calc(100vh - 120px)",
+          height: "calc(113vh - 120px)",
           display: "flex",
           flexDirection: "column",
         }}
@@ -162,7 +162,7 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
             alignItems: "center",
             gap: 1.5,
             px: { xs: 2.5, sm: 4 },
-            py: 2.5,
+            py: 1,
             background: "#6846C6",
           }}
         >
