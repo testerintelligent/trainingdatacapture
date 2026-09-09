@@ -583,12 +583,9 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
         overflow: "auto",
       }}
     >
-      <Box sx={{ width: "100%", mt: 0, mb: 1.5, flex: "0 0 auto" }}>
+      <Box sx={{ width: "100%", mt: 0, mb: 0.5, flex: "0 0 auto" }}>
         <Typography variant="h6" sx={{ color: "#6846C6", fontWeight: 700 }}>
           Executive Training Dashboard
-        </Typography>
-        <Typography variant="body2" sx={{ color: "#6b7280" }}>
-          A high-level snapshot of training progress across the organization
         </Typography>
       </Box>
 

@@ -417,13 +417,19 @@ function App() {
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "flex-end",
+                  justifyContent: "space-between",
                   width: "100%",
                   mt: 2,
                   mb: 2,
                   gap: 2,
                 }}
               >
+                <Typography
+                  variant="h6"
+                  sx={{ color: "#6846C6", fontWeight: 700 }}
+                >
+                  Training Summary
+                </Typography>
                 <Button
                   variant="contained"
                   disableElevation

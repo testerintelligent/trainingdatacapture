@@ -107,6 +107,14 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
       alert("Candidate Email ID is required.");
       return;
     }
+    if (!form.course.trim()) {
+      alert("Course is required.");
+      return;
+    }
+    if (!form.department.trim()) {
+      alert("Department is required.");
+      return;
+    }
     if (editId) {
       await axios.put(
         `${process.env.REACT_APP_API_BASE_URL}/api/candidates/${editId}`,

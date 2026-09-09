@@ -57,7 +57,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-fill-color: transparent;
         }
 
         h3 {
@@ -81,33 +80,6 @@
         }
 
         /* --- Layout & Grid System --- */
-        .main-header {
-            /* This class is no longer used but kept for potential future use */
-        }
-
-        .main-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: var(--spacing-unit) calc(var(--spacing-unit) * 3);
-            border-radius: var(--border-radius);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        .logo a {
-            color: var(--text-primary);
-            font-weight: 700;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: var(--spacing-unit);
-            list-style: none;
-        }
-
         .content-area {
             padding: calc(var(--spacing-unit) * 3);
         }
@@ -206,38 +178,9 @@
             width: 100%;
         }
 
-        /* --- Buttons & Interactive Elements --- */
-        .nav-button {
-            padding: var(--spacing-unit) calc(var(--spacing-unit) * 2);
-            border-radius: 12px;
-            background: transparent;
-            color: var(--text-secondary);
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .nav-button:hover {
-            background: rgba(0, 0, 0, 0.05);
-            color: var(--text-primary);
-        }
-
-        /* --- Mobile Responsiveness --- */
-        @media (max-width: 768px) {
-            .main-nav {
-                flex-direction: column;
-                gap: calc(var(--spacing-unit) * 2);
-            }
-
-            .nav-links {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-        }
     </style>
 </head>
 <body>
-    <!-- The main-header element has been removed to bring the content to the top -->
-
     <main class="content-area">
         <section class="welcome-section">
             <h2>!!! Welcome Team !!!</h2>

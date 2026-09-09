@@ -22,21 +22,11 @@ body {
   margin: 0;
 }
 
-.page-header {
-  width: auto;
-  margin-bottom: 16px;
-  margin-left: 8px;
-  margin-right: 8px;
-  transition: font-size 0.2s;
-}
-
 :root {
   --main-top-margin: 20px;
   --table-header-padding: 8px 10px;
   --table-header-min-width: 30px;
   --brand: #6846C6;
-  --brand-dark: #4E2FA8;
-  --brand-soft: #F0EBFB;
   --border: #E7E3F1;
 }
 
@@ -276,9 +266,6 @@ body {
   .main-content-flex {
     padding: 0 2vw;
     margin-top: 12vw;
-  }
-  .page-header {
-    margin-bottom: 12px;
   }
 }
 

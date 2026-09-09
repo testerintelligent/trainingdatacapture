@@ -650,5 +650,29 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *         description: Candidate assessment record deleted
  */
 
+// Central error handler. Express 5 forwards any error thrown/rejected by an
+// async route handler here automatically, so route handlers don't need their
+// own try/catch. Without this, an unhandled error (e.g. a Mongoose
+// ValidationError from a missing required field) falls through to Express's
+// default handler, which returns a bare "Internal Server Error" HTML page
+// with no indication of what actually went wrong.
+app.use((err, req, res, next) => {
+  console.error(`Error handling ${req.method} ${req.originalUrl}:`, err);
+
+  if (err.name === 'ValidationError') {
+    return res.status(400).json({
+      error: 'Validation failed.',
+      details: Object.fromEntries(
+        Object.entries(err.errors).map(([field, e]) => [field, e.message])
+      ),
+    });
+  }
+  if (err.name === 'CastError') {
+    return res.status(400).json({ error: `Invalid value for field "${err.path}".` });
+  }
+
+  res.status(500).json({ error: 'Internal server error.' });
+});
+
 const PORT = process.env.PORT || 5002;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -1,20 +1,11 @@
 import { createTheme } from "@mui/material/styles";
 
-/**
- * Central design tokens for the app. Components that can't consume the MUI
- * theme directly (raw hex in sx props) should still pull from here so the
- * palette stays in one place.
- */
-export const colors = {
+// Design tokens backing the MUI theme below.
+const colors = {
   primary: "#6846C6",
   primaryDark: "#4E2FA8",
   primarySoft: "#F0EBFB",
-  primarySoftHover: "#E3D7F8",
-  sidebar: "#1B1339",
-  sidebarActive: "rgba(255,255,255,0.12)",
-  sidebarText: "rgba(255,255,255,0.68)",
   border: "#E7E3F1",
-  rowHover: "#F6F3FC",
   textSecondary: "#667085",
   surface: "#FFFFFF",
   background: "#F6F5FA",
