@@ -26,6 +26,8 @@ export interface Candidate {
   attitudeTowardsLearning: number;
   devExperience: number;
   totalScore?: number;
+  writtenTestStatus: string;
+  groupDiscussionStatus: string;
   l1ConductedBy: string;
   l1ConductedDate: string;
   l1Status: string;
@@ -53,6 +55,8 @@ export const emptyCandidate: Candidate = {
   databaseSkill: 0,
   attitudeTowardsLearning: 0,
   devExperience: 0,
+  writtenTestStatus: "",
+  groupDiscussionStatus: "",
   l1ConductedBy: "",
   l1ConductedDate: "",
   l1Status: "",
@@ -132,9 +136,9 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
   return (
     <Box
       sx={{
-        mt: 4,
+        mt: 0,
         mx: "auto",
-        mb: 4,
+        mb: 0,
         maxWidth: "100%",
       }}
     >
@@ -146,7 +150,7 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
           boxShadow: "0 4px 24px rgba(0, 106, 113, 0.12)",
           border: "1px solid #E7E3F1",
           overflow: "hidden",
-          maxHeight: "calc(100vh - 120px)",
+          height: "calc(100vh - 120px)",
           display: "flex",
           flexDirection: "column",
         }}
@@ -193,6 +197,7 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
         {/* Fields */}
         <Box
           sx={{
+            flex: 1,
             px: { xs: 2, sm: 3 },
             py: 2,
             overflowY: "auto",
@@ -370,6 +375,73 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                   </MenuItem>
                 ))}
               </TextField>
+            </Grid>
+
+            <Grid size={12}>
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  fontWeight: 700,
+                  color: "#6846C6",
+                  mt: 1,
+                  mb: 0.5,
+                }}
+              >
+                Preliminary Tests Status
+              </Typography>
+            </Grid>
+            <Grid size={12}>
+              <Box
+                sx={{
+                  backgroundColor: "transparent",
+                  border: "1px solid #6846C6",
+                  borderRadius: 1,
+                  p: 1.5,
+                }}
+              >
+                <Grid container spacing={1.5}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      size="small"
+                      select
+                      fullWidth
+                      label="Written Test"
+                      name="writtenTestStatus"
+                      value={form.writtenTestStatus}
+                      onChange={handleChange}
+                    >
+                      <MenuItem value="">
+                        <em>None</em>
+                      </MenuItem>
+                      {interviewStatusOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      size="small"
+                      select
+                      fullWidth
+                      label="Group Discussion"
+                      name="groupDiscussionStatus"
+                      value={form.groupDiscussionStatus}
+                      onChange={handleChange}
+                    >
+                      <MenuItem value="">
+                        <em>None</em>
+                      </MenuItem>
+                      {interviewStatusOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                </Grid>
+              </Box>
             </Grid>
 
             <Grid size={12}>

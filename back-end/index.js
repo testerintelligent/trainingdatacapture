@@ -64,6 +64,8 @@ const candidateSchema = new mongoose.Schema({
   attitudeTowardsLearning: { type: Number, enum: ratingValues, required: true },
   devExperience: { type: Number, enum: ratingValues, required: true },
   totalScore: { type: Number },
+  writtenTestStatus: { type: String, enum: ['', 'Selected', 'Not Selected', 'On Hold'], default: '' },
+  groupDiscussionStatus: { type: String, enum: ['', 'Selected', 'Not Selected', 'On Hold'], default: '' },
   l1ConductedBy: { type: String },
   l1ConductedDate: { type: Date },
   l1Status: { type: String, enum: ['', 'Selected', 'Not Selected', 'On Hold'], default: '' },
@@ -487,6 +489,12 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *           type: number
  *           readOnly: true
  *           description: Sum of communication, technicalSkill, programmingLanguageSkill, databaseSkill, attitudeTowardsLearning and devExperience. Computed server-side; any client-supplied value is ignored.
+ *         writtenTestStatus:
+ *           type: string
+ *           enum: ['', Selected, Not Selected, On Hold]
+ *         groupDiscussionStatus:
+ *           type: string
+ *           enum: ['', Selected, Not Selected, On Hold]
  *         l1ConductedBy:
  *           type: string
  *         l1ConductedDate:
