@@ -77,7 +77,22 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
   const editId = editingCandidate?._id ?? null;
 
   useEffect(() => {
-    setForm(editingCandidate ?? emptyCandidate);
+    setForm(
+      editingCandidate
+        ? {
+            ...editingCandidate,
+            // Backend returns full ISO datetime strings, but the date
+            // inputs below require a plain YYYY-MM-DD value to display
+            // the existing value when editing a record.
+            l1ConductedDate: editingCandidate.l1ConductedDate
+              ? editingCandidate.l1ConductedDate.slice(0, 10)
+              : "",
+            l2ConductedDate: editingCandidate.l2ConductedDate
+              ? editingCandidate.l2ConductedDate.slice(0, 10)
+              : "",
+          }
+        : emptyCandidate
+    );
   }, [editingCandidate]);
 
   const handleChange = (
