@@ -24,6 +24,10 @@ import {
   ratingOptions,
   interviewStatusOptions,
   getTotalScore,
+  getL1Score,
+  getL2Score,
+  L1_MAX_SCORE,
+  L2_MAX_SCORE,
 } from "./CandidateAssessment";
 import { useElementHeight } from "./useElementHeight";
 
@@ -39,22 +43,30 @@ const tableHeaders = [
   { label: "Candidate Email ID" },
   { label: "Course" },
   { label: "Department" },
-  { label: "Communication" },
-  { label: "Technical Skill" },
-  { label: "Programming Language Skill" },
-  { label: "Database Skill" },
-  { label: "Attitude Towards Learning" },
-  { label: "Dev Experience" },
   { label: "Written Test Score" },
   { label: "Group Discussion Score" },
   { label: "Total Score" },
   { label: "Written Test" },
   { label: "Group Discussion" },
   { label: "Preliminary Tests Remarks" },
+  { label: "L1 Communication" },
+  { label: "L1 Technical Skill" },
+  { label: "L1 Programming Language Skill" },
+  { label: "L1 Database Skill" },
+  { label: "L1 Attitude Towards Learning" },
+  { label: "L1 Dev Experience" },
+  { label: `L1 Score (of ${L1_MAX_SCORE})` },
   { label: "L1 Conducted By" },
   { label: "L1 Conducted Date" },
   { label: "L1 Status" },
   { label: "L1 Remarks" },
+  { label: "L2 Communication" },
+  { label: "L2 Technical Skill" },
+  { label: "L2 Programming Language Skill" },
+  { label: "L2 Database Skill" },
+  { label: "L2 Attitude Towards Learning" },
+  { label: "L2 Dev Experience" },
+  { label: `L2 Score (of ${L2_MAX_SCORE})` },
   { label: "L2 Conducted By" },
   { label: "L2 Conducted Date" },
   { label: "L2 Status" },
@@ -70,22 +82,30 @@ interface CandidateFilters {
   candidateEmail: string;
   course: string;
   department: string;
-  communication: string;
-  technicalSkill: string;
-  programmingLanguageSkill: string;
-  databaseSkill: string;
-  attitudeTowardsLearning: string;
-  devExperience: string;
   writtenTestScore: string;
   groupDiscussionScore: string;
   totalScore: string;
   writtenTestStatus: string;
   groupDiscussionStatus: string;
   preliminaryTestsRemarks: string;
+  l1Communication: string;
+  l1TechnicalSkill: string;
+  l1ProgrammingLanguageSkill: string;
+  l1DatabaseSkill: string;
+  l1AttitudeTowardsLearning: string;
+  l1DevExperience: string;
+  l1Score: string;
   l1ConductedBy: string;
   l1ConductedDate: string;
   l1Status: string;
   l1Remarks: string;
+  l2Communication: string;
+  l2TechnicalSkill: string;
+  l2ProgrammingLanguageSkill: string;
+  l2DatabaseSkill: string;
+  l2AttitudeTowardsLearning: string;
+  l2DevExperience: string;
+  l2Score: string;
   l2ConductedBy: string;
   l2ConductedDate: string;
   l2Status: string;
@@ -100,22 +120,30 @@ const emptyFilters: CandidateFilters = {
   candidateEmail: "",
   course: "",
   department: "",
-  communication: "",
-  technicalSkill: "",
-  programmingLanguageSkill: "",
-  databaseSkill: "",
-  attitudeTowardsLearning: "",
-  devExperience: "",
   writtenTestScore: "",
   groupDiscussionScore: "",
   totalScore: "",
   writtenTestStatus: "",
   groupDiscussionStatus: "",
   preliminaryTestsRemarks: "",
+  l1Communication: "",
+  l1TechnicalSkill: "",
+  l1ProgrammingLanguageSkill: "",
+  l1DatabaseSkill: "",
+  l1AttitudeTowardsLearning: "",
+  l1DevExperience: "",
+  l1Score: "",
   l1ConductedBy: "",
   l1ConductedDate: "",
   l1Status: "",
   l1Remarks: "",
+  l2Communication: "",
+  l2TechnicalSkill: "",
+  l2ProgrammingLanguageSkill: "",
+  l2DatabaseSkill: "",
+  l2AttitudeTowardsLearning: "",
+  l2DevExperience: "",
+  l2Score: "",
   l2ConductedBy: "",
   l2ConductedDate: "",
   l2Status: "",
@@ -182,20 +210,6 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
         textMatch(c.candidateEmail, filters.candidateEmail) &&
         textMatch(c.course, filters.course) &&
         textMatch(c.department, filters.department) &&
-        (!filters.communication ||
-          String(c.communication) === filters.communication) &&
-        (!filters.technicalSkill ||
-          String(c.technicalSkill) === filters.technicalSkill) &&
-        (!filters.programmingLanguageSkill ||
-          String(c.programmingLanguageSkill) ===
-            filters.programmingLanguageSkill) &&
-        (!filters.databaseSkill ||
-          String(c.databaseSkill) === filters.databaseSkill) &&
-        (!filters.attitudeTowardsLearning ||
-          String(c.attitudeTowardsLearning) ===
-            filters.attitudeTowardsLearning) &&
-        (!filters.devExperience ||
-          String(c.devExperience) === filters.devExperience) &&
         textMatch(String(getTotalScore(c)), filters.totalScore) &&
         (!filters.writtenTestScore ||
           String(c.writtenTestScore) === filters.writtenTestScore) &&
@@ -209,11 +223,41 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
           c.preliminaryTestsRemarks ?? "",
           filters.preliminaryTestsRemarks
         ) &&
+        (!filters.l1Communication ||
+          String(c.l1Communication) === filters.l1Communication) &&
+        (!filters.l1TechnicalSkill ||
+          String(c.l1TechnicalSkill) === filters.l1TechnicalSkill) &&
+        (!filters.l1ProgrammingLanguageSkill ||
+          String(c.l1ProgrammingLanguageSkill) ===
+            filters.l1ProgrammingLanguageSkill) &&
+        (!filters.l1DatabaseSkill ||
+          String(c.l1DatabaseSkill) === filters.l1DatabaseSkill) &&
+        (!filters.l1AttitudeTowardsLearning ||
+          String(c.l1AttitudeTowardsLearning) ===
+            filters.l1AttitudeTowardsLearning) &&
+        (!filters.l1DevExperience ||
+          String(c.l1DevExperience) === filters.l1DevExperience) &&
+        textMatch(String(getL1Score(c)), filters.l1Score) &&
         textMatch(c.l1ConductedBy, filters.l1ConductedBy) &&
         (!filters.l1ConductedDate ||
           (c.l1ConductedDate ?? "").slice(0, 10) === filters.l1ConductedDate) &&
         (!filters.l1Status || c.l1Status === filters.l1Status) &&
         textMatch(c.l1Remarks ?? "", filters.l1Remarks) &&
+        (!filters.l2Communication ||
+          String(c.l2Communication) === filters.l2Communication) &&
+        (!filters.l2TechnicalSkill ||
+          String(c.l2TechnicalSkill) === filters.l2TechnicalSkill) &&
+        (!filters.l2ProgrammingLanguageSkill ||
+          String(c.l2ProgrammingLanguageSkill) ===
+            filters.l2ProgrammingLanguageSkill) &&
+        (!filters.l2DatabaseSkill ||
+          String(c.l2DatabaseSkill) === filters.l2DatabaseSkill) &&
+        (!filters.l2AttitudeTowardsLearning ||
+          String(c.l2AttitudeTowardsLearning) ===
+            filters.l2AttitudeTowardsLearning) &&
+        (!filters.l2DevExperience ||
+          String(c.l2DevExperience) === filters.l2DevExperience) &&
+        textMatch(String(getL2Score(c)), filters.l2Score) &&
         textMatch(c.l2ConductedBy, filters.l2ConductedBy) &&
         (!filters.l2ConductedDate ||
           (c.l2ConductedDate ?? "").slice(0, 10) === filters.l2ConductedDate) &&
@@ -262,6 +306,8 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
             exportToExcel(
               candidates.map((c) => ({
                 ...c,
+                l1Score: getL1Score(c),
+                l2Score: getL2Score(c),
                 totalScore: getTotalScore(c),
               })),
               "candidate_summary.xlsx"
@@ -381,132 +427,6 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   size="small"
                   select
                   variant="outlined"
-                  value={filters.communication}
-                  onChange={setFilter("communication")}
-                  fullWidth
-                  SelectProps={{
-                    displayEmpty: true,
-                    renderValue: filterRenderValue,
-                  }}
-                >
-                  <MenuItem value="">All</MenuItem>
-                  {ratingOptions.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </TableCell>
-              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
-                <TextField
-                  size="small"
-                  select
-                  variant="outlined"
-                  value={filters.technicalSkill}
-                  onChange={setFilter("technicalSkill")}
-                  fullWidth
-                  SelectProps={{
-                    displayEmpty: true,
-                    renderValue: filterRenderValue,
-                  }}
-                >
-                  <MenuItem value="">All</MenuItem>
-                  {ratingOptions.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </TableCell>
-              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
-                <TextField
-                  size="small"
-                  select
-                  variant="outlined"
-                  value={filters.programmingLanguageSkill}
-                  onChange={setFilter("programmingLanguageSkill")}
-                  fullWidth
-                  SelectProps={{
-                    displayEmpty: true,
-                    renderValue: filterRenderValue,
-                  }}
-                >
-                  <MenuItem value="">All</MenuItem>
-                  {ratingOptions.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </TableCell>
-              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
-                <TextField
-                  size="small"
-                  select
-                  variant="outlined"
-                  value={filters.databaseSkill}
-                  onChange={setFilter("databaseSkill")}
-                  fullWidth
-                  SelectProps={{
-                    displayEmpty: true,
-                    renderValue: filterRenderValue,
-                  }}
-                >
-                  <MenuItem value="">All</MenuItem>
-                  {ratingOptions.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </TableCell>
-              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
-                <TextField
-                  size="small"
-                  select
-                  variant="outlined"
-                  value={filters.attitudeTowardsLearning}
-                  onChange={setFilter("attitudeTowardsLearning")}
-                  fullWidth
-                  SelectProps={{
-                    displayEmpty: true,
-                    renderValue: filterRenderValue,
-                  }}
-                >
-                  <MenuItem value="">All</MenuItem>
-                  {ratingOptions.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </TableCell>
-              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
-                <TextField
-                  size="small"
-                  select
-                  variant="outlined"
-                  value={filters.devExperience}
-                  onChange={setFilter("devExperience")}
-                  fullWidth
-                  SelectProps={{
-                    displayEmpty: true,
-                    renderValue: filterRenderValue,
-                  }}
-                >
-                  <MenuItem value="">All</MenuItem>
-                  {ratingOptions.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </TableCell>
-              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
-                <TextField
-                  size="small"
-                  select
-                  variant="outlined"
                   value={filters.writtenTestScore}
                   onChange={setFilter("writtenTestScore")}
                   fullWidth
@@ -609,6 +529,142 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
               <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
+                  select
+                  variant="outlined"
+                  value={filters.l1Communication}
+                  onChange={setFilter("l1Communication")}
+                  fullWidth
+                  SelectProps={{
+                    displayEmpty: true,
+                    renderValue: filterRenderValue,
+                  }}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {ratingOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
+                <TextField
+                  size="small"
+                  select
+                  variant="outlined"
+                  value={filters.l1TechnicalSkill}
+                  onChange={setFilter("l1TechnicalSkill")}
+                  fullWidth
+                  SelectProps={{
+                    displayEmpty: true,
+                    renderValue: filterRenderValue,
+                  }}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {ratingOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
+                <TextField
+                  size="small"
+                  select
+                  variant="outlined"
+                  value={filters.l1ProgrammingLanguageSkill}
+                  onChange={setFilter("l1ProgrammingLanguageSkill")}
+                  fullWidth
+                  SelectProps={{
+                    displayEmpty: true,
+                    renderValue: filterRenderValue,
+                  }}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {ratingOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
+                <TextField
+                  size="small"
+                  select
+                  variant="outlined"
+                  value={filters.l1DatabaseSkill}
+                  onChange={setFilter("l1DatabaseSkill")}
+                  fullWidth
+                  SelectProps={{
+                    displayEmpty: true,
+                    renderValue: filterRenderValue,
+                  }}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {ratingOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
+                <TextField
+                  size="small"
+                  select
+                  variant="outlined"
+                  value={filters.l1AttitudeTowardsLearning}
+                  onChange={setFilter("l1AttitudeTowardsLearning")}
+                  fullWidth
+                  SelectProps={{
+                    displayEmpty: true,
+                    renderValue: filterRenderValue,
+                  }}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {ratingOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
+                <TextField
+                  size="small"
+                  select
+                  variant="outlined"
+                  value={filters.l1DevExperience}
+                  onChange={setFilter("l1DevExperience")}
+                  fullWidth
+                  SelectProps={{
+                    displayEmpty: true,
+                    renderValue: filterRenderValue,
+                  }}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {ratingOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
+                <TextField
+                  size="small"
+                  variant="outlined"
+                  placeholder="Filter"
+                  value={filters.l1Score}
+                  onChange={setFilter("l1Score")}
+                  fullWidth
+                />
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
+                <TextField
+                  size="small"
                   variant="outlined"
                   placeholder="Filter"
                   value={filters.l1ConductedBy}
@@ -655,6 +711,142 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   placeholder="Filter"
                   value={filters.l1Remarks}
                   onChange={setFilter("l1Remarks")}
+                  fullWidth
+                />
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
+                <TextField
+                  size="small"
+                  select
+                  variant="outlined"
+                  value={filters.l2Communication}
+                  onChange={setFilter("l2Communication")}
+                  fullWidth
+                  SelectProps={{
+                    displayEmpty: true,
+                    renderValue: filterRenderValue,
+                  }}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {ratingOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
+                <TextField
+                  size="small"
+                  select
+                  variant="outlined"
+                  value={filters.l2TechnicalSkill}
+                  onChange={setFilter("l2TechnicalSkill")}
+                  fullWidth
+                  SelectProps={{
+                    displayEmpty: true,
+                    renderValue: filterRenderValue,
+                  }}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {ratingOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
+                <TextField
+                  size="small"
+                  select
+                  variant="outlined"
+                  value={filters.l2ProgrammingLanguageSkill}
+                  onChange={setFilter("l2ProgrammingLanguageSkill")}
+                  fullWidth
+                  SelectProps={{
+                    displayEmpty: true,
+                    renderValue: filterRenderValue,
+                  }}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {ratingOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
+                <TextField
+                  size="small"
+                  select
+                  variant="outlined"
+                  value={filters.l2DatabaseSkill}
+                  onChange={setFilter("l2DatabaseSkill")}
+                  fullWidth
+                  SelectProps={{
+                    displayEmpty: true,
+                    renderValue: filterRenderValue,
+                  }}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {ratingOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
+                <TextField
+                  size="small"
+                  select
+                  variant="outlined"
+                  value={filters.l2AttitudeTowardsLearning}
+                  onChange={setFilter("l2AttitudeTowardsLearning")}
+                  fullWidth
+                  SelectProps={{
+                    displayEmpty: true,
+                    renderValue: filterRenderValue,
+                  }}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {ratingOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
+                <TextField
+                  size="small"
+                  select
+                  variant="outlined"
+                  value={filters.l2DevExperience}
+                  onChange={setFilter("l2DevExperience")}
+                  fullWidth
+                  SelectProps={{
+                    displayEmpty: true,
+                    renderValue: filterRenderValue,
+                  }}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {ratingOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
+                <TextField
+                  size="small"
+                  variant="outlined"
+                  placeholder="Filter"
+                  value={filters.l2Score}
+                  onChange={setFilter("l2Score")}
                   fullWidth
                 />
               </TableCell>
@@ -765,16 +957,6 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   <TableCell sx={bodyCellSx}>{c.candidateEmail}</TableCell>
                   <TableCell sx={bodyCellSx}>{c.course}</TableCell>
                   <TableCell sx={bodyCellSx}>{c.department}</TableCell>
-                  <TableCell sx={bodyCellSx}>{c.communication}</TableCell>
-                  <TableCell sx={bodyCellSx}>{c.technicalSkill}</TableCell>
-                  <TableCell sx={bodyCellSx}>
-                    {c.programmingLanguageSkill}
-                  </TableCell>
-                  <TableCell sx={bodyCellSx}>{c.databaseSkill}</TableCell>
-                  <TableCell sx={bodyCellSx}>
-                    {c.attitudeTowardsLearning}
-                  </TableCell>
-                  <TableCell sx={bodyCellSx}>{c.devExperience}</TableCell>
                   <TableCell sx={bodyCellSx}>{c.writtenTestScore}</TableCell>
                   <TableCell sx={bodyCellSx}>{c.groupDiscussionScore}</TableCell>
                   <TableCell sx={bodyCellSx}>{getTotalScore(c)}</TableCell>
@@ -783,12 +965,34 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   <TableCell sx={bodyCellSx}>
                     {c.preliminaryTestsRemarks}
                   </TableCell>
+                  <TableCell sx={bodyCellSx}>{c.l1Communication}</TableCell>
+                  <TableCell sx={bodyCellSx}>{c.l1TechnicalSkill}</TableCell>
+                  <TableCell sx={bodyCellSx}>
+                    {c.l1ProgrammingLanguageSkill}
+                  </TableCell>
+                  <TableCell sx={bodyCellSx}>{c.l1DatabaseSkill}</TableCell>
+                  <TableCell sx={bodyCellSx}>
+                    {c.l1AttitudeTowardsLearning}
+                  </TableCell>
+                  <TableCell sx={bodyCellSx}>{c.l1DevExperience}</TableCell>
+                  <TableCell sx={bodyCellSx}>{getL1Score(c)}</TableCell>
                   <TableCell sx={bodyCellSx}>{c.l1ConductedBy}</TableCell>
                   <TableCell sx={bodyCellSx}>
                     {formatDate(c.l1ConductedDate)}
                   </TableCell>
                   <TableCell sx={bodyCellSx}>{c.l1Status}</TableCell>
                   <TableCell sx={bodyCellSx}>{c.l1Remarks}</TableCell>
+                  <TableCell sx={bodyCellSx}>{c.l2Communication}</TableCell>
+                  <TableCell sx={bodyCellSx}>{c.l2TechnicalSkill}</TableCell>
+                  <TableCell sx={bodyCellSx}>
+                    {c.l2ProgrammingLanguageSkill}
+                  </TableCell>
+                  <TableCell sx={bodyCellSx}>{c.l2DatabaseSkill}</TableCell>
+                  <TableCell sx={bodyCellSx}>
+                    {c.l2AttitudeTowardsLearning}
+                  </TableCell>
+                  <TableCell sx={bodyCellSx}>{c.l2DevExperience}</TableCell>
+                  <TableCell sx={bodyCellSx}>{getL2Score(c)}</TableCell>
                   <TableCell sx={bodyCellSx}>{c.l2ConductedBy}</TableCell>
                   <TableCell sx={bodyCellSx}>
                     {formatDate(c.l2ConductedDate)}

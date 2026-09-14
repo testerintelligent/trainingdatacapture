@@ -57,12 +57,6 @@ const candidateSchema = new mongoose.Schema({
   candidateEmail: { type: String, required: true },
   course: { type: String, required: true },
   department: { type: String, required: true },
-  communication: { type: Number, enum: ratingValues, required: true },
-  technicalSkill: { type: Number, enum: ratingValues, required: true },
-  programmingLanguageSkill: { type: Number, enum: ratingValues, required: true },
-  databaseSkill: { type: Number, enum: ratingValues, required: true },
-  attitudeTowardsLearning: { type: Number, enum: ratingValues, required: true },
-  devExperience: { type: Number, enum: ratingValues, required: true },
   totalScore: { type: Number },
   writtenTestStatus: { type: String, enum: ['', 'Selected', 'Not Selected', 'On Hold'], default: '' },
   groupDiscussionStatus: { type: String, enum: ['', 'Selected', 'Not Selected', 'On Hold'], default: '' },
@@ -73,10 +67,24 @@ const candidateSchema = new mongoose.Schema({
   l1ConductedDate: { type: Date },
   l1Status: { type: String, enum: ['', 'Selected', 'Not Selected', 'On Hold'], default: '' },
   l1Remarks: { type: String },
+  l1Communication: { type: Number, enum: ratingValues, required: true },
+  l1TechnicalSkill: { type: Number, enum: ratingValues, required: true },
+  l1ProgrammingLanguageSkill: { type: Number, enum: ratingValues, required: true },
+  l1DatabaseSkill: { type: Number, enum: ratingValues, required: true },
+  l1AttitudeTowardsLearning: { type: Number, enum: ratingValues, required: true },
+  l1DevExperience: { type: Number, enum: ratingValues, required: true },
+  l1Score: { type: Number },
   l2ConductedBy: { type: String },
   l2ConductedDate: { type: Date },
   l2Status: { type: String, enum: ['', 'Selected', 'Not Selected', 'On Hold'], default: '' },
   l2Remarks: { type: String },
+  l2Communication: { type: Number, enum: ratingValues, required: true },
+  l2TechnicalSkill: { type: Number, enum: ratingValues, required: true },
+  l2ProgrammingLanguageSkill: { type: Number, enum: ratingValues, required: true },
+  l2DatabaseSkill: { type: Number, enum: ratingValues, required: true },
+  l2AttitudeTowardsLearning: { type: Number, enum: ratingValues, required: true },
+  l2DevExperience: { type: Number, enum: ratingValues, required: true },
+  l2Score: { type: Number },
 }, { timestamps: true });
 const Candidate = recruitmentConnection.model('Candidate', candidateSchema);
 
@@ -147,22 +155,41 @@ app.get('/api/candidates', async (req, res) => {
 
 // Empty date-input strings ('') would fail Mongoose's Date cast, so normalize
 // blank L1/L2 conducted dates to null before writing to the database.
-// totalScore is always recomputed server-side from the rating fields rather
-// than trusting whatever (if anything) the client sends.
-const normalizeCandidateData = (body = {}) => ({
-  ...body,
-  l1ConductedDate: body.l1ConductedDate || null,
-  l2ConductedDate: body.l2ConductedDate || null,
-  totalScore:
-    Number(body.communication) +
-    Number(body.technicalSkill) +
-    Number(body.programmingLanguageSkill) +
-    Number(body.databaseSkill) +
-    Number(body.attitudeTowardsLearning) +
-    Number(body.devExperience) +
-    Number(body.writtenTestScore) +
-    Number(body.groupDiscussionScore),
-});
+// l1Score, l2Score and totalScore are always recomputed server-side from the
+// rating fields rather than trusting whatever (if anything) the client sends.
+const sumFields = (body, fields) =>
+  fields.reduce((sum, field) => sum + (Number(body[field]) || 0), 0);
+
+const L1_SCORE_FIELDS = [
+  'l1Communication',
+  'l1TechnicalSkill',
+  'l1ProgrammingLanguageSkill',
+  'l1DatabaseSkill',
+  'l1AttitudeTowardsLearning',
+  'l1DevExperience',
+];
+const L2_SCORE_FIELDS = [
+  'l2Communication',
+  'l2TechnicalSkill',
+  'l2ProgrammingLanguageSkill',
+  'l2DatabaseSkill',
+  'l2AttitudeTowardsLearning',
+  'l2DevExperience',
+];
+
+const normalizeCandidateData = (body = {}) => {
+  const l1Score = sumFields(body, L1_SCORE_FIELDS);
+  const l2Score = sumFields(body, L2_SCORE_FIELDS);
+  const preliminaryScore = sumFields(body, ['writtenTestScore', 'groupDiscussionScore']);
+  return {
+    ...body,
+    l1ConductedDate: body.l1ConductedDate || null,
+    l2ConductedDate: body.l2ConductedDate || null,
+    l1Score,
+    l2Score,
+    totalScore: preliminaryScore + l1Score + l2Score,
+  };
+};
 
 app.post('/api/candidates', async (req, res) => {
   if (!req.body || Object.keys(req.body).length === 0) {
@@ -455,12 +482,18 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *         - candidateEmail
  *         - course
  *         - department
- *         - communication
- *         - technicalSkill
- *         - programmingLanguageSkill
- *         - databaseSkill
- *         - attitudeTowardsLearning
- *         - devExperience
+ *         - l1Communication
+ *         - l1TechnicalSkill
+ *         - l1ProgrammingLanguageSkill
+ *         - l1DatabaseSkill
+ *         - l1AttitudeTowardsLearning
+ *         - l1DevExperience
+ *         - l2Communication
+ *         - l2TechnicalSkill
+ *         - l2ProgrammingLanguageSkill
+ *         - l2DatabaseSkill
+ *         - l2AttitudeTowardsLearning
+ *         - l2DevExperience
  *       properties:
  *         candidateId:
  *           type: string
@@ -472,28 +505,10 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *           type: string
  *         department:
  *           type: string
- *         communication:
- *           type: number
- *           enum: [0, 1, 2, 3, 4, 5]
- *         technicalSkill:
- *           type: number
- *           enum: [0, 1, 2, 3, 4, 5]
- *         programmingLanguageSkill:
- *           type: number
- *           enum: [0, 1, 2, 3, 4, 5]
- *         databaseSkill:
- *           type: number
- *           enum: [0, 1, 2, 3, 4, 5]
- *         attitudeTowardsLearning:
- *           type: number
- *           enum: [0, 1, 2, 3, 4, 5]
- *         devExperience:
- *           type: number
- *           enum: [0, 1, 2, 3, 4, 5]
  *         totalScore:
  *           type: number
  *           readOnly: true
- *           description: Sum of communication, technicalSkill, programmingLanguageSkill, databaseSkill, attitudeTowardsLearning, devExperience, writtenTestScore and groupDiscussionScore. Computed server-side; any client-supplied value is ignored.
+ *           description: preliminaryScore (writtenTestScore + groupDiscussionScore) + l1Score + l2Score. Computed server-side; any client-supplied value is ignored.
  *         writtenTestStatus:
  *           type: string
  *           enum: ['', Selected, Not Selected, On Hold]
@@ -518,6 +533,28 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *           enum: ['', Selected, Not Selected, On Hold]
  *         l1Remarks:
  *           type: string
+ *         l1Communication:
+ *           type: number
+ *           enum: [0, 1, 2, 3, 4, 5]
+ *         l1TechnicalSkill:
+ *           type: number
+ *           enum: [0, 1, 2, 3, 4, 5]
+ *         l1ProgrammingLanguageSkill:
+ *           type: number
+ *           enum: [0, 1, 2, 3, 4, 5]
+ *         l1DatabaseSkill:
+ *           type: number
+ *           enum: [0, 1, 2, 3, 4, 5]
+ *         l1AttitudeTowardsLearning:
+ *           type: number
+ *           enum: [0, 1, 2, 3, 4, 5]
+ *         l1DevExperience:
+ *           type: number
+ *           enum: [0, 1, 2, 3, 4, 5]
+ *         l1Score:
+ *           type: number
+ *           readOnly: true
+ *           description: Sum of l1Communication, l1TechnicalSkill, l1ProgrammingLanguageSkill, l1DatabaseSkill, l1AttitudeTowardsLearning and l1DevExperience. Computed server-side; any client-supplied value is ignored.
  *         l2ConductedBy:
  *           type: string
  *         l2ConductedDate:
@@ -528,6 +565,28 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *           enum: ['', Selected, Not Selected, On Hold]
  *         l2Remarks:
  *           type: string
+ *         l2Communication:
+ *           type: number
+ *           enum: [0, 1, 2, 3, 4, 5]
+ *         l2TechnicalSkill:
+ *           type: number
+ *           enum: [0, 1, 2, 3, 4, 5]
+ *         l2ProgrammingLanguageSkill:
+ *           type: number
+ *           enum: [0, 1, 2, 3, 4, 5]
+ *         l2DatabaseSkill:
+ *           type: number
+ *           enum: [0, 1, 2, 3, 4, 5]
+ *         l2AttitudeTowardsLearning:
+ *           type: number
+ *           enum: [0, 1, 2, 3, 4, 5]
+ *         l2DevExperience:
+ *           type: number
+ *           enum: [0, 1, 2, 3, 4, 5]
+ *         l2Score:
+ *           type: number
+ *           readOnly: true
+ *           description: Sum of l2Communication, l2TechnicalSkill, l2ProgrammingLanguageSkill, l2DatabaseSkill, l2AttitudeTowardsLearning and l2DevExperience. Computed server-side; any client-supplied value is ignored.
  */
 
 /**

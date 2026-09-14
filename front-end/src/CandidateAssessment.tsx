@@ -19,12 +19,6 @@ export interface Candidate {
   candidateEmail: string;
   course: string;
   department: string;
-  communication: number;
-  technicalSkill: number;
-  programmingLanguageSkill: number;
-  databaseSkill: number;
-  attitudeTowardsLearning: number;
-  devExperience: number;
   totalScore?: number;
   writtenTestStatus: string;
   groupDiscussionStatus: string;
@@ -35,10 +29,24 @@ export interface Candidate {
   l1ConductedDate: string;
   l1Status: string;
   l1Remarks: string;
+  l1Communication: number;
+  l1TechnicalSkill: number;
+  l1ProgrammingLanguageSkill: number;
+  l1DatabaseSkill: number;
+  l1AttitudeTowardsLearning: number;
+  l1DevExperience: number;
+  l1Score?: number;
   l2ConductedBy: string;
   l2ConductedDate: string;
   l2Status: string;
   l2Remarks: string;
+  l2Communication: number;
+  l2TechnicalSkill: number;
+  l2ProgrammingLanguageSkill: number;
+  l2DatabaseSkill: number;
+  l2AttitudeTowardsLearning: number;
+  l2DevExperience: number;
+  l2Score?: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -46,22 +54,51 @@ export interface Candidate {
 export const ratingOptions = [0, 1, 2, 3, 4, 5];
 export const interviewStatusOptions = ["Selected", "Not Selected", "On Hold"];
 
-const SCORE_FIELDS = [
-  "communication",
-  "technicalSkill",
-  "programmingLanguageSkill",
-  "databaseSkill",
-  "attitudeTowardsLearning",
-  "devExperience",
+const PRELIMINARY_SCORE_FIELDS = [
   "writtenTestScore",
   "groupDiscussionScore",
 ] as const;
 
-export const getTotalScore = (c: Candidate) =>
-  SCORE_FIELDS.reduce((sum, field) => sum + (c[field] ?? 0), 0);
+const L1_SCORE_FIELDS = [
+  "l1Communication",
+  "l1TechnicalSkill",
+  "l1ProgrammingLanguageSkill",
+  "l1DatabaseSkill",
+  "l1AttitudeTowardsLearning",
+  "l1DevExperience",
+] as const;
 
+const L2_SCORE_FIELDS = [
+  "l2Communication",
+  "l2TechnicalSkill",
+  "l2ProgrammingLanguageSkill",
+  "l2DatabaseSkill",
+  "l2AttitudeTowardsLearning",
+  "l2DevExperience",
+] as const;
+
+const sumFields = (
+  c: Candidate,
+  fields: readonly (keyof Candidate)[]
+) => fields.reduce((sum, field) => sum + (Number(c[field]) || 0), 0);
+
+export const getPreliminaryScore = (c: Candidate) =>
+  sumFields(c, PRELIMINARY_SCORE_FIELDS);
+
+export const getL1Score = (c: Candidate) => sumFields(c, L1_SCORE_FIELDS);
+
+export const getL2Score = (c: Candidate) => sumFields(c, L2_SCORE_FIELDS);
+
+export const getTotalScore = (c: Candidate) =>
+  getPreliminaryScore(c) + getL1Score(c) + getL2Score(c);
+
+const MAX_RATING = Math.max(...ratingOptions);
+export const PRELIMINARY_MAX_SCORE =
+  MAX_RATING * PRELIMINARY_SCORE_FIELDS.length;
+export const L1_MAX_SCORE = MAX_RATING * L1_SCORE_FIELDS.length;
+export const L2_MAX_SCORE = MAX_RATING * L2_SCORE_FIELDS.length;
 export const MAX_TOTAL_SCORE =
-  Math.max(...ratingOptions) * SCORE_FIELDS.length;
+  PRELIMINARY_MAX_SCORE + L1_MAX_SCORE + L2_MAX_SCORE;
 
 export const emptyCandidate: Candidate = {
   candidateId: "",
@@ -69,12 +106,6 @@ export const emptyCandidate: Candidate = {
   candidateEmail: "",
   course: "",
   department: "",
-  communication: 0,
-  technicalSkill: 0,
-  programmingLanguageSkill: 0,
-  databaseSkill: 0,
-  attitudeTowardsLearning: 0,
-  devExperience: 0,
   writtenTestStatus: "",
   groupDiscussionStatus: "",
   writtenTestScore: 0,
@@ -84,10 +115,22 @@ export const emptyCandidate: Candidate = {
   l1ConductedDate: "",
   l1Status: "",
   l1Remarks: "",
+  l1Communication: 0,
+  l1TechnicalSkill: 0,
+  l1ProgrammingLanguageSkill: 0,
+  l1DatabaseSkill: 0,
+  l1AttitudeTowardsLearning: 0,
+  l1DevExperience: 0,
   l2ConductedBy: "",
   l2ConductedDate: "",
   l2Status: "",
   l2Remarks: "",
+  l2Communication: 0,
+  l2TechnicalSkill: 0,
+  l2ProgrammingLanguageSkill: 0,
+  l2DatabaseSkill: 0,
+  l2AttitudeTowardsLearning: 0,
+  l2DevExperience: 0,
 };
 
 interface CandidateAssessmentProps {
@@ -117,6 +160,8 @@ function CandidateAssessment({
   );
   const editId = savedId;
   const runningScore = useMemo(() => getTotalScore(form), [form]);
+  const runningL1Score = useMemo(() => getL1Score(form), [form]);
+  const runningL2Score = useMemo(() => getL2Score(form), [form]);
 
   useEffect(() => {
     setForm(
@@ -144,14 +189,20 @@ function CandidateAssessment({
   ) => {
     const { name, value } = e.target;
     const isRatingField = [
-      "communication",
-      "technicalSkill",
-      "programmingLanguageSkill",
-      "databaseSkill",
-      "attitudeTowardsLearning",
-      "devExperience",
       "writtenTestScore",
       "groupDiscussionScore",
+      "l1Communication",
+      "l1TechnicalSkill",
+      "l1ProgrammingLanguageSkill",
+      "l1DatabaseSkill",
+      "l1AttitudeTowardsLearning",
+      "l1DevExperience",
+      "l2Communication",
+      "l2TechnicalSkill",
+      "l2ProgrammingLanguageSkill",
+      "l2DatabaseSkill",
+      "l2AttitudeTowardsLearning",
+      "l2DevExperience",
     ].includes(name);
     setForm({
       ...form,
@@ -522,17 +573,28 @@ function CandidateAssessment({
             </Grid>
 
             <Grid size={{ xs: 12, sm: 6 }}>
-              <Typography
-                variant="subtitle2"
+              <Box
                 sx={{
-                  fontWeight: 700,
-                  color: "#6846C6",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
                   mt: 1,
                   mb: 1.5,
                 }}
               >
-                L1 Interview
-              </Typography>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 700, color: "#6846C6" }}
+                >
+                  L1 Interview
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{ fontWeight: 700, color: "#6846C6" }}
+                >
+                  L1 Score: {runningL1Score} / {L1_MAX_SCORE}
+                </Typography>
+              </Box>
               <Box
                 sx={{
                   backgroundColor: "transparent",
@@ -548,8 +610,8 @@ function CandidateAssessment({
                       select
                       fullWidth
                       label="Communication"
-                      name="communication"
-                      value={form.communication}
+                      name="l1Communication"
+                      value={form.l1Communication}
                       onChange={handleChange}
                       required
                     >
@@ -566,8 +628,8 @@ function CandidateAssessment({
                       select
                       fullWidth
                       label="Technical Skill"
-                      name="technicalSkill"
-                      value={form.technicalSkill}
+                      name="l1TechnicalSkill"
+                      value={form.l1TechnicalSkill}
                       onChange={handleChange}
                       required
                     >
@@ -584,8 +646,8 @@ function CandidateAssessment({
                       select
                       fullWidth
                       label="Programming Language Skill"
-                      name="programmingLanguageSkill"
-                      value={form.programmingLanguageSkill}
+                      name="l1ProgrammingLanguageSkill"
+                      value={form.l1ProgrammingLanguageSkill}
                       onChange={handleChange}
                       required
                     >
@@ -602,8 +664,8 @@ function CandidateAssessment({
                       select
                       fullWidth
                       label="Database Skill"
-                      name="databaseSkill"
-                      value={form.databaseSkill}
+                      name="l1DatabaseSkill"
+                      value={form.l1DatabaseSkill}
                       onChange={handleChange}
                       required
                     >
@@ -620,8 +682,8 @@ function CandidateAssessment({
                       select
                       fullWidth
                       label="Attitude Towards Learning New Things"
-                      name="attitudeTowardsLearning"
-                      value={form.attitudeTowardsLearning}
+                      name="l1AttitudeTowardsLearning"
+                      value={form.l1AttitudeTowardsLearning}
                       onChange={handleChange}
                       required
                     >
@@ -638,8 +700,8 @@ function CandidateAssessment({
                       select
                       fullWidth
                       label="Dev Experience"
-                      name="devExperience"
-                      value={form.devExperience}
+                      name="l1DevExperience"
+                      value={form.l1DevExperience}
                       onChange={handleChange}
                       required
                     >
@@ -710,17 +772,28 @@ function CandidateAssessment({
             </Grid>
 
             <Grid size={{ xs: 12, sm: 6 }}>
-              <Typography
-                variant="subtitle2"
+              <Box
                 sx={{
-                  fontWeight: 700,
-                  color: "#6846C6",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
                   mt: 1,
                   mb: 1.5,
                 }}
               >
-                L2 Interview
-              </Typography>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 700, color: "#6846C6" }}
+                >
+                  L2 Interview
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{ fontWeight: 700, color: "#6846C6" }}
+                >
+                  L2 Score: {runningL2Score} / {L2_MAX_SCORE}
+                </Typography>
+              </Box>
               <Box
                 sx={{
                   backgroundColor: "transparent",
@@ -736,8 +809,8 @@ function CandidateAssessment({
                       select
                       fullWidth
                       label="Communication"
-                      name="communication"
-                      value={form.communication}
+                      name="l2Communication"
+                      value={form.l2Communication}
                       onChange={handleChange}
                       required
                     >
@@ -754,8 +827,8 @@ function CandidateAssessment({
                       select
                       fullWidth
                       label="Technical Skill"
-                      name="technicalSkill"
-                      value={form.technicalSkill}
+                      name="l2TechnicalSkill"
+                      value={form.l2TechnicalSkill}
                       onChange={handleChange}
                       required
                     >
@@ -772,8 +845,8 @@ function CandidateAssessment({
                       select
                       fullWidth
                       label="Programming Language Skill"
-                      name="programmingLanguageSkill"
-                      value={form.programmingLanguageSkill}
+                      name="l2ProgrammingLanguageSkill"
+                      value={form.l2ProgrammingLanguageSkill}
                       onChange={handleChange}
                       required
                     >
@@ -790,8 +863,8 @@ function CandidateAssessment({
                       select
                       fullWidth
                       label="Database Skill"
-                      name="databaseSkill"
-                      value={form.databaseSkill}
+                      name="l2DatabaseSkill"
+                      value={form.l2DatabaseSkill}
                       onChange={handleChange}
                       required
                     >
@@ -808,8 +881,8 @@ function CandidateAssessment({
                       select
                       fullWidth
                       label="Attitude Towards Learning New Things"
-                      name="attitudeTowardsLearning"
-                      value={form.attitudeTowardsLearning}
+                      name="l2AttitudeTowardsLearning"
+                      value={form.l2AttitudeTowardsLearning}
                       onChange={handleChange}
                       required
                     >
@@ -826,8 +899,8 @@ function CandidateAssessment({
                       select
                       fullWidth
                       label="Dev Experience"
-                      name="devExperience"
-                      value={form.devExperience}
+                      name="l2DevExperience"
+                      value={form.l2DevExperience}
                       onChange={handleChange}
                       required
                     >
