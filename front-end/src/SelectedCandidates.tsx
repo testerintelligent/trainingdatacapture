@@ -15,6 +15,7 @@ import {
 import DownloadIcon from "@mui/icons-material/Download";
 import { exportToExcel } from "./exportToExcel";
 import type { Candidate } from "./CandidateAssessment";
+import { getTotalScore } from "./CandidateAssessment";
 
 interface SelectedCandidatesProps {
   candidates: Candidate[];
@@ -25,6 +26,7 @@ const tableHeaders = [
   { label: "Candidate ID" },
   { label: "Candidate Name" },
   { label: "L2 Status" },
+  { label: "Total Score" },
 ];
 
 const ROWS_PER_PAGE = 10;
@@ -75,6 +77,7 @@ function SelectedCandidates({ candidates }: SelectedCandidatesProps) {
                 "Candidate ID": c.candidateId,
                 "Candidate Name": c.candidateName,
                 "L2 Status": c.l2Status,
+                "Total Score": getTotalScore(c),
               })),
               "selected_candidates.xlsx"
             )
@@ -157,6 +160,9 @@ function SelectedCandidates({ candidates }: SelectedCandidatesProps) {
                   </TableCell>
                   <TableCell sx={{ padding: "0 8px" }}>
                     {c.l2Status}
+                  </TableCell>
+                  <TableCell sx={{ padding: "0 8px" }}>
+                    {getTotalScore(c)}
                   </TableCell>
                 </TableRow>
               ))
