@@ -66,6 +66,9 @@ const candidateSchema = new mongoose.Schema({
   totalScore: { type: Number },
   writtenTestStatus: { type: String, enum: ['', 'Selected', 'Not Selected', 'On Hold'], default: '' },
   groupDiscussionStatus: { type: String, enum: ['', 'Selected', 'Not Selected', 'On Hold'], default: '' },
+  writtenTestScore: { type: Number, enum: ratingValues, default: 0 },
+  groupDiscussionScore: { type: Number, enum: ratingValues, default: 0 },
+  preliminaryTestsRemarks: { type: String },
   l1ConductedBy: { type: String },
   l1ConductedDate: { type: Date },
   l1Status: { type: String, enum: ['', 'Selected', 'Not Selected', 'On Hold'], default: '' },
@@ -156,7 +159,9 @@ const normalizeCandidateData = (body = {}) => ({
     Number(body.programmingLanguageSkill) +
     Number(body.databaseSkill) +
     Number(body.attitudeTowardsLearning) +
-    Number(body.devExperience),
+    Number(body.devExperience) +
+    Number(body.writtenTestScore) +
+    Number(body.groupDiscussionScore),
 });
 
 app.post('/api/candidates', async (req, res) => {
@@ -488,13 +493,21 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *         totalScore:
  *           type: number
  *           readOnly: true
- *           description: Sum of communication, technicalSkill, programmingLanguageSkill, databaseSkill, attitudeTowardsLearning and devExperience. Computed server-side; any client-supplied value is ignored.
+ *           description: Sum of communication, technicalSkill, programmingLanguageSkill, databaseSkill, attitudeTowardsLearning, devExperience, writtenTestScore and groupDiscussionScore. Computed server-side; any client-supplied value is ignored.
  *         writtenTestStatus:
  *           type: string
  *           enum: ['', Selected, Not Selected, On Hold]
  *         groupDiscussionStatus:
  *           type: string
  *           enum: ['', Selected, Not Selected, On Hold]
+ *         writtenTestScore:
+ *           type: number
+ *           enum: [0, 1, 2, 3, 4, 5]
+ *         groupDiscussionScore:
+ *           type: number
+ *           enum: [0, 1, 2, 3, 4, 5]
+ *         preliminaryTestsRemarks:
+ *           type: string
  *         l1ConductedBy:
  *           type: string
  *         l1ConductedDate:

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import {
   Box,
@@ -28,6 +28,9 @@ export interface Candidate {
   totalScore?: number;
   writtenTestStatus: string;
   groupDiscussionStatus: string;
+  writtenTestScore: number;
+  groupDiscussionScore: number;
+  preliminaryTestsRemarks: string;
   l1ConductedBy: string;
   l1ConductedDate: string;
   l1Status: string;
@@ -43,6 +46,23 @@ export interface Candidate {
 export const ratingOptions = [0, 1, 2, 3, 4, 5];
 export const interviewStatusOptions = ["Selected", "Not Selected", "On Hold"];
 
+const SCORE_FIELDS = [
+  "communication",
+  "technicalSkill",
+  "programmingLanguageSkill",
+  "databaseSkill",
+  "attitudeTowardsLearning",
+  "devExperience",
+  "writtenTestScore",
+  "groupDiscussionScore",
+] as const;
+
+export const getTotalScore = (c: Candidate) =>
+  SCORE_FIELDS.reduce((sum, field) => sum + (c[field] ?? 0), 0);
+
+export const MAX_TOTAL_SCORE =
+  Math.max(...ratingOptions) * SCORE_FIELDS.length;
+
 export const emptyCandidate: Candidate = {
   candidateId: "",
   candidateName: "",
@@ -57,6 +77,9 @@ export const emptyCandidate: Candidate = {
   devExperience: 0,
   writtenTestStatus: "",
   groupDiscussionStatus: "",
+  writtenTestScore: 0,
+  groupDiscussionScore: 0,
+  preliminaryTestsRemarks: "",
   l1ConductedBy: "",
   l1ConductedDate: "",
   l1Status: "",
@@ -70,11 +93,30 @@ export const emptyCandidate: Candidate = {
 interface CandidateAssessmentProps {
   editingCandidate: Candidate | null;
   onDone: () => void;
+  // Called with the latest saved record every time Save/Submit succeeds,
+  // so a parent can remember it as the in-progress draft and restore it
+  // if the user navigates away and back before Cancelling. `isNewRecord`
+  // is true only the moment a save creates the record for the first time
+  // (as opposed to updating one that already existed before this form
+  // session started) — a parent can use it to know the record is still
+  // an unfinalized draft safe to discard if the browser reloads.
+  onSaved?: (candidate: Candidate, isNewRecord: boolean) => void;
 }
 
-function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentProps) {
+function CandidateAssessment({
+  editingCandidate,
+  onDone,
+  onSaved,
+}: CandidateAssessmentProps) {
   const [form, setForm] = useState<Candidate>(editingCandidate ?? emptyCandidate);
-  const editId = editingCandidate?._id ?? null;
+  const [savedId, setSavedId] = useState<string | null>(
+    editingCandidate?._id ?? null
+  );
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">(
+    "idle"
+  );
+  const editId = savedId;
+  const runningScore = useMemo(() => getTotalScore(form), [form]);
 
   useEffect(() => {
     setForm(
@@ -93,6 +135,8 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
           }
         : emptyCandidate
     );
+    setSavedId(editingCandidate?._id ?? null);
+    setSaveStatus("idle");
   }, [editingCandidate]);
 
   const handleChange = (
@@ -106,46 +150,81 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
       "databaseSkill",
       "attitudeTowardsLearning",
       "devExperience",
+      "writtenTestScore",
+      "groupDiscussionScore",
     ].includes(name);
     setForm({
       ...form,
       [name]: isRatingField ? Number(value) : value,
     });
+    setSaveStatus((status) => (status === "saved" ? "idle" : status));
   };
 
-  const handleSubmit = async () => {
+  const validateBasicDetails = () => {
     if (!form.candidateId.trim()) {
       alert("Candidate ID is required.");
-      return;
+      return false;
     }
     if (!form.candidateName.trim()) {
       alert("Candidate Name is required.");
-      return;
+      return false;
     }
     if (!form.candidateEmail.trim()) {
       alert("Candidate Email ID is required.");
-      return;
+      return false;
     }
     if (!form.course.trim()) {
       alert("Course is required.");
-      return;
+      return false;
     }
     if (!form.department.trim()) {
       alert("Department is required.");
-      return;
+      return false;
     }
-    if (editId) {
-      await axios.put(
-        `${process.env.REACT_APP_API_BASE_URL}/api/candidates/${editId}`,
-        form
-      );
-    } else {
-      await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL}/api/candidates`,
-        form
-      );
+    return true;
+  };
+
+  // Saves the form to the backend without leaving the page: updates the
+  // existing record if one has already been saved, otherwise creates a
+  // new one and remembers its id so later saves update it in place.
+  const saveCandidate = async (): Promise<boolean> => {
+    if (!validateBasicDetails()) {
+      return false;
     }
-    onDone();
+    setSaveStatus("saving");
+    const isNewRecord = !savedId;
+    try {
+      const res = savedId
+        ? await axios.put(
+            `${process.env.REACT_APP_API_BASE_URL}/api/candidates/${savedId}`,
+            form
+          )
+        : await axios.post(
+            `${process.env.REACT_APP_API_BASE_URL}/api/candidates`,
+            form
+          );
+      setSavedId(res.data?._id ?? savedId ?? null);
+      onSaved?.(
+        res.data ?? { ...form, _id: savedId ?? undefined },
+        isNewRecord
+      );
+      setSaveStatus("saved");
+      return true;
+    } catch (err) {
+      setSaveStatus("idle");
+      throw err;
+    }
+  };
+
+  const handleSave = async () => {
+    await saveCandidate();
+  };
+
+  const handleSubmit = async () => {
+    const saved = await saveCandidate();
+    if (saved) {
+      onDone();
+    }
   };
 
   return (
@@ -175,36 +254,62 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
           sx={{
             display: "flex",
             alignItems: "center",
+            justifyContent: "space-between",
             gap: 1.5,
             px: { xs: 2.5, sm: 4 },
             py: 1,
             background: "#6846C6",
           }}
         >
-          <Avatar
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <Avatar
+              sx={{
+                bgcolor: "rgba(255,255,255,0.18)",
+                color: "#fff",
+                width: 40,
+                height: 40,
+              }}
+            >
+              <HowToRegIcon fontSize="small" />
+            </Avatar>
+            <Box>
+              <Typography
+                variant="subtitle1"
+                sx={{ color: "#fff", fontWeight: 700, lineHeight: 1.2 }}
+              >
+                {editId ? "Edit Candidate Assessment" : "Add Candidate Assessment"}
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ color: "rgba(255,255,255,0.85)" }}
+              >
+                {editId
+                  ? "Update the details for this candidate"
+                  : "Fill in the details to create a new candidate assessment"}
+              </Typography>
+            </Box>
+          </Box>
+
+          <Box
             sx={{
-              bgcolor: "rgba(255,255,255,0.18)",
-              color: "#fff",
-              width: 40,
-              height: 40,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+              flexShrink: 0,
+              pl: 2,
             }}
           >
-            <HowToRegIcon fontSize="small" />
-          </Avatar>
-          <Box>
             <Typography
-              variant="subtitle1"
-              sx={{ color: "#fff", fontWeight: 700, lineHeight: 1.2 }}
+              variant="caption"
+              sx={{ color: "rgba(255,255,255,0.85)", lineHeight: 1.2 }}
             >
-              {editId ? "Edit Candidate Assessment" : "Add Candidate Assessment"}
+              Total Score
             </Typography>
             <Typography
-              variant="body2"
-              sx={{ color: "rgba(255,255,255,0.85)" }}
+              variant="h6"
+              sx={{ color: "#fff", fontWeight: 700, lineHeight: 1.2 }}
             >
-              {editId
-                ? "Update the details for this candidate"
-                : "Fill in the details to create a new candidate assessment"}
+              {runningScore} / {MAX_TOTAL_SCORE}
             </Typography>
           </Box>
         </Box>
@@ -221,175 +326,88 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
             "& .MuiMenuItem-root": { fontSize: "0.85rem" },
           }}
         >
-          <Grid container spacing={1.5}>
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <TextField
-                size="small"
-                fullWidth
-                label="Candidate ID"
-                name="candidateId"
-                value={form.candidateId}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <TextField
-                size="small"
-                fullWidth
-                label="Candidate Name"
-                name="candidateName"
-                value={form.candidateName}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <TextField
-                size="small"
-                fullWidth
-                label="Candidate Email ID"
-                name="candidateEmail"
-                type="email"
-                value={form.candidateEmail}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                size="small"
-                fullWidth
-                label="Course"
-                name="course"
-                value={form.course}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                size="small"
-                fullWidth
-                label="Department"
-                name="department"
-                value={form.department}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-              <TextField
-                size="small"
-                select
-                fullWidth
-                label="Communication"
-                name="communication"
-                value={form.communication}
-                onChange={handleChange}
-                required
+          <Grid container rowSpacing={2.5} columnSpacing={1.5}>
+            <Grid size={12}>
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  fontWeight: 700,
+                  color: "#6846C6",
+                  mt: 1,
+                  mb: 1.5,
+                }}
               >
-                {ratingOptions.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-              <TextField
-                size="small"
-                select
-                fullWidth
-                label="Technical Skill"
-                name="technicalSkill"
-                value={form.technicalSkill}
-                onChange={handleChange}
-                required
+                Candidate Details
+              </Typography>
+              <Box
+                sx={{
+                  backgroundColor: "transparent",
+                  border: "1px solid #6846C6",
+                  borderRadius: 1,
+                  p: 1.5,
+                }}
               >
-                {ratingOptions.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-              <TextField
-                size="small"
-                select
-                fullWidth
-                label="Programming Language Skill"
-                name="programmingLanguageSkill"
-                value={form.programmingLanguageSkill}
-                onChange={handleChange}
-                required
-              >
-                {ratingOptions.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-              <TextField
-                size="small"
-                select
-                fullWidth
-                label="Database Skill"
-                name="databaseSkill"
-                value={form.databaseSkill}
-                onChange={handleChange}
-                required
-              >
-                {ratingOptions.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-              <TextField
-                size="small"
-                select
-                fullWidth
-                label="Attitude Towards Learning New Things"
-                name="attitudeTowardsLearning"
-                value={form.attitudeTowardsLearning}
-                onChange={handleChange}
-                required
-              >
-                {ratingOptions.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-              <TextField
-                size="small"
-                select
-                fullWidth
-                label="Dev Experience"
-                name="devExperience"
-                value={form.devExperience}
-                onChange={handleChange}
-                required
-              >
-                {ratingOptions.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </TextField>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 2,
+                  }}
+                >
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
+                    <TextField
+                      size="small"
+                      label="Candidate ID"
+                      name="candidateId"
+                      value={form.candidateId}
+                      onChange={handleChange}
+                      required
+                      sx={{ flex: "1 1 calc(50% - 12px)", minWidth: 0 }}
+                    />
+                    <TextField
+                      size="small"
+                      label="Candidate Name"
+                      name="candidateName"
+                      value={form.candidateName}
+                      onChange={handleChange}
+                      required
+                      sx={{ flex: "1 1 calc(50% - 12px)", minWidth: 0 }}
+                    />
+                  </Box>
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
+                    <TextField
+                      size="small"
+                      label="Candidate Email ID"
+                      name="candidateEmail"
+                      type="email"
+                      value={form.candidateEmail}
+                      onChange={handleChange}
+                      required
+                      sx={{ flex: "1 1 calc(50% - 12px)", minWidth: 0 }}
+                    />
+                    <TextField
+                      size="small"
+                      label="Course"
+                      name="course"
+                      value={form.course}
+                      onChange={handleChange}
+                      required
+                      sx={{ flex: "1 1 calc(50% - 12px)", minWidth: 0 }}
+                    />
+                  </Box>
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
+                    <TextField
+                      size="small"
+                      label="Department"
+                      name="department"
+                      value={form.department}
+                      onChange={handleChange}
+                      required
+                      sx={{ flex: "1 1 calc(50% - 12px)", minWidth: 0 }}
+                    />
+                  </Box>
+                </Box>
+              </Box>
             </Grid>
 
             <Grid size={12}>
@@ -399,7 +417,7 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                   fontWeight: 700,
                   color: "#6846C6",
                   mt: 1,
-                  mb: 0.5,
+                  mb: 1.5,
                 }}
               >
                 Preliminary Tests Status
@@ -414,7 +432,7 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                   p: 1.5,
                 }}
               >
-                <Grid container spacing={1.5}>
+                <Grid container rowSpacing={2.5} columnSpacing={1.5}>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       size="small"
@@ -429,6 +447,23 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                         <em>None</em>
                       </MenuItem>
                       {interviewStatusOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      size="small"
+                      select
+                      fullWidth
+                      label="Written Test Score"
+                      name="writtenTestScore"
+                      value={form.writtenTestScore}
+                      onChange={handleChange}
+                    >
+                      {ratingOptions.map((option) => (
                         <MenuItem key={option} value={option}>
                           {option}
                         </MenuItem>
@@ -455,34 +490,168 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                       ))}
                     </TextField>
                   </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      size="small"
+                      select
+                      fullWidth
+                      label="Group Discussion Score"
+                      name="groupDiscussionScore"
+                      value={form.groupDiscussionScore}
+                      onChange={handleChange}
+                    >
+                      {ratingOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid size={12}>
+                    <TextField
+                      size="small"
+                      fullWidth
+                      label="Remarks"
+                      name="preliminaryTestsRemarks"
+                      value={form.preliminaryTestsRemarks}
+                      onChange={handleChange}
+                    />
+                  </Grid>
                 </Grid>
               </Box>
             </Grid>
 
-            <Grid size={12}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Typography
                 variant="subtitle2"
                 sx={{
                   fontWeight: 700,
                   color: "#6846C6",
                   mt: 1,
-                  mb: 0.5,
+                  mb: 1.5,
                 }}
               >
                 L1 Interview
               </Typography>
-            </Grid>
-            <Grid size={12}>
               <Box
                 sx={{
                   backgroundColor: "transparent",
                   border: "1px solid #6846C6",
                   borderRadius: 1,
-                  p: 1.5,
+                  p: 3.5,
                 }}
               >
-                <Grid container spacing={1.5}>
-                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                <Grid container rowSpacing={2.5} columnSpacing={1.5}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      size="small"
+                      select
+                      fullWidth
+                      label="Communication"
+                      name="communication"
+                      value={form.communication}
+                      onChange={handleChange}
+                      required
+                    >
+                      {ratingOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      size="small"
+                      select
+                      fullWidth
+                      label="Technical Skill"
+                      name="technicalSkill"
+                      value={form.technicalSkill}
+                      onChange={handleChange}
+                      required
+                    >
+                      {ratingOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      size="small"
+                      select
+                      fullWidth
+                      label="Programming Language Skill"
+                      name="programmingLanguageSkill"
+                      value={form.programmingLanguageSkill}
+                      onChange={handleChange}
+                      required
+                    >
+                      {ratingOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      size="small"
+                      select
+                      fullWidth
+                      label="Database Skill"
+                      name="databaseSkill"
+                      value={form.databaseSkill}
+                      onChange={handleChange}
+                      required
+                    >
+                      {ratingOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      size="small"
+                      select
+                      fullWidth
+                      label="Attitude Towards Learning New Things"
+                      name="attitudeTowardsLearning"
+                      value={form.attitudeTowardsLearning}
+                      onChange={handleChange}
+                      required
+                    >
+                      {ratingOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      size="small"
+                      select
+                      fullWidth
+                      label="Dev Experience"
+                      name="devExperience"
+                      value={form.devExperience}
+                      onChange={handleChange}
+                      required
+                    >
+                      {ratingOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       size="small"
                       fullWidth
@@ -492,7 +661,7 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                       onChange={handleChange}
                     />
                   </Grid>
-                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       size="small"
                       fullWidth
@@ -505,7 +674,7 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                     />
                   </Grid>
 
-                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       size="small"
                       select
@@ -540,30 +709,137 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
               </Box>
             </Grid>
 
-            <Grid size={12}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Typography
                 variant="subtitle2"
                 sx={{
                   fontWeight: 700,
                   color: "#6846C6",
                   mt: 1,
-                  mb: 0.5,
+                  mb: 1.5,
                 }}
               >
                 L2 Interview
               </Typography>
-            </Grid>
-            <Grid size={12}>
               <Box
                 sx={{
                   backgroundColor: "transparent",
                   border: "1px solid #6846C6",
                   borderRadius: 1,
-                  p: 1.5,
+                  p: 3.5,
                 }}
               >
-                <Grid container spacing={1.5}>
-                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                <Grid container rowSpacing={2.5} columnSpacing={1.5}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      size="small"
+                      select
+                      fullWidth
+                      label="Communication"
+                      name="communication"
+                      value={form.communication}
+                      onChange={handleChange}
+                      required
+                    >
+                      {ratingOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      size="small"
+                      select
+                      fullWidth
+                      label="Technical Skill"
+                      name="technicalSkill"
+                      value={form.technicalSkill}
+                      onChange={handleChange}
+                      required
+                    >
+                      {ratingOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      size="small"
+                      select
+                      fullWidth
+                      label="Programming Language Skill"
+                      name="programmingLanguageSkill"
+                      value={form.programmingLanguageSkill}
+                      onChange={handleChange}
+                      required
+                    >
+                      {ratingOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      size="small"
+                      select
+                      fullWidth
+                      label="Database Skill"
+                      name="databaseSkill"
+                      value={form.databaseSkill}
+                      onChange={handleChange}
+                      required
+                    >
+                      {ratingOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      size="small"
+                      select
+                      fullWidth
+                      label="Attitude Towards Learning New Things"
+                      name="attitudeTowardsLearning"
+                      value={form.attitudeTowardsLearning}
+                      onChange={handleChange}
+                      required
+                    >
+                      {ratingOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      size="small"
+                      select
+                      fullWidth
+                      label="Dev Experience"
+                      name="devExperience"
+                      value={form.devExperience}
+                      onChange={handleChange}
+                      required
+                    >
+                      {ratingOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       size="small"
                       fullWidth
@@ -574,7 +850,7 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                     />
                   </Grid>
 
-                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       size="small"
                       fullWidth
@@ -586,7 +862,7 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                       InputLabelProps={{ shrink: true }}
                     />
                   </Grid>
-                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       size="small"
                       select
@@ -629,14 +905,23 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
         <Box
           sx={{
             display: "flex",
-            justifyContent: "flex-end",
+            alignItems: "center",
+            justifyContent: "space-between",
             gap: 1.5,
             px: { xs: 2.5, sm: 4 },
             py: 2,
             background: "#F8FBFB",
           }}
         >
-          {editId && (
+          <Typography
+            variant="body2"
+            sx={{ color: "#6B7280", minHeight: "1.25em" }}
+          >
+            {saveStatus === "saving" && "Saving…"}
+            {saveStatus === "saved" && "All changes saved."}
+          </Typography>
+
+          <Box sx={{ display: "flex", gap: 1.5 }}>
             <Button
               variant="outlined"
               onClick={onDone}
@@ -645,29 +930,44 @@ function CandidateAssessment({ editingCandidate, onDone }: CandidateAssessmentPr
                 fontWeight: 600,
                 borderColor: "#D9D2EC",
                 color: "#4A5568",
-                minWidth: 300,
+                minWidth: 200,
               }}
             >
               Cancel
             </Button>
-          )}
-          <Button
-            onClick={handleSubmit}
-            variant="contained"
-            sx={{
-              textTransform: "none",
-              fontWeight: 600,
-              background: "#6846C6",
-              boxShadow: "none",
-              minWidth: 300,
-              "&:hover": {
-                background: "#4E2FA8",
+            <Button
+              variant="outlined"
+              onClick={handleSave}
+              disabled={saveStatus === "saving"}
+              sx={{
+                textTransform: "none",
+                fontWeight: 600,
+                borderColor: "#6846C6",
+                color: "#6846C6",
+                minWidth: 200,
+              }}
+            >
+              Save
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              disabled={saveStatus === "saving"}
+              variant="contained"
+              sx={{
+                textTransform: "none",
+                fontWeight: 600,
+                background: "#6846C6",
                 boxShadow: "none",
-              },
-            }}
-          >
-            {editId ? "Update Candidate" : "Add Candidate"}
-          </Button>
+                minWidth: 200,
+                "&:hover": {
+                  background: "#4E2FA8",
+                  boxShadow: "none",
+                },
+              }}
+            >
+              Submit
+            </Button>
+          </Box>
         </Box>
       </Box>
     </Box>

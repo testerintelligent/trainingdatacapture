@@ -20,7 +20,11 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import DownloadIcon from "@mui/icons-material/Download";
 import { exportToExcel } from "./exportToExcel";
 import type { Candidate } from "./CandidateAssessment";
-import { ratingOptions, interviewStatusOptions } from "./CandidateAssessment";
+import {
+  ratingOptions,
+  interviewStatusOptions,
+  getTotalScore,
+} from "./CandidateAssessment";
 import { useElementHeight } from "./useElementHeight";
 
 interface CandidateSummaryProps {
@@ -41,15 +45,20 @@ const tableHeaders = [
   { label: "Database Skill" },
   { label: "Attitude Towards Learning" },
   { label: "Dev Experience" },
+  { label: "Written Test Score" },
+  { label: "Group Discussion Score" },
   { label: "Total Score" },
   { label: "Written Test" },
   { label: "Group Discussion" },
+  { label: "Preliminary Tests Remarks" },
   { label: "L1 Conducted By" },
   { label: "L1 Conducted Date" },
   { label: "L1 Status" },
+  { label: "L1 Remarks" },
   { label: "L2 Conducted By" },
   { label: "L2 Conducted Date" },
   { label: "L2 Status" },
+  { label: "L2 Remarks" },
   { label: "Submitted On" },
   { label: "Last Updated" },
   { label: "Actions" },
@@ -67,15 +76,20 @@ interface CandidateFilters {
   databaseSkill: string;
   attitudeTowardsLearning: string;
   devExperience: string;
+  writtenTestScore: string;
+  groupDiscussionScore: string;
   totalScore: string;
   writtenTestStatus: string;
   groupDiscussionStatus: string;
+  preliminaryTestsRemarks: string;
   l1ConductedBy: string;
   l1ConductedDate: string;
   l1Status: string;
+  l1Remarks: string;
   l2ConductedBy: string;
   l2ConductedDate: string;
   l2Status: string;
+  l2Remarks: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -92,15 +106,20 @@ const emptyFilters: CandidateFilters = {
   databaseSkill: "",
   attitudeTowardsLearning: "",
   devExperience: "",
+  writtenTestScore: "",
+  groupDiscussionScore: "",
   totalScore: "",
   writtenTestStatus: "",
   groupDiscussionStatus: "",
+  preliminaryTestsRemarks: "",
   l1ConductedBy: "",
   l1ConductedDate: "",
   l1Status: "",
+  l1Remarks: "",
   l2ConductedBy: "",
   l2ConductedDate: "",
   l2Status: "",
+  l2Remarks: "",
   createdAt: "",
   updatedAt: "",
 };
@@ -143,14 +162,6 @@ const formatDate = (value?: string) => {
   return `${day}-${month}-${year}`;
 };
 
-const getTotalScore = (c: Candidate) =>
-  c.communication +
-  c.technicalSkill +
-  c.programmingLanguageSkill +
-  c.databaseSkill +
-  c.attitudeTowardsLearning +
-  c.devExperience;
-
 function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProps) {
   const [filters, setFilters] = useState<CandidateFilters>(emptyFilters);
   const [labelRowRef, labelRowHeight] = useElementHeight<HTMLTableRowElement>();
@@ -186,18 +197,28 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
         (!filters.devExperience ||
           String(c.devExperience) === filters.devExperience) &&
         textMatch(String(getTotalScore(c)), filters.totalScore) &&
+        (!filters.writtenTestScore ||
+          String(c.writtenTestScore) === filters.writtenTestScore) &&
+        (!filters.groupDiscussionScore ||
+          String(c.groupDiscussionScore) === filters.groupDiscussionScore) &&
         (!filters.writtenTestStatus ||
           c.writtenTestStatus === filters.writtenTestStatus) &&
         (!filters.groupDiscussionStatus ||
           c.groupDiscussionStatus === filters.groupDiscussionStatus) &&
+        textMatch(
+          c.preliminaryTestsRemarks ?? "",
+          filters.preliminaryTestsRemarks
+        ) &&
         textMatch(c.l1ConductedBy, filters.l1ConductedBy) &&
         (!filters.l1ConductedDate ||
           (c.l1ConductedDate ?? "").slice(0, 10) === filters.l1ConductedDate) &&
         (!filters.l1Status || c.l1Status === filters.l1Status) &&
+        textMatch(c.l1Remarks ?? "", filters.l1Remarks) &&
         textMatch(c.l2ConductedBy, filters.l2ConductedBy) &&
         (!filters.l2ConductedDate ||
           (c.l2ConductedDate ?? "").slice(0, 10) === filters.l2ConductedDate) &&
         (!filters.l2Status || c.l2Status === filters.l2Status) &&
+        textMatch(c.l2Remarks ?? "", filters.l2Remarks) &&
         (!filters.createdAt ||
           (c.createdAt ?? "").slice(0, 10) === filters.createdAt) &&
         (!filters.updatedAt ||
@@ -484,6 +505,48 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
               <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
+                  select
+                  variant="outlined"
+                  value={filters.writtenTestScore}
+                  onChange={setFilter("writtenTestScore")}
+                  fullWidth
+                  SelectProps={{
+                    displayEmpty: true,
+                    renderValue: filterRenderValue,
+                  }}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {ratingOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
+                <TextField
+                  size="small"
+                  select
+                  variant="outlined"
+                  value={filters.groupDiscussionScore}
+                  onChange={setFilter("groupDiscussionScore")}
+                  fullWidth
+                  SelectProps={{
+                    displayEmpty: true,
+                    renderValue: filterRenderValue,
+                  }}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {ratingOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
+                <TextField
+                  size="small"
                   variant="outlined"
                   placeholder="Filter"
                   value={filters.totalScore}
@@ -538,6 +601,16 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   size="small"
                   variant="outlined"
                   placeholder="Filter"
+                  value={filters.preliminaryTestsRemarks}
+                  onChange={setFilter("preliminaryTestsRemarks")}
+                  fullWidth
+                />
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
+                <TextField
+                  size="small"
+                  variant="outlined"
+                  placeholder="Filter"
                   value={filters.l1ConductedBy}
                   onChange={setFilter("l1ConductedBy")}
                   fullWidth
@@ -580,6 +653,16 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                   size="small"
                   variant="outlined"
                   placeholder="Filter"
+                  value={filters.l1Remarks}
+                  onChange={setFilter("l1Remarks")}
+                  fullWidth
+                />
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
+                <TextField
+                  size="small"
+                  variant="outlined"
+                  placeholder="Filter"
                   value={filters.l2ConductedBy}
                   onChange={setFilter("l2ConductedBy")}
                   fullWidth
@@ -616,6 +699,16 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                     </MenuItem>
                   ))}
                 </TextField>
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
+                <TextField
+                  size="small"
+                  variant="outlined"
+                  placeholder="Filter"
+                  value={filters.l2Remarks}
+                  onChange={setFilter("l2Remarks")}
+                  fullWidth
+                />
               </TableCell>
               <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
@@ -682,19 +775,26 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                     {c.attitudeTowardsLearning}
                   </TableCell>
                   <TableCell sx={bodyCellSx}>{c.devExperience}</TableCell>
+                  <TableCell sx={bodyCellSx}>{c.writtenTestScore}</TableCell>
+                  <TableCell sx={bodyCellSx}>{c.groupDiscussionScore}</TableCell>
                   <TableCell sx={bodyCellSx}>{getTotalScore(c)}</TableCell>
                   <TableCell sx={bodyCellSx}>{c.writtenTestStatus}</TableCell>
                   <TableCell sx={bodyCellSx}>{c.groupDiscussionStatus}</TableCell>
+                  <TableCell sx={bodyCellSx}>
+                    {c.preliminaryTestsRemarks}
+                  </TableCell>
                   <TableCell sx={bodyCellSx}>{c.l1ConductedBy}</TableCell>
                   <TableCell sx={bodyCellSx}>
                     {formatDate(c.l1ConductedDate)}
                   </TableCell>
                   <TableCell sx={bodyCellSx}>{c.l1Status}</TableCell>
+                  <TableCell sx={bodyCellSx}>{c.l1Remarks}</TableCell>
                   <TableCell sx={bodyCellSx}>{c.l2ConductedBy}</TableCell>
                   <TableCell sx={bodyCellSx}>
                     {formatDate(c.l2ConductedDate)}
                   </TableCell>
                   <TableCell sx={bodyCellSx}>{c.l2Status}</TableCell>
+                  <TableCell sx={bodyCellSx}>{c.l2Remarks}</TableCell>
                   <TableCell sx={bodyCellSx}>
                     {c.createdAt ? new Date(c.createdAt).toLocaleString() : ""}
                   </TableCell>

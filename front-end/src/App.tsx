@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import {
   Container,
@@ -78,8 +78,12 @@ function App() {
     projectName: projectNameOptions[0],
   });
   const [editId, setEditId] = useState<string | null>(null);
+  const [section, setSection] = useState<"home" | "training" | "hiring">(
+    "home"
+  );
+  const [showHome, setShowHome] = useState(true);
   const [showTable, setShowTable] = useState(false);
-  const [showForm, setShowForm] = useState(true);
+  const [showForm, setShowForm] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [showExecutive, setShowExecutive] = useState(false);
   const [showRecruitment, setShowRecruitment] = useState(false);
@@ -88,6 +92,37 @@ function App() {
 
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [editingCandidate, setEditingCandidate] = useState<Candidate | null>(null);
+  // The most recently Saved-but-not-yet-Submitted/Cancelled candidate.
+  // Kept here (rather than inside CandidateAssessment) so it survives
+  // navigating away from and back to the Candidate Assessment page.
+  const [draftCandidate, setDraftCandidate] = useState<Candidate | null>(null);
+  // True only while draftCandidate is a record that was freshly created
+  // by Save this session and never Submitted (finalized) — never true for
+  // a pre-existing candidate opened via "Edit". Used to decide whether the
+  // record is safe to delete from the backend if the browser reloads.
+  const [isEphemeralDraft, setIsEphemeralDraft] = useState(false);
+  const draftCandidateRef = useRef<Candidate | null>(null);
+  const isEphemeralDraftRef = useRef(false);
+  useEffect(() => {
+    draftCandidateRef.current = draftCandidate;
+    isEphemeralDraftRef.current = isEphemeralDraft;
+  }, [draftCandidate, isEphemeralDraft]);
+
+  // If the browser is reloaded/closed while an unfinalized draft candidate
+  // (created via Save, never Submitted) is in play, delete it from the
+  // backend too instead of leaving an orphaned record behind.
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      const draft = draftCandidateRef.current;
+      if (draft?._id && isEphemeralDraftRef.current) {
+        const url = `${process.env.REACT_APP_API_BASE_URL}/api/candidates/${draft._id}`;
+        fetch(url, { method: "DELETE", keepalive: true }).catch(() => {});
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, []);
+
   const [trainingLabelRowRef, trainingLabelRowHeight] =
     useElementHeight<HTMLTableRowElement>();
 
@@ -100,8 +135,18 @@ function App() {
     fetchCandidates();
   }, []);
 
+  const handleCandidateSaved = (candidate: Candidate, isNewRecord: boolean) => {
+    setDraftCandidate(candidate);
+    if (isNewRecord) {
+      setIsEphemeralDraft(true);
+    }
+  };
+
   const handleCandidateEdit = (candidate: Candidate) => {
     setEditingCandidate(candidate);
+    setDraftCandidate(candidate);
+    setIsEphemeralDraft(false);
+    setSection("hiring");
     setShowRecruitment(true);
     setShowCandidateSummary(false);
     setShowSelectedCandidates(false);
@@ -119,6 +164,9 @@ function App() {
   const handleCandidateDone = () => {
     fetchCandidates();
     setEditingCandidate(null);
+    setDraftCandidate(null);
+    setIsEphemeralDraft(false);
+    setSection("hiring");
     setShowCandidateSummary(true);
     setShowSelectedCandidates(false);
     setShowRecruitment(false);
@@ -292,6 +340,7 @@ function App() {
   );
 
   const resetViews = () => {
+    setShowHome(false);
     setShowForm(false);
     setShowTable(false);
     setShowSummary(false);
@@ -301,14 +350,22 @@ function App() {
     setShowSelectedCandidates(false);
   };
 
+  const handleGoHome = () => {
+    resetViews();
+    setSection("home");
+    setShowHome(true);
+  };
+
   const navItems = [
     {
       key: "form",
       label: "Add Training",
       icon: <AddCircleIcon />,
       active: showForm,
+      section: "training" as const,
       onClick: () => {
         resetViews();
+        setSection("training");
         setShowForm(true);
         handleOpen();
       },
@@ -318,8 +375,10 @@ function App() {
       label: "Training Summary",
       icon: <DashboardIcon />,
       active: showTable,
+      section: "training" as const,
       onClick: () => {
         resetViews();
+        setSection("training");
         setShowTable(true);
       },
     },
@@ -328,8 +387,10 @@ function App() {
       label: "Completion Summary",
       icon: <AssessmentIcon />,
       active: showSummary,
+      section: "training" as const,
       onClick: () => {
         resetViews();
+        setSection("training");
         setShowSummary(true);
       },
     },
@@ -338,8 +399,10 @@ function App() {
       label: "Executive Dashboard",
       icon: <TrendingUpIcon />,
       active: showExecutive,
+      section: "training" as const,
       onClick: () => {
         resetViews();
+        setSection("training");
         setShowExecutive(true);
       },
     },
@@ -348,9 +411,11 @@ function App() {
       label: "Candidate Assessment",
       icon: <HowToRegIcon />,
       active: showRecruitment,
+      section: "hiring" as const,
       onClick: () => {
-        setEditingCandidate(null);
+        setEditingCandidate(draftCandidate);
         resetViews();
+        setSection("hiring");
         setShowRecruitment(true);
       },
     },
@@ -359,8 +424,10 @@ function App() {
       label: "Candidate Summary",
       icon: <SummarizeIcon />,
       active: showCandidateSummary,
+      section: "hiring" as const,
       onClick: () => {
         resetViews();
+        setSection("hiring");
         setShowCandidateSummary(true);
       },
     },
@@ -369,24 +436,43 @@ function App() {
       label: "Selected Candidates",
       icon: <CheckCircleIcon />,
       active: showSelectedCandidates,
+      section: "hiring" as const,
       onClick: () => {
         resetViews();
+        setSection("hiring");
         setShowSelectedCandidates(true);
       },
     },
   ];
 
+  const visibleNavItems = navItems.filter((item) => item.section === section);
+
   return (
     <div className="app-flex-root">
       <aside className="side-menu">
-        <Box className="sidebar-brand">
-          <Avatar className="sidebar-brand-avatar">
-            <WorkspacePremiumIcon sx={{ fontSize: 20 }} />
-          </Avatar>
-        </Box>
+        <Tooltip title="Home" placement="right" enterDelay={300}>
+          <Box
+            component="button"
+            type="button"
+            aria-label="Home"
+            onClick={handleGoHome}
+            className="sidebar-brand"
+            sx={{
+              border: "none",
+              background: "transparent",
+              cursor: "pointer",
+              font: "inherit",
+              p: 0,
+            }}
+          >
+            <Avatar className="sidebar-brand-avatar">
+              <WorkspacePremiumIcon sx={{ fontSize: 20 }} />
+            </Avatar>
+          </Box>
+        </Tooltip>
 
         <nav className="sidebar-nav">
-          {navItems.map((item) => (
+          {visibleNavItems.map((item) => (
             <Tooltip key={item.key} title={item.label} placement="right" enterDelay={300}>
               <Box
                 component="button"
@@ -411,6 +497,143 @@ function App() {
             px: "8px", // 2px gap between left and right
           }}
         >
+          {showHome && (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: "calc(100vh - 80px)",
+                width: "100%",
+                px: 2,
+              }}
+            >
+              <Box sx={{ width: "100%", maxWidth: 832 }}>
+                <Typography
+                  variant="h5"
+                  sx={{ color: "#6846C6", fontWeight: 700, mb: 0.5 }}
+                >
+                  Welcome
+                </Typography>
+                <Typography variant="body2" sx={{ color: "#6B7280", mb: 3 }}>
+                  Choose where you'd like to go
+                </Typography>
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns:
+                      "repeat(auto-fit, minmax(280px, 1fr))",
+                    gap: "31px",
+                  }}
+                >
+                  <Box
+                    onClick={() => {
+                      setEditingCandidate(draftCandidate);
+                      resetViews();
+                      setSection("hiring");
+                      setShowRecruitment(true);
+                    }}
+                    sx={{
+                      cursor: "pointer",
+                      background: "#ffffff",
+                      borderRadius: 4,
+                      border: "1px solid #E7E3F1",
+                      boxShadow: "0 4px 24px rgba(0, 106, 113, 0.08)",
+                      p: 5.2,
+                      textAlign: "center",
+                      transition:
+                        "transform 0.15s ease, box-shadow 0.15s ease",
+                      "&:hover": {
+                        transform: "translateY(-4px)",
+                        boxShadow: "0 8px 28px rgba(104, 70, 198, 0.18)",
+                      },
+                    }}
+                  >
+                    <Avatar
+                      sx={{
+                        bgcolor: "#F0EBFB",
+                        color: "#6846C6",
+                        width: 73,
+                        height: 73,
+                        mx: "auto",
+                        mb: 2,
+                      }}
+                    >
+                      <HowToRegIcon sx={{ fontSize: 31 }} />
+                    </Avatar>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: 700,
+                        color: "#1B1339",
+                        fontSize: "1.625rem",
+                      }}
+                    >
+                      Hiring
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "#6B7280", mt: 0.5, fontSize: "1.14rem" }}
+                    >
+                      Assess and manage candidates
+                    </Typography>
+                  </Box>
+                  <Box
+                    onClick={() => {
+                      resetViews();
+                      setSection("training");
+                      setShowForm(true);
+                      handleOpen();
+                    }}
+                    sx={{
+                      cursor: "pointer",
+                      background: "#ffffff",
+                      borderRadius: 4,
+                      border: "1px solid #E7E3F1",
+                      boxShadow: "0 4px 24px rgba(0, 106, 113, 0.08)",
+                      p: 5.2,
+                      textAlign: "center",
+                      transition:
+                        "transform 0.15s ease, box-shadow 0.15s ease",
+                      "&:hover": {
+                        transform: "translateY(-4px)",
+                        boxShadow: "0 8px 28px rgba(104, 70, 198, 0.18)",
+                      },
+                    }}
+                  >
+                    <Avatar
+                      sx={{
+                        bgcolor: "#F0EBFB",
+                        color: "#6846C6",
+                        width: 73,
+                        height: 73,
+                        mx: "auto",
+                        mb: 2,
+                      }}
+                    >
+                      <SchoolIcon sx={{ fontSize: 31 }} />
+                    </Avatar>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: 700,
+                        color: "#1B1339",
+                        fontSize: "1.625rem",
+                      }}
+                    >
+                      Training
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "#6B7280", mt: 0.5, fontSize: "1.14rem" }}
+                    >
+                      Add and track employee training
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+          )}
           {showTable && (
             <>
               <Box
@@ -1350,6 +1573,7 @@ function App() {
             <CandidateAssessment
               editingCandidate={editingCandidate}
               onDone={handleCandidateDone}
+              onSaved={handleCandidateSaved}
             />
           )}
           {showCandidateSummary && (
