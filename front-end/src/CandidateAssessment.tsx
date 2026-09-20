@@ -736,7 +736,7 @@ function CandidateAssessment({
                     />
                   </Grid>
 
-                  <Grid size={{ xs: 12, sm: 6 }}>
+                  <Grid size={12}>
                     <TextField
                       size="small"
                       select
@@ -935,7 +935,7 @@ function CandidateAssessment({
                       InputLabelProps={{ shrink: true }}
                     />
                   </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
+                  <Grid size={12}>
                     <TextField
                       size="small"
                       select
