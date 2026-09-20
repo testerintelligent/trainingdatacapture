@@ -43,21 +43,5 @@ pipeline {
                 }
             }
         }
-
-        stage('Insert Data') {
-            steps {
-                script {
-                    // Back-end API port (5002) is host-mapped the same way as
-                    // the frontend's 8002 in docker-compose.yml, on the same host.
-                    def apiHost = params.ENVIRONMENT == 'dev' ? '127.0.0.1:5002' : '10.192.190.158:5002'
-                    echo "Seeding sample training and candidate data via API_BASE_URL=http://${apiHost}"
-                    sh """
-                     cd testing
-                     npm install
-                     API_BASE_URL=http://${apiHost} npm run seed
-                    """
-                }
-            }
-        }
     }
 }
