@@ -88,6 +88,24 @@ const candidateSchema = new mongoose.Schema({
 }, { timestamps: true });
 const Candidate = recruitmentConnection.model('Candidate', candidateSchema);
 
+// Login Endpoint
+// No user database exists yet, so credentials are validated against a single
+// configurable demo account (defaults to demo/1234, matching the front-end's
+// pre-filled login form) rather than a per-user lookup.
+const DEMO_LOGIN_ID = process.env.DEMO_LOGIN_ID || 'demo';
+const DEMO_LOGIN_PASSWORD = process.env.DEMO_LOGIN_PASSWORD || '1234';
+
+app.post('/api/login', async (req, res) => {
+  const { loginId, password } = req.body || {};
+  if (!loginId || !password) {
+    return res.status(400).json({ error: 'Login ID and password are required.' });
+  }
+  if (loginId !== DEMO_LOGIN_ID || password !== DEMO_LOGIN_PASSWORD) {
+    return res.status(401).json({ error: 'Invalid login ID or password.' });
+  }
+  res.json({ success: true, message: 'Login successful.' });
+});
+
 // CRUD Endpoints
 app.get('/api/trainings', async (req, res) => {
   const trainings = await Training.find();
@@ -258,6 +276,7 @@ const swaggerOptions = {
       { url: `${process.env.REACT_APP_API_BASE_URL || 'http://localhost'}:${process.env.PORT || 5002}` }
     ],
     tags: [
+      { name: 'Auth', description: 'Login and authentication' },
       { name: 'Trainings', description: 'Operations related to employee training records' },
       { name: 'Candidates', description: 'Operations related to candidate assessment records' }
     ]
@@ -282,6 +301,60 @@ if (swaggerSpec) {
 }
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     LoginRequest:
+ *       type: object
+ *       required:
+ *         - loginId
+ *         - password
+ *       properties:
+ *         loginId:
+ *           type: string
+ *           example: demo
+ *         password:
+ *           type: string
+ *           format: password
+ *           example: '1234'
+ *     LoginResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         message:
+ *           type: string
+ *           example: Login successful.
+ */
+
+/**
+ * @swagger
+ * /api/login:
+ *   post:
+ *     summary: Log in with the demo credentials
+ *     description: Validates loginId/password against the demo account (default login ID "demo", password "1234", configurable via the DEMO_LOGIN_ID/DEMO_LOGIN_PASSWORD environment variables). No session or token is issued; the front-end treats a 200 response as authenticated.
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/LoginRequest'
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/LoginResponse'
+ *       400:
+ *         description: Login ID and/or password missing from the request body
+ *       401:
+ *         description: Invalid login ID or password
+ */
 
 /**
  * @swagger

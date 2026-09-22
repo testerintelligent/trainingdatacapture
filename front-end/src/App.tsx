@@ -464,6 +464,7 @@ function App() {
         onLogin={() => {
           sessionStorage.setItem("isAuthenticated", "true");
           setIsAuthenticated(true);
+          handleGoHome();
         }}
       />
     );

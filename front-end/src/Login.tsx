@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Box,
   Paper,
@@ -43,19 +44,20 @@ function Login({ onLogin }: LoginProps) {
     setError("");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-    // Small delay so the submit transitions feel fluid rather than an instant snap.
-    setTimeout(() => {
-      if (loginId === DEFAULT_LOGIN_ID && password === DEFAULT_PASSWORD) {
-        onLogin();
-      } else {
-        setLoading(false);
-        setError("Invalid login ID or password.");
-      }
-    }, 450);
+    try {
+      await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/login`, {
+        loginId,
+        password,
+      });
+      onLogin();
+    } catch (err) {
+      setLoading(false);
+      setError("Invalid login ID or password.");
+    }
   };
 
   return (
