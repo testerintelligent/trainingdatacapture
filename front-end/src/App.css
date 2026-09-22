@@ -123,6 +123,15 @@ body {
   flex: 0 0 auto;
 }
 
+.sidebar-logout {
+  margin-top: auto;
+}
+
+.sidebar-logout:hover {
+  background: rgba(239, 83, 80, 0.16);
+  color: #ff8a80;
+}
+
 .nav-icon .MuiSvgIcon-root {
   font-size: 1.3rem;
 }
@@ -241,6 +250,11 @@ body {
     gap: 4px;
     width: 100%;
     justify-content: space-between;
+  }
+  .sidebar-logout {
+    margin-top: 0;
+    margin-left: auto;
+    flex: 0 0 auto;
   }
   .nav-item-active::before {
     left: 10%;

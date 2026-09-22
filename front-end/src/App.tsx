@@ -20,6 +20,7 @@ import {
   Grid,
   Divider,
   Avatar,
+  Fade,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -33,7 +34,9 @@ import SummarizeIcon from "@mui/icons-material/Summarize";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import DownloadIcon from "@mui/icons-material/Download";
+import LogoutIcon from "@mui/icons-material/Logout";
 import { exportToExcel } from "./exportToExcel";
+import Login from "./Login";
 import ExecutiveDashboard from "./ExecutiveDashboard";
 import CandidateAssessment, { Candidate } from "./CandidateAssessment";
 import CandidateSummary from "./CandidateSummary";
@@ -64,6 +67,9 @@ const ROWS_PER_PAGE = 10;
 const COMPLETION_ROWS_PER_PAGE = 10;
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    () => sessionStorage.getItem("isAuthenticated") === "true"
+  );
   const [trainings, setTrainings] = useState<Training[]>([]);
   const [form, setForm] = useState<Training>({
     empId: "",
@@ -356,6 +362,11 @@ function App() {
     setShowHome(true);
   };
 
+  const handleLogout = () => {
+    sessionStorage.removeItem("isAuthenticated");
+    setIsAuthenticated(false);
+  };
+
   const navItems = [
     {
       key: "form",
@@ -447,7 +458,19 @@ function App() {
 
   const visibleNavItems = navItems.filter((item) => item.section === section);
 
+  if (!isAuthenticated) {
+    return (
+      <Login
+        onLogin={() => {
+          sessionStorage.setItem("isAuthenticated", "true");
+          setIsAuthenticated(true);
+        }}
+      />
+    );
+  }
+
   return (
+    <Fade in timeout={400}>
     <div className="app-flex-root">
       <aside className="side-menu">
         <Tooltip title="Home" placement="right" enterDelay={300}>
@@ -486,6 +509,20 @@ function App() {
             </Tooltip>
           ))}
         </nav>
+
+        <Tooltip title="Logout" placement="right" enterDelay={300}>
+          <Box
+            component="button"
+            type="button"
+            aria-label="Logout"
+            onClick={handleLogout}
+            className="nav-item sidebar-logout"
+          >
+            <span className="nav-icon">
+              <LogoutIcon />
+            </span>
+          </Box>
+        </Tooltip>
       </aside>
 
       <main className="main-content-flex">
@@ -1589,6 +1626,7 @@ function App() {
         </Container>
       </main>
     </div>
+    </Fade>
   );
 }
 
