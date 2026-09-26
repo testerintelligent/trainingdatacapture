@@ -18,19 +18,13 @@ require('dotenv').config({
 });
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect(process.env.MONGODB_URI);
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', () => console.log('Connected to MongoDB - trainingData'));
 
 // Separate MongoDB connection for the recruitment database
-const recruitmentConnection = mongoose.createConnection(process.env.RECRUITMENT_MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+const recruitmentConnection = mongoose.createConnection(process.env.RECRUITMENT_MONGODB_URI);
 recruitmentConnection.on('error', console.error.bind(console, 'MongoDB connection error (recruitment):'));
 recruitmentConnection.once('open', () => console.log('Connected to MongoDB - recruitment'));
 
