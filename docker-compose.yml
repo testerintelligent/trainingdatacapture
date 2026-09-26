@@ -43,10 +43,9 @@
 
 
     newman:
-      image: postman/newman:latest
+      build:
+        context: ./collections
       network_mode: "host"
-      volumes:
-        - ./collections:/etc/newman
       entrypoint:
         - newman
         - run
