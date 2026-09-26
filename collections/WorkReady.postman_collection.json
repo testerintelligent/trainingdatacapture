@@ -1,0 +1,323 @@
+{
+  "info": {
+    "_postman_id": "2c889dea-6aa6-4f93-aa47-067094157525",
+    "name": "WorkReady",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "27551199"
+  },
+  "item": [
+    {
+      "name": "createEmployeeRecord",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "function isExpired(token) {",
+              "    try {",
+              "        const payload = JSON.parse(atob(token.split(\".\")[1]));",
+              "        return Date.now() >= payload.exp * 1000;",
+              "    } catch (e) {",
+              "        return true; // unreadable token -> treat as expired",
+              "    }",
+              "}",
+              "",
+              "const existingToken = pm.environment.get(\"token\");",
+              "",
+              "if (!existingToken || isExpired(existingToken)) {",
+              "    pm.sendRequest({",
+              "        url: pm.environment.get(\"URL\") + \":5002/api/login\",",
+              "        method: \"POST\",",
+              "        header: { \"Content-Type\": \"application/json\" },",
+              "        body: {",
+              "            mode: \"raw\",",
+              "            raw: JSON.stringify({ loginId: \"demo\", password: \"1234\" })",
+              "        }",
+              "    }, function (err, res) {",
+              "        if (err) {",
+              "            console.error(\"Login failed:\", err);",
+              "        } else {",
+              "            pm.environment.set(\"token\", res.json().token);",
+              "        }",
+              "    });",
+              "}",
+              "const moment = require('moment');",
+              "",
+              "// Pull a random past timestamp and format it",
+              "let randomPastDate = pm.variables.replaceIn('{{$randomDatePast}}');",
+              "let formattedDate = moment(randomPastDate).format(\"YYYY-MM-DD\");",
+              "pm.variables.set(\"randomDate\", formattedDate);",
+              "",
+              "",
+              "",
+              "// Your list of static choices",
+              "var projectName  = [\"ABC\", \"CDE\", \"EFG\",\"HIJ\",\"KLM\"];",
+              "// Pick one randomly",
+              "var randomProject = _.sample(projectName);",
+              "// Set it to an environment or local variable",
+              "pm.environment.set(\"chosenProject\", randomProject);",
+              "",
+              "// Your list of COURCE choices",
+              "var coursetName  = [\"AI\", \"PYTHON\", \"PLAYWRIGHT\",\"GUIDEWIRE\"];",
+              "// Pick one randomly",
+              "var randomCourse = _.sample(coursetName);",
+              "// Set it to an environment or local variable",
+              "pm.environment.set(\"chosenCourse\", randomCourse);",
+              "",
+              "",
+              "// Your list of Training Type choices",
+              "var trainingType  = [\"Udemy\",\"Coursera\", \"Virtual\",\"Classroom\"];",
+              "// Pick one randomly",
+              "var randomTrainingType = _.sample(trainingType);",
+              "// Set it to an environment or local variable",
+              "pm.environment.set(\"chosenTrainingType\", randomTrainingType);",
+              "",
+              "",
+              "// Your list of static choices",
+              "var userRoles = [\"Completed\", \"In Progress\", \"Not Started\"];",
+              "// Pick one randomly",
+              "var randomRole = _.sample(userRoles);",
+              "// Set it to an environment or local variable",
+              "pm.environment.set(\"chosenRole\", randomRole);",
+              "",
+              "",
+              "// Pick the status first",
+              "const statuses = [\"Not Started\", \"In Progress\", \"Completed\"];",
+              "const chosenRole = statuses[Math.floor(Math.random() * statuses.length)];",
+              "pm.variables.set(\"chosenRole\", chosenRole);",
+              "",
+              "// Set percentCompleted based on status",
+              "//let chosenRole;",
+              "let percent;",
+              "if (chosenRole === \"Not Started\") {",
+              "    percent = 0;",
+              "} else if (chosenRole === \"Completed\") {",
+              "    percent = 100;   // optional: completed = 100",
+              "} else {",
+              "    percent = Math.floor(Math.random() * 100) + 1;  // 1 to 100",
+              "}",
+              "pm.variables.set(\"random_1_to_100\", percent);",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test(\"Successful POST request\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([201, 202]);",
+              "});",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"empId\": \"TG-{{$randomInt}}\",\n    \"employeeName\": \"{{$randomFullName}}\",\n    \"course\": \"{{chosenCourse}}\",\n    \"startDate\": \"{{randomDate}}\",\n    \"endDate\": \"{{randomDate}}\",\n    \"status\": \"{{chosenRole}}\",\n    \"trainerName\": \"{{$randomFullName}}\",\n    \"trainingType\": \"{{chosenTrainingType}}\",\n    \"percentCompleted\": {{random_1_to_100}},\n    \"projectName\": \"{{chosenProject}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{URL}}:5002/api/trainings/",
+          "host": [
+            "{{URL}}"
+          ],
+          "port": "5002",
+          "path": [
+            "api",
+            "trainings",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "createCandidate",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "function isExpired(token) {",
+              "    try {",
+              "        const payload = JSON.parse(atob(token.split(\".\")[1]));",
+              "        return Date.now() >= payload.exp * 1000;",
+              "    } catch (e) {",
+              "        return true; // unreadable token -> treat as expired",
+              "    }",
+              "}",
+              "",
+              "const existingToken = pm.environment.get(\"token\");",
+              "",
+              "if (!existingToken || isExpired(existingToken)) {",
+              "    pm.sendRequest({",
+              "        url: pm.environment.get(\"URL\") + \":5002/api/login\",",
+              "        method: \"POST\",",
+              "        header: { \"Content-Type\": \"application/json\" },",
+              "        body: {",
+              "            mode: \"raw\",",
+              "            raw: JSON.stringify({ loginId: \"demo\", password: \"1234\" })",
+              "        }",
+              "    }, function (err, res) {",
+              "        if (err) {",
+              "            console.error(\"Login failed:\", err);",
+              "        } else {",
+              "            pm.environment.set(\"token\", res.json().token);",
+              "        }",
+              "    });",
+              "}",
+              "",
+              "",
+              "",
+              "const moment = require('moment');",
+              "",
+              "// Pull a random past timestamp and format it",
+              "let randomPastDate = pm.variables.replaceIn('{{$randomDatePast}}');",
+              "let formattedDate = moment(randomPastDate).format(\"YYYY-MM-DD\");",
+              "pm.variables.set(\"randomDate\", formattedDate);",
+              "",
+              "// Your list of static choices",
+              "var userDepartment = [\"CSE\", \"IT\", \"ECE\"];",
+              "var randomDepartment = _.sample(userDepartment);",
+              "pm.environment.set(\"chosenDepartment\", randomDepartment);",
+              "",
+              "// Your list of static choices",
+              "var userL1Status = [\"Selected\", \"Not Selected\", \"On Hold\"];",
+              "var randomL1Status = _.sample(userL1Status);",
+              "pm.environment.set(\"chosenL1Status\", randomL1Status);",
+              "",
+              "// Your list of static choices",
+              "var userL2Status = [\"Selected\", \"Not Selected\", \"On Hold\"];",
+              "var randomL2Status = _.sample(userL2Status);",
+              "pm.environment.set(\"chosenL2Status\", randomL2Status);",
+              "",
+              "// Generate a random integer between 1 and 5 (inclusive)",
+              "const randomNumber = _.random(1, 5);",
+              "// Save it as a local variable for the current request",
+              "pm.variables.set(\"random_1_to_5\", randomNumber);",
+              "",
+              "// Generate a random integer between 1 and 5 (inclusive)",
+              "const randomNumber1 = _.random(1, 5);",
+              "// Save it as a local variable for the current request",
+              "pm.variables.set(\"random1_1_to_5\", randomNumber1);",
+              "",
+              "// Generate a random integer between 1 and 5 (inclusive)",
+              "const randomNumber2 = _.random(1, 5);",
+              "// Save it as a local variable for the current request",
+              "pm.variables.set(\"random2_1_to_5\", randomNumber2);",
+              "",
+              "// Generate a random integer between 1 and 5 (inclusive)",
+              "const randomNumber3 = _.random(1, 5);",
+              "// Save it as a local variable for the current request",
+              "pm.variables.set(\"random3_1_to_5\", randomNumber3);",
+              "",
+              "// Generate a random integer between 1 and 5 (inclusive)",
+              "const randomNumber4 = _.random(1, 5);",
+              "// Save it as a local variable for the current request",
+              "pm.variables.set(\"random4_1_to_5\", randomNumber4);",
+              "",
+              "",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Successful POST request\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([201, 202]);",
+              "});",
+              "",
+              "pm.test(\"Response time is less than 200ms\", function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(200);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"candidateId\": \"BUACS-{{$randomInt}}\",\n    \"candidateName\": \"{{$randomFullName}}\",\n    \"candidateEmail\": \"{{$randomEmail}}\",\n    \"course\": \"BE\",\n    \"department\": \"{{chosenDepartment}}\",    \n    \"writtenTestScore\": {{random_1_to_5}},\n    \"groupDiscussionScore\": {{random1_1_to_5}},\n    \"writtenTestStatus\": \"{{chosenL1Status}}\",\n    \"groupDiscussionStatus\": \"{{chosenL1Status}}\",\n    \"preliminaryTestsRemarks\": \"{{$randomAlphaNumeric}}\",\n    \"l1Communication\": {{random2_1_to_5}},\n    \"l1TechnicalSkill\": {{random3_1_to_5}},\n    \"l1ProgrammingLanguageSkill\": {{random4_1_to_5}},\n    \"l1DatabaseSkill\": {{random1_1_to_5}},\n    \"l1AttitudeTowardsLearning\": {{random2_1_to_5}},\n    \"l1DevExperience\": {{random3_1_to_5}},\n    \"l1Score\": {{random4_1_to_5}},\n    \"l1ConductedBy\": \"{{$randomFullName}}\",\n    \"l1ConductedDate\": \"{{randomDate}}\",\n    \"l1Status\": \"{{chosenL1Status}}\",\n    \"l1Remarks\": \"{{$randomAlphaNumeric}}\",\n    \"l2Communication\": {{random4_1_to_5}},\n    \"l2TechnicalSkill\": {{random3_1_to_5}},\n    \"l2ProgrammingLanguageSkill\": {{random_1_to_5}},\n    \"l2DatabaseSkill\": {{random1_1_to_5}},\n    \"l2AttitudeTowardsLearning\": {{random2_1_to_5}},\n    \"l2DevExperience\": {{random1_1_to_5}},\n    \"l2Score\": {{random4_1_to_5}},\n    \"l2ConductedBy\": \"{{$randomFullName}}\",\n    \"l2ConductedDate\": \"{{randomDate}}\",\n    \"l2Status\": \"{{chosenL2Status}}\",\n    \"l2Remarks\": \"{{$randomAlphaNumeric}}\"\n\n}"
+        },
+        "url": {
+          "raw": "{{URL}}:5002/api/candidates/",
+          "host": [
+            "{{URL}}"
+          ],
+          "port": "5002",
+          "path": [
+            "api",
+            "candidates",
+            ""
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
