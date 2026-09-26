@@ -40,7 +40,24 @@
         - "27019:27017"
       networks:
         - training-mern-network
-      
+
+
+    newman:
+      image: postman/newman:latest
+      network_mode: "host"
+      volumes:
+        - ./collections:/etc/newman
+      entrypoint:
+        - newman
+        - run
+        - WorkReady.postman_collection.json
+        - -e
+        - workReady-Local.postman_environment.json
+      profiles:
+        - test
+      depends_on:
+        - backend
+
   networks:
     training-mern-network:
       driver: bridge

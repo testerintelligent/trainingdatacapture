@@ -35,6 +35,14 @@ pipeline {
             }
         }
 
+        stage('Run API Tests (Newman)') {
+            steps {
+                sh """
+                 echo "Running Postman collection with Newman" | sudo -S docker compose --profile test run --rm newman
+                """
+            }
+        }
+
         stage('Display URL') {
             steps {
                 script {
