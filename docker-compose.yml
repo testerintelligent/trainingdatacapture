@@ -56,6 +56,8 @@
         - test
       depends_on:
         - backend
+      networks:
+        - training-mern-network
 
   networks:
     training-mern-network:
