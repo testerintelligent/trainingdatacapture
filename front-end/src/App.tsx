@@ -579,10 +579,11 @@ function App() {
                       boxShadow: "0 4px 24px rgba(0, 106, 113, 0.08)",
                       p: 5.2,
                       textAlign: "center",
+                      animation: "zoomInCard 1s ease-out backwards",
                       transition:
                         "transform 0.15s ease, box-shadow 0.15s ease",
                       "&:hover": {
-                        transform: "translateY(-4px)",
+                        transform: "translateY(-4px) scale(1.05)",
                         boxShadow: "0 8px 28px rgba(104, 70, 198, 0.18)",
                       },
                     }}
@@ -631,10 +632,12 @@ function App() {
                       boxShadow: "0 4px 24px rgba(0, 106, 113, 0.08)",
                       p: 5.2,
                       textAlign: "center",
+                      animation:
+                        "zoomInCard 1s ease-out 0.15s backwards",
                       transition:
                         "transform 0.15s ease, box-shadow 0.15s ease",
                       "&:hover": {
-                        transform: "translateY(-4px)",
+                        transform: "translateY(-4px) scale(1.05)",
                         boxShadow: "0 8px 28px rgba(104, 70, 198, 0.18)",
                       },
                     }}
