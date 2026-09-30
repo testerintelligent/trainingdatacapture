@@ -37,9 +37,15 @@ pipeline {
 
         stage('Run API Tests (Newman)') {
             steps {
-                sh """
-                 echo "Running Postman collection with Newman" | sudo -S docker compose --profile test run --build --rm newman
-                """
+                script {
+                    // Map the Jenkins choice ('dev'/'prod') to the Postman environment
+                    // file suffix, so newman uses workReady-Local or workReady-Remote.
+                    def newmanEnv = params.ENVIRONMENT == 'dev' ? 'Local' : 'Remote'
+                    echo "Running Newman with NEWMAN_ENV=${newmanEnv}"
+                    sh """
+                     echo "Running Postman collection with Newman" | sudo -S NEWMAN_ENV=${newmanEnv} docker compose --profile test run --build --rm newman
+                    """
+                }
             }
         }
 

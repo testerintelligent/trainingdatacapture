@@ -51,9 +51,9 @@
         - run
         - WorkReady.postman_collection.json
         - -e
-        - workReady-Local.postman_environment.json
+        - workReady-${NEWMAN_ENV:-Local}.postman_environment.json
         - -n
-        - "50"
+        - "100"
       profiles:
         - test
       depends_on:
