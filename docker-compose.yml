@@ -52,6 +52,8 @@
         - WorkReady.postman_collection.json
         - -e
         - workReady-Local.postman_environment.json
+        - -n
+        - "20"
       profiles:
         - test
       depends_on:
