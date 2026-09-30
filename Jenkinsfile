@@ -7,7 +7,8 @@ pipeline {
     parameters {
         choice(
             name: 'ENVIRONMENT',
-            choices: ['prod', 'dev'],   // first value = default, so prod is default
+            // 'newman-dev'/'newman-prod' skip the build/deploy and only run the newman service.
+            choices: ['prod', 'dev', 'newman-dev', 'newman-prod'],   // first value = default, so prod is default
             description: 'Select the deployment environment'
         )
     }
@@ -20,6 +21,9 @@ pipeline {
         }
 
         stage('Build and Run Containers') {
+            when {
+                expression { !params.ENVIRONMENT.startsWith('newman-') }
+            }
             steps {
                 script {
                     // Map the Jenkins choice ('dev'/'prod') to the NODE_ENV value
@@ -38,9 +42,9 @@ pipeline {
         stage('Run API Tests (Newman)') {
             steps {
                 script {
-                    // Map the Jenkins choice ('dev'/'prod') to the Postman environment
-                    // file suffix, so newman uses workReady-Local or workReady-Remote.
-                    def newmanEnv = params.ENVIRONMENT == 'dev' ? 'Local' : 'Remote'
+                    // Map the Jenkins choice ('dev'/'prod'/'newman-dev'/'newman-prod') to the
+                    // Postman environment file suffix, so newman uses workReady-Local or workReady-Remote.
+                    def newmanEnv = (params.ENVIRONMENT in ['dev', 'newman-dev']) ? 'Local' : 'Remote'
                     echo "Running Newman with NEWMAN_ENV=${newmanEnv}"
                     sh """
                      echo "Running Postman collection with Newman" | sudo -S NEWMAN_ENV=${newmanEnv} docker compose --profile test run --build --rm newman
@@ -50,6 +54,9 @@ pipeline {
         }
 
         stage('Display URL') {
+            when {
+                expression { !params.ENVIRONMENT.startsWith('newman-') }
+            }
             steps {
                 script {
                     def url = params.ENVIRONMENT == 'dev' ? '127.0.0.1:8002' : '10.192.190.158:8002'
