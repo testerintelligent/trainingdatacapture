@@ -53,7 +53,7 @@
         - -e
         - workReady-Local.postman_environment.json
         - -n
-        - "20"
+        - "50"
       profiles:
         - test
       depends_on:
