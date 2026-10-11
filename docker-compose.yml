@@ -53,7 +53,7 @@
         - -e
         - workReady-${NEWMAN_ENV:-Local}.postman_environment.json
         - -n
-        - "100"
+        - "1000"
       profiles:
         - test
       depends_on:
