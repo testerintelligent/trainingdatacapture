@@ -15,6 +15,7 @@ import HowToRegIcon from "@mui/icons-material/HowToReg";
 export interface Candidate {
   _id?: string;
   candidateId: string;
+  empId?: string;
   candidateName: string;
   candidateEmail: string;
   course: string;

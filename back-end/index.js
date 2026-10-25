@@ -47,6 +47,7 @@ const Training = mongoose.model('Training', trainingSchema);
 const ratingValues = [0, 1, 2, 3, 4, 5];
 const candidateSchema = new mongoose.Schema({
   candidateId: { type: String, required: true },
+  empId: { type: String },
   candidateName: { type: String, required: true },
   candidateEmail: { type: String, required: true },
   course: { type: String, required: true },
@@ -81,6 +82,33 @@ const candidateSchema = new mongoose.Schema({
   l2Score: { type: Number },
 }, { timestamps: true });
 const Candidate = recruitmentConnection.model('Candidate', candidateSchema);
+
+// Atomic sequence counter used to generate employee IDs (EXP00001, EXP00002, ...).
+const counterSchema = new mongoose.Schema({
+  _id: { type: String },
+  seq: { type: Number, default: 0 },
+});
+const Counter = recruitmentConnection.model('Counter', counterSchema);
+
+const nextEmpId = async () => {
+  const counter = await Counter.findOneAndUpdate(
+    { _id: 'empId' },
+    { $inc: { seq: 1 } },
+    { new: true, upsert: true }
+  );
+  return `EXP${String(counter.seq).padStart(5, '0')}`;
+};
+
+// empId is server-managed: clients cannot set it. It is assigned once, when both
+// L1 and L2 statuses are 'Selected', and never changes afterwards.
+const withEmpId = async (data, existing) => {
+  delete data.empId;
+  if (existing && existing.empId) return data;
+  if (data.l1Status === 'Selected' && data.l2Status === 'Selected') {
+    data.empId = await nextEmpId();
+  }
+  return data;
+};
 
 // Login Endpoint
 // No user database exists yet, so credentials are validated against a single
@@ -207,7 +235,7 @@ app.post('/api/candidates', async (req, res) => {
   if (!req.body || Object.keys(req.body).length === 0) {
     return res.status(400).json({ error: 'Request body is required.' });
   }
-  const candidate = new Candidate(normalizeCandidateData(req.body));
+  const candidate = new Candidate(await withEmpId(normalizeCandidateData(req.body), null));
   await candidate.save();
   res.status(201).json(candidate);
 });
@@ -216,7 +244,12 @@ app.put('/api/candidates/:id', async (req, res) => {
   if (!req.body || Object.keys(req.body).length === 0) {
     return res.status(400).json({ error: 'Request body is required.' });
   }
-  const candidate = await Candidate.findByIdAndUpdate(req.params.id, normalizeCandidateData(req.body), { new: true });
+  const existing = await Candidate.findById(req.params.id);
+  const candidate = await Candidate.findByIdAndUpdate(
+    req.params.id,
+    await withEmpId(normalizeCandidateData(req.body), existing),
+    { new: true }
+  );
   res.json(candidate);
 });
 
@@ -237,9 +270,10 @@ app.put('/api/candidates/candidate/:candidateId', async (req, res) => {
   if (!req.body || Object.keys(req.body).length === 0) {
     return res.status(400).json({ error: 'Request body is required.' });
   }
+  const existing = await Candidate.findOne({ candidateId: req.params.candidateId });
   const candidate = await Candidate.findOneAndUpdate(
     { candidateId: req.params.candidateId },
-    normalizeCandidateData(req.body),
+    await withEmpId(normalizeCandidateData(req.body), existing),
     { new: true }
   );
   if (!candidate) {
@@ -564,6 +598,10 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *       properties:
  *         candidateId:
  *           type: string
+ *         empId:
+ *           type: string
+ *           readOnly: true
+ *           description: Auto-generated (EXP + 5-digit sequence) when L1 and L2 status are both Selected
  *         candidateName:
  *           type: string
  *         candidateEmail:

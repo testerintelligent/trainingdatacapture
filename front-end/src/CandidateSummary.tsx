@@ -38,6 +38,7 @@ interface CandidateSummaryProps {
 }
 
 const tableHeaders = [
+  { label: "Emp ID" },
   { label: "Candidate ID" },
   { label: "Candidate Name" },
   { label: "Candidate Email ID" },
@@ -77,6 +78,7 @@ const tableHeaders = [
 ];
 
 interface CandidateFilters {
+  empId: string;
   candidateId: string;
   candidateName: string;
   candidateEmail: string;
@@ -115,6 +117,7 @@ interface CandidateFilters {
 }
 
 const emptyFilters: CandidateFilters = {
+  empId: "",
   candidateId: "",
   candidateName: "",
   candidateEmail: "",
@@ -205,6 +208,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
 
     return candidates.filter(
       (c) =>
+        textMatch(c.empId ?? "", filters.empId) &&
         textMatch(c.candidateId, filters.candidateId) &&
         textMatch(c.candidateName, filters.candidateName) &&
         textMatch(c.candidateEmail, filters.candidateEmail) &&
@@ -372,6 +376,16 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                 },
               }}
             >
+              <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
+                <TextField
+                  size="small"
+                  variant="outlined"
+                  placeholder="Filter"
+                  value={filters.empId}
+                  onChange={setFilter("empId")}
+                  fullWidth
+                />
+              </TableCell>
               <TableCell sx={{ backgroundColor: "#FBFAFE" }}>
                 <TextField
                   size="small"
@@ -952,6 +966,7 @@ function CandidateSummary({ candidates, onEdit, onDelete }: CandidateSummaryProp
                     backgroundColor: "#FBFAFE",
                   }}
                 >
+                  <TableCell sx={bodyCellSx}>{c.empId}</TableCell>
                   <TableCell sx={bodyCellSx}>{c.candidateId}</TableCell>
                   <TableCell sx={bodyCellSx}>{c.candidateName}</TableCell>
                   <TableCell sx={bodyCellSx}>{c.candidateEmail}</TableCell>

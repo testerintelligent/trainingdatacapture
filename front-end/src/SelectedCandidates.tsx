@@ -23,6 +23,7 @@ interface SelectedCandidatesProps {
 
 const tableHeaders = [
   { label: "Department" },
+  { label: "Emp ID" },
   { label: "Candidate ID" },
   { label: "Candidate Name" },
   { label: "L2 Status" },
@@ -74,6 +75,7 @@ function SelectedCandidates({ candidates }: SelectedCandidatesProps) {
             exportToExcel(
               selectedCandidates.map((c) => ({
                 Department: c.department,
+                "Emp ID": c.empId || "",
                 "Candidate ID": c.candidateId,
                 "Candidate Name": c.candidateName,
                 "L2 Status": c.l2Status,
@@ -151,6 +153,9 @@ function SelectedCandidates({ candidates }: SelectedCandidatesProps) {
                 >
                   <TableCell sx={{ padding: "0 8px" }}>
                     {c.department}
+                  </TableCell>
+                  <TableCell sx={{ padding: "0 8px" }}>
+                    {c.empId}
                   </TableCell>
                   <TableCell sx={{ padding: "0 8px" }}>
                     {c.candidateId}

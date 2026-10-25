@@ -21,6 +21,7 @@ import {
   Divider,
   Avatar,
   Fade,
+  Autocomplete,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -35,6 +36,7 @@ import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import DownloadIcon from "@mui/icons-material/Download";
 import LogoutIcon from "@mui/icons-material/Logout";
+import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import { exportToExcel } from "./exportToExcel";
 import Login from "./Login";
 import ExecutiveDashboard from "./ExecutiveDashboard";
@@ -84,7 +86,7 @@ function App() {
     projectName: projectNameOptions[0],
   });
   const [editId, setEditId] = useState<string | null>(null);
-  const [section, setSection] = useState<"home" | "training" | "hiring">(
+  const [section, setSection] = useState<"home" | "training" | "hiring" | "onboarding">(
     "home"
   );
   const [showHome, setShowHome] = useState(true);
@@ -95,6 +97,7 @@ function App() {
   const [showRecruitment, setShowRecruitment] = useState(false);
   const [showCandidateSummary, setShowCandidateSummary] = useState(false);
   const [showSelectedCandidates, setShowSelectedCandidates] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [editingCandidate, setEditingCandidate] = useState<Candidate | null>(null);
@@ -205,6 +208,7 @@ function App() {
   }, []);
 
   const handleOpen = (training?: Training) => {
+    fetchCandidates();
     if (training) {
       setForm({
         ...training,
@@ -243,6 +247,13 @@ function App() {
       [name]: name === "projectName" ? value.trim() : value,
     });
   };
+
+  // EMP IDs are looked up from the recruitment records (assigned when a
+  // candidate is selected in both L1 and L2).
+  const empIdOptions = useMemo(
+    () => candidates.filter((c) => !!c.empId),
+    [candidates]
+  );
 
   const handleSubmit = async () => {
     if (!form.trainerName.trim()) {
@@ -354,6 +365,7 @@ function App() {
     setShowRecruitment(false);
     setShowCandidateSummary(false);
     setShowSelectedCandidates(false);
+    setShowOnboarding(false);
   };
 
   const handleGoHome = () => {
@@ -546,7 +558,7 @@ function App() {
                 px: 2,
               }}
             >
-              <Box sx={{ width: "100%", maxWidth: 832 }}>
+              <Box sx={{ width: "100%", maxWidth: 1100 }}>
                 <Typography
                   variant="h5"
                   sx={{ color: "#6846C6", fontWeight: 700, mb: 0.5 }}
@@ -559,8 +571,7 @@ function App() {
                 <Box
                   sx={{
                     display: "grid",
-                    gridTemplateColumns:
-                      "repeat(auto-fit, minmax(280px, 1fr))",
+                    gridTemplateColumns: "repeat(3, 1fr)",
                     gap: "31px",
                   }}
                 >
@@ -671,9 +682,70 @@ function App() {
                       Add and track employee training
                     </Typography>
                   </Box>
+                  <Box
+                    onClick={() => {
+                      resetViews();
+                      setSection("onboarding");
+                      setShowOnboarding(true);
+                    }}
+                    sx={{
+                      cursor: "pointer",
+                      background: "#ffffff",
+                      borderRadius: 4,
+                      border: "1px solid #E7E3F1",
+                      boxShadow: "0 4px 24px rgba(0, 106, 113, 0.08)",
+                      p: 5.2,
+                      textAlign: "center",
+                      animation:
+                        "zoomInCard 1s ease-out 0.3s backwards",
+                      transition:
+                        "transform 0.15s ease, box-shadow 0.15s ease",
+                      "&:hover": {
+                        transform: "translateY(-4px) scale(1.05)",
+                        boxShadow: "0 8px 28px rgba(104, 70, 198, 0.18)",
+                      },
+                    }}
+                  >
+                    <Avatar
+                      sx={{
+                        bgcolor: "#F0EBFB",
+                        color: "#6846C6",
+                        width: 73,
+                        height: 73,
+                        mx: "auto",
+                        mb: 2,
+                      }}
+                    >
+                      <RocketLaunchIcon sx={{ fontSize: 31 }} />
+                    </Avatar>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: 700,
+                        color: "#1B1339",
+                        fontSize: "1.625rem",
+                      }}
+                    >
+                      Project On Boarding
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "#6B7280", mt: 0.5, fontSize: "1.14rem" }}
+                    >
+                      Onboard people to a project
+                    </Typography>
+                  </Box>
                 </Box>
               </Box>
             </Box>
+          )}
+          {showOnboarding && (
+            <Typography
+              variant="h6"
+              sx={{ color: "#6846C6", fontWeight: 700, mt: 2 }}
+            >
+              Project On Boarding
+            </Typography>
           )}
           {showTable && (
             <>
@@ -1321,13 +1393,43 @@ function App() {
                       </TextField>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6 }}>
-                      <TextField
+                      <Autocomplete
                         fullWidth
-                        label="EMP ID"
-                        name="empId"
-                        value={form.empId}
-                        onChange={handleChange}
-                        required
+                        options={empIdOptions}
+                        value={
+                          form.empId
+                            ? empIdOptions.find((c) => c.empId === form.empId) ??
+                              ({ empId: form.empId, candidateName: form.employeeName } as Candidate)
+                            : null
+                        }
+                        isOptionEqualToValue={(option, value) =>
+                          option.empId === value.empId
+                        }
+                        getOptionLabel={(option) => option.empId ?? ""}
+                        filterOptions={(options, { inputValue }) => {
+                          const q = inputValue.toLowerCase();
+                          return options.filter(
+                            (c) =>
+                              (c.empId ?? "").toLowerCase().includes(q) ||
+                              c.candidateName.toLowerCase().includes(q)
+                          );
+                        }}
+                        renderOption={(props, option) => (
+                          <li {...props} key={option.empId}>
+                            {option.empId} - {option.candidateName}
+                          </li>
+                        )}
+                        onChange={(_e, option) =>
+                          setForm({
+                            ...form,
+                            empId: option?.empId ?? "",
+                            employeeName: option?.candidateName ?? "",
+                          })
+                        }
+                        noOptionsText="No selected candidates found"
+                        renderInput={(params) => (
+                          <TextField {...params} label="EMP ID" required />
+                        )}
                       />
                     </Grid>
 
