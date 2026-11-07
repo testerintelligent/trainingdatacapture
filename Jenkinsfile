@@ -47,7 +47,7 @@ pipeline {
                     def newmanEnv = (params.ENVIRONMENT in ['dev', 'newman-dev']) ? 'Local' : 'Remote'
                     echo "Running Newman with NEWMAN_ENV=${newmanEnv}"
                     sh """
-                     echo "Running Postman collection with Newman" | sudo -S NEWMAN_ENV=${newmanEnv} docker compose --profile test run --build --rm newman
+                     echo "Running Postman collection with Newman" | NEWMAN_ENV=${newmanEnv} docker compose --profile test run --build --rm newman
                     """
                 }
             }
